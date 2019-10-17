@@ -8,6 +8,7 @@
     <Company>Outcompute</Company>
     <Product>Outkeep</Product>
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
+    <NeutralLanguage>en-GB</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +18,11 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="2.4.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Outkeep.Implementations\Outkeep.Implementations.csproj" />
   </ItemGroup>
 
   <ItemGroup>
