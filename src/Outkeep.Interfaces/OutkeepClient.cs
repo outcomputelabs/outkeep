@@ -1,8 +1,7 @@
 ﻿using Orleans;
-using Outkeep.Interfaces;
 using System;
 
-namespace Outkeep.Client
+namespace Outkeep.Interfaces
 {
     public class OutkeepClient : IOutkeepClient
     {

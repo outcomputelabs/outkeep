@@ -1,7 +1,6 @@
-﻿using Outkeep.Interfaces;
-using System;
+﻿using System;
 
-namespace Outkeep.Client
+namespace Outkeep.Interfaces
 {
     public interface IOutkeepClient
     {
