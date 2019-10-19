@@ -12,6 +12,8 @@ namespace Outkeep.Interfaces
             this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
+        public IDistributedCacheGrain GetCacheGrain(string key) => factory.GetGrain<IDistributedCacheGrain>(key);
+
         public IPingGrain GetPingGrain(Guid key) => factory.GetGrain<IPingGrain>(key);
     }
 }
