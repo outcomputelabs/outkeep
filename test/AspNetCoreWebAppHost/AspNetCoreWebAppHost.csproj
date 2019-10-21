@@ -12,4 +12,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Outkeep.Client\Outkeep.Client.csproj" />
+  </ItemGroup>
+
 </Project>

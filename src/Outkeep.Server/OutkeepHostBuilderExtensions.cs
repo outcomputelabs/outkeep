@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Outkeep.Server;
 using System;
 
-namespace Outkeep.Server
+namespace Microsoft.Extensions.Hosting
 {
     public static class OutkeepHostBuilderExtensions
     {

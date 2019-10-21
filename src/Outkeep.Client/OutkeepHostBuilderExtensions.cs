@@ -1,29 +1,41 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Outkeep.Client;
 using System;
 
-namespace Outkeep.Client
+namespace Microsoft.Extensions.Hosting
 {
     public static class OutkeepHostBuilderExtensions
     {
-        public static IHostBuilder UseOutkeepClient(this IHostBuilder builder, Action<OutkeepClientOptions> configure)
+        private const string HostBuilderContextKey = nameof(OutkeepClientBuilder);
+
+        public static IHostBuilder UseOutkeepClient(this IHostBuilder builder, Action<IOutkeepClientBuilder> configure)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-            return builder.UseOutkeepClient((context, options) => configure(options));
+            return builder.UseOutkeepClient((context, outkeep) => configure(outkeep));
         }
 
-        public static IHostBuilder UseOutkeepClient(this IHostBuilder builder, Action<HostBuilderContext, OutkeepClientOptions> configure)
+        public static IHostBuilder UseOutkeepClient(this IHostBuilder builder, Action<HostBuilderContext, IOutkeepClientBuilder> configure)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             return builder.ConfigureServices((context, services) =>
             {
-                services
-                    .AddOutkeepClient()
-                    .Configure<OutkeepClientOptions>(options => configure(context, options));
+                OutkeepClientBuilder outkeep;
+                if (context.Properties.TryGetValue(HostBuilderContextKey, out var existing))
+                {
+                    outkeep = (OutkeepClientBuilder)existing;
+                }
+                else
+                {
+                    outkeep = new OutkeepClientBuilder();
+                    context.Properties[HostBuilderContextKey] = outkeep;
+                }
+
+                configure(context, outkeep);
+
+                outkeep.Build(context, services);
             });
         }
     }

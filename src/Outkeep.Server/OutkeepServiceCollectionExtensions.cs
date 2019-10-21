@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Outkeep.Implementations;
+﻿using Outkeep.Implementations;
+using Outkeep.Server;
 
-namespace Outkeep.Server
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class OutkeepServiceCollectionExtensions
     {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Outkeep.Client;
 using System.Threading.Tasks;
 
 namespace ConsoleClientHost
@@ -14,7 +13,7 @@ namespace ConsoleClientHost
                 {
                     logging.AddConsole();
                 })
-                .UseOutkeepClient(options =>
+                .UseOutkeepClient(builder =>
                 {
                 })
                 .RunConsoleAsync();
