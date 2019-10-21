@@ -5,6 +5,8 @@ namespace Outkeep.Server
 {
     public static class OutkeepHostBuilderExtensions
     {
+        private const string HostBuilderContextKey = nameof(OutkeepServerBuilder);
+
         public static IHostBuilder UseOutkeepServer(this IHostBuilder builder, Action<IOutkeepServerBuilder> configure)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -21,17 +23,19 @@ namespace Outkeep.Server
             return builder.ConfigureServices((context, services) =>
             {
                 OutkeepServerBuilder outkeep;
-                if (context.Properties.TryGetValue(nameof(OutkeepServerBuilder), out var existing))
+                if (context.Properties.TryGetValue(HostBuilderContextKey, out var existing))
                 {
                     outkeep = (OutkeepServerBuilder)existing;
                 }
                 else
                 {
-                    outkeep = new OutkeepServerBuilder(builder);
-                    context.Properties[nameof(OutkeepServerBuilder)] = outkeep;
+                    outkeep = new OutkeepServerBuilder();
+                    context.Properties[HostBuilderContextKey] = outkeep;
                 }
 
                 configure(context, outkeep);
+
+                outkeep.Build(context, services);
             });
         }
     }

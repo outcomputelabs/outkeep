@@ -11,6 +11,6 @@ namespace Outkeep.Interfaces
 
         Task RemoveAsync();
 
-        Task SetAsync(Immutable<byte[]> value, DateTimeOffset? absoluteExpiration, TimeSpan? absoluteExpirationRelativeToNow, TimeSpan? slidingExpiration);
+        Task SetAsync(Immutable<byte[]> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration);
     }
 }

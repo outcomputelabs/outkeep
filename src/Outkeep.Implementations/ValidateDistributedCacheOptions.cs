@@ -11,8 +11,8 @@ namespace Outkeep.Implementations
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            if (options.PolicyExecutionPeriod <= TimeSpan.Zero)
-                return ValidateOptionsResult.Fail(Resources.X_MustBeAPositive_X.Format(nameof(options.PolicyExecutionPeriod), nameof(TimeSpan)));
+            if (options.ExpirationPolicyEvaluationPeriod <= TimeSpan.Zero)
+                return ValidateOptionsResult.Fail(Resources.X_MustBeAPositive_X.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)));
 
             return ValidateOptionsResult.Success;
         }

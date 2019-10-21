@@ -1,4 +1,5 @@
-﻿using Orleans;
+﻿using Microsoft.Extensions.Options;
+using Orleans;
 using Orleans.Concurrency;
 using Orleans.Timers;
 using Outkeep.Interfaces;
@@ -9,29 +10,44 @@ namespace Outkeep.Implementations
 {
     public class DistributedCacheGrain : Grain, IDistributedCacheGrain
     {
+        private readonly DistributedCacheOptions options;
         private readonly ITimerRegistry timerRegistry;
 
-        public DistributedCacheGrain(ITimerRegistry timerRegistry)
+        public DistributedCacheGrain(IOptions<DistributedCacheOptions> options, ITimerRegistry timerRegistry)
         {
-            this.timerRegistry = timerRegistry;
+            this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            this.timerRegistry = timerRegistry ?? throw new ArgumentNullException(nameof(timerRegistry));
         }
 
         private Task<Immutable<byte[]>> value;
+        private DateTimeOffset accessed;
         private DateTimeOffset? absoluteExpiration;
-        private TimeSpan? absoluteExpirationRelativeToNow;
         private TimeSpan? slidingExpiration;
 
         public override Task OnActivateAsync()
         {
-            timerRegistry.RegisterTimer(this, TickExpirationPolicy, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+            timerRegistry.RegisterTimer(this, TickExpirationPolicy, null, options.ExpirationPolicyEvaluationPeriod, options.ExpirationPolicyEvaluationPeriod);
+            return Task.CompletedTask;
         }
 
         private Task TickExpirationPolicy(object state)
         {
+            var now = DateTimeOffset.UtcNow;
+
+            if ((absoluteExpiration.HasValue && absoluteExpiration.Value <= now) ||
+                (slidingExpiration.HasValue && accessed.Add(slidingExpiration.Value) <= now))
+            {
+                DeactivateOnIdle();
+            }
+
             return Task.CompletedTask;
         }
 
-        public Task<Immutable<byte[]>> GetAsync() => value;
+        public Task<Immutable<byte[]>> GetAsync()
+        {
+            accessed = DateTimeOffset.UtcNow;
+            return value;
+        }
 
         public Task RemoveAsync()
         {
@@ -39,12 +55,13 @@ namespace Outkeep.Implementations
             return Task.CompletedTask;
         }
 
-        public Task SetAsync(Immutable<byte[]> value, DateTimeOffset? absoluteExpiration, TimeSpan? absoluteExpirationRelativeToNow, TimeSpan? slidingExpiration)
+        public Task SetAsync(Immutable<byte[]> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
             this.value = Task.FromResult(value);
             this.absoluteExpiration = absoluteExpiration;
-            this.absoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow;
             this.slidingExpiration = slidingExpiration;
+
+            accessed = DateTimeOffset.UtcNow;
 
             return Task.CompletedTask;
         }
