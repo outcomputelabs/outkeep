@@ -65,5 +65,11 @@ namespace Outkeep.Implementations
 
             return Task.CompletedTask;
         }
+
+        public Task RefreshAsync()
+        {
+            accessed = DateTimeOffset.UtcNow;
+            return Task.CompletedTask;
+        }
     }
 }
