@@ -35,7 +35,7 @@ namespace Microsoft.Extensions.Hosting
 
                 configure(context, outkeep);
 
-                outkeep.Build(context, services);
+                outkeep.Build(builder, context, services);
             });
         }
     }

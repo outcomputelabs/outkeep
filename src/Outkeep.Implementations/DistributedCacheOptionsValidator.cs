@@ -5,7 +5,7 @@ using System;
 
 namespace Outkeep.Implementations
 {
-    public class ValidateDistributedCacheOptions : IValidateOptions<DistributedCacheOptions>
+    public class DistributedCacheOptionsValidator : IValidateOptions<DistributedCacheOptions>
     {
         public ValidateOptionsResult Validate(string name, DistributedCacheOptions options)
         {

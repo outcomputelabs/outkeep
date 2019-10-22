@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Orleans.Hosting;
 using System;
+using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
 namespace Outkeep.Server
 {
@@ -9,5 +10,9 @@ namespace Outkeep.Server
         IOutkeepServerBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configure);
 
         IOutkeepServerBuilder ConfigureServices(Action<IServiceCollection> configure);
+
+        IOutkeepServerBuilder ConfigureSilo(Action<HostBuilderContext, ISiloBuilder> configure);
+
+        IOutkeepServerBuilder ConfigureSilo(Action<ISiloBuilder> configure);
     }
 }

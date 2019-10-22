@@ -1,5 +1,6 @@
 ﻿using Outkeep.Implementations;
 using Outkeep.Server;
+using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -7,9 +8,11 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddOutkeepServer(this IServiceCollection services)
         {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+
             return services
                 .AddHostedService<OutkeepServerHostedService>()
-                .AddSingleton<ValidateDistributedCacheOptions>();
+                .AddSingleton<DistributedCacheOptionsValidator>();
         }
     }
 }

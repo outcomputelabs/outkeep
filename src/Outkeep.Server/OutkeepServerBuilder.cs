@@ -1,19 +1,23 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Orleans.Hosting;
+using Outkeep.Implementations;
 using System;
 using System.Collections.Generic;
+using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
 namespace Outkeep.Server
 {
     internal class OutkeepServerBuilder : IOutkeepServerBuilder
     {
-        private readonly List<Action<HostBuilderContext, IServiceCollection>> configurators = new List<Action<HostBuilderContext, IServiceCollection>>();
+        private readonly List<Action<HostBuilderContext, IServiceCollection>> servicesConfigurators = new List<Action<HostBuilderContext, IServiceCollection>>();
+        private readonly List<Action<HostBuilderContext, ISiloBuilder>> siloConfigurators = new List<Action<HostBuilderContext, ISiloBuilder>>();
 
         public IOutkeepServerBuilder ConfigureServices(Action<IServiceCollection> configure)
         {
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-            configurators.Add((context, services) => configure(services));
+            servicesConfigurators.Add((context, services) => configure(services));
 
             return this;
         }
@@ -22,21 +26,47 @@ namespace Outkeep.Server
         {
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-            configurators.Add(configure);
+            servicesConfigurators.Add(configure);
 
             return this;
         }
 
-        public void Build(HostBuilderContext context, IServiceCollection services)
+        public IOutkeepServerBuilder ConfigureSilo(Action<HostBuilderContext, ISiloBuilder> configure)
         {
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
+
+            siloConfigurators.Add(configure);
+
+            return this;
+        }
+
+        public IOutkeepServerBuilder ConfigureSilo(Action<ISiloBuilder> configure)
+        {
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
+
+            siloConfigurators.Add((context, orleans) => configure(orleans));
+
+            return this;
+        }
+
+        public void Build(IHostBuilder builder, HostBuilderContext context, IServiceCollection services)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            services.AddHostedService<OutkeepServerHostedService>();
+            services
+                .AddHostedService<OutkeepServerHostedService>()
+                .AddSingleton<DistributedCacheOptionsValidator>();
 
-            foreach (var configure in configurators)
+            foreach (var configure in siloConfigurators)
             {
-                configure(context, services);
+                builder.UseOrleans(configure);
+            }
+
+            foreach (var configure in servicesConfigurators)
+            {
+                builder.ConfigureServices(configure);
             }
         }
     }
