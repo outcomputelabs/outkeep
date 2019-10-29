@@ -32,6 +32,9 @@ namespace Outkeep.Application
                 })
                 .UseOutkeepServer((context, outkeep) =>
                 {
+                    outkeep.ConfigureSilo(orleans =>
+                    {
+                    });
                 })
                 .RunConsoleAsync();
         }
