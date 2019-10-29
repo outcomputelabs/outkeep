@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using System;
+using Serilog;
 using System.Threading.Tasks;
 
 namespace Outkeep.Application
@@ -23,8 +23,14 @@ namespace Outkeep.Application
                 })
                 .ConfigureLogging((context, logging) =>
                 {
+                    logging.AddSerilog(new LoggerConfiguration()
+                        .WriteTo.Console()
+                        .CreateLogger());
                 })
                 .ConfigureServices((context, services) =>
+                {
+                })
+                .UseOutkeepServer((context, outkeep) =>
                 {
                 })
                 .RunConsoleAsync();
