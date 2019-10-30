@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Orleans.Hosting;
+using System;
 
 namespace Outkeep.Server
 {
@@ -14,6 +15,18 @@ namespace Outkeep.Server
 
             outkeep.ConfigureSilo(orleans =>
             {
+            });
+
+            return outkeep;
+        }
+
+        public static IOutkeepServerBuilder UseLocalhostSetup(this IOutkeepServerBuilder outkeep)
+        {
+            if (outkeep == null) throw new ArgumentNullException(nameof(outkeep));
+
+            outkeep.ConfigureSilo(silo =>
+            {
+                silo.UseLocalhostClustering();
             });
 
             return outkeep;
