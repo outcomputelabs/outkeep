@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans.Hosting;
 using System;
-using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
+using Microsoft.Extensions.Hosting.HostBuilderContext;
+using Microsoft.Extensions.Hosting;
 
-namespace Outkeep.Server
+namespace Outkeep.Hosting
 {
     public interface IOutkeepServerBuilder
     {

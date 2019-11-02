@@ -23,7 +23,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleClientHost", "test\C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Product", "Product", "{4B4D9264-36A3-4B49-9BC1-0DDC85FE095B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Application", "src\Outkeep.Application\Outkeep.Application.csproj", "{21B7AB7F-B120-4577-AC3F-8B12B7DAE8E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Application", "src\Outkeep.Application\Outkeep.Application.csproj", "{21B7AB7F-B120-4577-AC3F-8B12B7DAE8E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Hosting.Azure", "src\Outkeep.Hosting.Azure\Outkeep.Hosting.Azure.csproj", "{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Application.Azure", "src\Outkeep.Application.Azure\Outkeep.Application.Azure.csproj", "{6DD2DF52-640E-47E6-9945-AE7278EA57FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Hosting", "src\Outkeep.Hosting\Outkeep.Hosting.csproj", "{56D0F1D3-243F-49A6-BC96-A006687F0443}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Core", "src\Outkeep.Core\Outkeep.Core.csproj", "{BCC021FF-397B-4A12-A5FA-45A59FC1209F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +75,22 @@ Global
 		{21B7AB7F-B120-4577-AC3F-8B12B7DAE8E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21B7AB7F-B120-4577-AC3F-8B12B7DAE8E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21B7AB7F-B120-4577-AC3F-8B12B7DAE8E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DD2DF52-640E-47E6-9945-AE7278EA57FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DD2DF52-640E-47E6-9945-AE7278EA57FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DD2DF52-640E-47E6-9945-AE7278EA57FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DD2DF52-640E-47E6-9945-AE7278EA57FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56D0F1D3-243F-49A6-BC96-A006687F0443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56D0F1D3-243F-49A6-BC96-A006687F0443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56D0F1D3-243F-49A6-BC96-A006687F0443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56D0F1D3-243F-49A6-BC96-A006687F0443}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCC021FF-397B-4A12-A5FA-45A59FC1209F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCC021FF-397B-4A12-A5FA-45A59FC1209F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCC021FF-397B-4A12-A5FA-45A59FC1209F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCC021FF-397B-4A12-A5FA-45A59FC1209F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +100,7 @@ Global
 		{716068C5-560B-47F7-BE9F-AE0135DECC54} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{21B1C781-AD9C-4B41-A2EE-E2C1182CAA94} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{21B7AB7F-B120-4577-AC3F-8B12B7DAE8E9} = {4B4D9264-36A3-4B49-9BC1-0DDC85FE095B}
+		{6DD2DF52-640E-47E6-9945-AE7278EA57FB} = {4B4D9264-36A3-4B49-9BC1-0DDC85FE095B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF479E3D-6C10-47A9-8079-70834C9DD8EB}

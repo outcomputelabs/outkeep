@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Outkeep.Server.Properties;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Outkeep.Server
+namespace Outkeep.Hosting
 {
     public class OutkeepServerHostedService : IHostedService
     {
