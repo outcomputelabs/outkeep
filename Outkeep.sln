@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Hosting", "src\Outk
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Core", "src\Outkeep.Core\Outkeep.Core.csproj", "{BCC021FF-397B-4A12-A5FA-45A59FC1209F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Client.Abstractions", "src\Outkeep.Client.Abstractions\Outkeep.Client.Abstractions.csproj", "{AFDCE2D0-3BA3-4233-82CF-6F465D4ED02E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{BCC021FF-397B-4A12-A5FA-45A59FC1209F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCC021FF-397B-4A12-A5FA-45A59FC1209F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCC021FF-397B-4A12-A5FA-45A59FC1209F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFDCE2D0-3BA3-4233-82CF-6F465D4ED02E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFDCE2D0-3BA3-4233-82CF-6F465D4ED02E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFDCE2D0-3BA3-4233-82CF-6F465D4ED02E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFDCE2D0-3BA3-4233-82CF-6F465D4ED02E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

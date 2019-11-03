@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Implementations
 {
-    public class PingGrain : Grain, IPingGrain
+    internal class PingGrain : Grain, IPingGrain
     {
         public Task PingAsync() => Task.CompletedTask;
     }

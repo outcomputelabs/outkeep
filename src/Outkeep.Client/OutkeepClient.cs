@@ -1,7 +1,8 @@
 ﻿using Orleans;
+using Outkeep.Interfaces;
 using System;
 
-namespace Outkeep.Interfaces
+namespace Outkeep.Client
 {
     public class OutkeepClient : IOutkeepClient
     {
@@ -9,7 +10,7 @@ namespace Outkeep.Interfaces
 
         public OutkeepClient(IGrainFactory factory)
         {
-            this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            this.factory = factory;
         }
 
         public IDistributedCacheGrain GetCacheGrain(string key) => factory.GetGrain<IDistributedCacheGrain>(key);

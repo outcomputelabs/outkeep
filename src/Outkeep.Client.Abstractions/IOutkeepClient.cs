@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Outkeep.Interfaces;
+using System;
 
-namespace Outkeep.Interfaces
+namespace Outkeep.Client
 {
     public interface IOutkeepClient
     {
         IPingGrain GetPingGrain(Guid key);
+
         IDistributedCacheGrain GetCacheGrain(string key);
     }
 }

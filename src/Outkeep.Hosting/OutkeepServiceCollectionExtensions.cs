@@ -1,5 +1,4 @@
 ﻿using Outkeep.Hosting;
-using Outkeep.Implementations;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -12,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services
                 .AddHostedService<OutkeepServerHostedService>()
-                .AddSingleton<DistributedCacheOptionsValidator>();
+                .AddDistributedCacheOptions();
         }
     }
 }

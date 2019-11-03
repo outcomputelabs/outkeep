@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Orleans;
+﻿using Orleans;
 using Orleans.Concurrency;
 using Orleans.Timers;
 using Outkeep.Interfaces;
@@ -8,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Implementations
 {
-    public class DistributedCacheGrain : Grain, IDistributedCacheGrain
+    internal class DistributedCacheGrain : Grain, IDistributedCacheGrain
     {
         private readonly DistributedCacheOptions options;
         private readonly ITimerRegistry timerRegistry;
 
-        public DistributedCacheGrain(IOptions<DistributedCacheOptions> options, ITimerRegistry timerRegistry)
+        public DistributedCacheGrain(DistributedCacheOptions options, ITimerRegistry timerRegistry)
         {
-            this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-            this.timerRegistry = timerRegistry ?? throw new ArgumentNullException(nameof(timerRegistry));
+            this.options = options;
+            this.timerRegistry = timerRegistry;
         }
 
         private Task<Immutable<byte[]>> value;

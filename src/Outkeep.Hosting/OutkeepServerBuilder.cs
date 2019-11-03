@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Orleans.Hosting;
-using Outkeep.Implementations;
 using System;
 using System.Collections.Generic;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
@@ -55,9 +54,7 @@ namespace Outkeep.Hosting
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            services
-                .AddHostedService<OutkeepServerHostedService>()
-                .AddSingleton<DistributedCacheOptionsValidator>();
+            services.AddOutkeepServer();
 
             foreach (var configure in siloConfigurators)
             {

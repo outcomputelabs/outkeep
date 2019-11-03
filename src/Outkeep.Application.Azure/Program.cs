@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Orleans.Hosting;
+using Outkeep.Hosting;
+using Outkeep.Implementations;
 using Serilog;
+using System;
 using System.Threading.Tasks;
 
 namespace Outkeep.Application.Azure
@@ -29,13 +33,11 @@ namespace Outkeep.Application.Azure
                             .CreateLogger(),
                         true);
                 })
-                .ConfigureServices((context, services) =>
-                {
-                })
                 .UseOutkeepServer((context, outkeep) =>
                 {
-                    outkeep.ConfigureSilo(orleans =>
+                    outkeep.Configure<DistributedCacheOptions>(options =>
                     {
+                        options.ExpirationPolicyEvaluationPeriod = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCache:ExpirationPolicyEvaluationPeriod");
                     });
                 })
                 .RunConsoleAsync();
