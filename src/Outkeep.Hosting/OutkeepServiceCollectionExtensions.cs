@@ -1,5 +1,5 @@
-﻿using Outkeep.Implementations;
-using Outkeep.Server;
+﻿using Outkeep.Hosting;
+using Outkeep.Implementations;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection

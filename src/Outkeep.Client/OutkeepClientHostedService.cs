@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Outkeep.Client.Properties;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,14 +17,14 @@ namespace Outkeep.Client
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation(Resources.OutkeepClientStarted);
+            logger.LogOutkeepClientStarted();
 
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation(Resources.OutkeepClientStopped);
+            logger.LogOutkeepClientStopped();
 
             return Task.CompletedTask;
         }

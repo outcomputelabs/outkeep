@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using Outkeep.Implementations.Properties;
-using Outkeep.Interfaces;
 using System;
 
 namespace Outkeep.Implementations

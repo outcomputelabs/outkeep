@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>Jorge Candeias</Authors>
+    <Company>Outcompute</Company>
+    <Product>Outkeep</Product>
+    <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
+    <NeutralLanguage>en-GB</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>

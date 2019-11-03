@@ -17,14 +17,14 @@ namespace Outkeep.Hosting
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation(Resources.OutkeepServerStarted);
+            logger.LogOutkeepServerStarted();
 
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation(Resources.OutkeepServerStopped);
+            logger.LogOutkeepServerStopped();
 
             return Task.CompletedTask;
         }

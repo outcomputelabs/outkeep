@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Version>0.0.1</Version>
     <Authors>Jorge Candeias</Authors>
     <Company>Outcompute</Company>
@@ -9,6 +9,7 @@
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,18 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

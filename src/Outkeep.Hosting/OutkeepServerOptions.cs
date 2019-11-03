@@ -1,4 +1,4 @@
-﻿namespace Outkeep.Server
+﻿namespace Outkeep.Hosting
 {
     public class OutkeepServerOptions
     {

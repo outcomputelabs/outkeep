@@ -18,5 +18,10 @@ namespace System
         {
             return string.Format(CultureInfo.InvariantCulture, format, arg0, arg1, arg2);
         }
+
+        public static string Format(this string format, params object[] args)
+        {
+            return string.Format(CultureInfo.InvariantCulture, format, args);
+        }
     }
 }

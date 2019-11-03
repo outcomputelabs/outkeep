@@ -2,10 +2,27 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>Jorge Candeias</Authors>
+    <Company>Outcompute</Company>
+    <Product>Outkeep</Product>
+    <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
+    <NeutralLanguage>en-GB</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Outkeep.Implementations\Outkeep.Implementations.csproj" />
   </ItemGroup>
 
   <ItemGroup>
