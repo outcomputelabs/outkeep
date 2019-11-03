@@ -3,7 +3,7 @@ using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class OutkeepServiceCollectionExtensions
+    public static class OutkeepClientServiceCollectionExtensions
     {
         public static IServiceCollection AddOutkeepClient(this IServiceCollection services, Action<OutkeepClientOptions> configure)
         {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Outkeep.Implementations.Properties;
 using System;
 
 namespace Outkeep.Implementations
@@ -10,7 +11,7 @@ namespace Outkeep.Implementations
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             if (options.ExpirationPolicyEvaluationPeriod <= TimeSpan.Zero)
-                return ValidateOptionsResult.Fail($"{nameof(options.ExpirationPolicyEvaluationPeriod)} must be a positive {nameof(TimeSpan)}");
+                return ValidateOptionsResult.Fail(Resources.ExceptionXMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)));
 
             return ValidateOptionsResult.Success;
         }

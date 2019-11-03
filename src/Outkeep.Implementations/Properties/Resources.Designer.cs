@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Outkeep.Core.Properties {
+namespace Outkeep.Implementations.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Outkeep.Core.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Outkeep.Core.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Outkeep.Implementations.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,15 @@ namespace Outkeep.Core.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} must be a positive {1}.
+        /// </summary>
+        internal static string ExceptionXMustBeAPositiveX {
+            get {
+                return ResourceManager.GetString("ExceptionXMustBeAPositiveX", resourceCulture);
             }
         }
     }

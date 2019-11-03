@@ -4,7 +4,7 @@ using System;
 
 namespace Outkeep.Client
 {
-    public class OutkeepClient : IOutkeepClient
+    internal class OutkeepClient : IOutkeepClient
     {
         private readonly IGrainFactory factory;
 

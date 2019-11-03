@@ -9,10 +9,6 @@ namespace Outkeep.Hosting
     {
         IOutkeepServerBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configure);
 
-        IOutkeepServerBuilder ConfigureServices(Action<IServiceCollection> configure);
-
         IOutkeepServerBuilder ConfigureSilo(Action<HostBuilderContext, ISiloBuilder> configure);
-
-        IOutkeepServerBuilder ConfigureSilo(Action<ISiloBuilder> configure);
     }
 }

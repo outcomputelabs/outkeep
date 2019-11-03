@@ -11,7 +11,6 @@ namespace Outkeep.Hosting
             return builder.ConfigureServices(services =>
             {
                 // todo: use azure clustering here
-
             });
         }
     }

@@ -61,29 +61,38 @@ namespace Outkeep.Hosting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a free dynamic port.
+        ///   Looks up a localized string similar to Could not open a dynamic port for exclusive use.
         /// </summary>
-        internal static string Exception_CouldNotFindAFreeDynamicPort {
+        internal static string ExceptionCouldNotOpenADynamicPortForExclusiveUse {
             get {
-                return ResourceManager.GetString("Exception_CouldNotFindAFreeDynamicPort", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find a free port between {0} and {1}.
-        /// </summary>
-        internal static string Exception_CouldNotFindAFreePortBetween_X_And_X {
-            get {
-                return ResourceManager.GetString("Exception_CouldNotFindAFreePortBetween_X_And_X", resourceCulture);
+                return ResourceManager.GetString("ExceptionCouldNotOpenADynamicPortForExclusiveUse", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Unexpected endpoint type.
         /// </summary>
-        internal static string Exception_UnexpectedEndpointType {
+        internal static string ExceptionUnexpectedEndpointType {
             get {
-                return ResourceManager.GetString("Exception_UnexpectedEndpointType", resourceCulture);
+                return ResourceManager.GetString("ExceptionUnexpectedEndpointType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outkeep Server Started.
+        /// </summary>
+        internal static string LogOutkeepServerStarted {
+            get {
+                return ResourceManager.GetString("LogOutkeepServerStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outkeep Server Stopped.
+        /// </summary>
+        internal static string LogOutkeepServerStopped {
+            get {
+                return ResourceManager.GetString("LogOutkeepServerStopped", resourceCulture);
             }
         }
     }

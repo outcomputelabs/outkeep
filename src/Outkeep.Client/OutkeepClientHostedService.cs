@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Client
 {
-    public class OutkeepClientHostedService : IHostedService
+    internal class OutkeepClientHostedService : IHostedService
     {
         private readonly ILogger<OutkeepClientHostedService> logger;
 

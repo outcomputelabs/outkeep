@@ -3,7 +3,7 @@ using System;
 
 namespace Outkeep.Hosting.Azure
 {
-    public static class OutkeepServiceCollectionExtensions
+    public static class OutkeepServiceCollectionAzureExtensions
     {
         public static IServiceCollection AddOutkeepAzureClustering(this IServiceCollection services)
         {
