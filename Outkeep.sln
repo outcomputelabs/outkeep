@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Client", "src\Outke
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleClientHost", "test\ConsoleClientHost\ConsoleClientHost.csproj", "{21B1C781-AD9C-4B41-A2EE-E2C1182CAA94}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Hosting.Azure", "src\Outkeep.Hosting.Azure\Outkeep.Hosting.Azure.csproj", "{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Application.Azure", "src\Outkeep.Application.Azure\Outkeep.Application.Azure.csproj", "{6DD2DF52-640E-47E6-9945-AE7278EA57FB}"
@@ -23,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Hosting", "src\Outk
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Core", "src\Outkeep.Core\Outkeep.Core.csproj", "{BCC021FF-397B-4A12-A5FA-45A59FC1209F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Client.Abstractions", "src\Outkeep.Client.Abstractions\Outkeep.Client.Abstractions.csproj", "{AFDCE2D0-3BA3-4233-82CF-6F465D4ED02E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Client.Abstractions", "src\Outkeep.Client.Abstractions\Outkeep.Client.Abstractions.csproj", "{AFDCE2D0-3BA3-4233-82CF-6F465D4ED02E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +45,6 @@ Global
 		{9A37CE1B-F752-438B-A279-92673F9AD573}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A37CE1B-F752-438B-A279-92673F9AD573}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A37CE1B-F752-438B-A279-92673F9AD573}.Release|Any CPU.Build.0 = Release|Any CPU
-		{21B1C781-AD9C-4B41-A2EE-E2C1182CAA94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{21B1C781-AD9C-4B41-A2EE-E2C1182CAA94}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21B1C781-AD9C-4B41-A2EE-E2C1182CAA94}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{21B1C781-AD9C-4B41-A2EE-E2C1182CAA94}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C30BBFDE-A3E9-4548-B3EB-C6DB775B2533}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -77,7 +71,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DD94CAE6-1089-4DB4-9251-B546FB1DE2FB} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
-		{21B1C781-AD9C-4B41-A2EE-E2C1182CAA94} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF479E3D-6C10-47A9-8079-70834C9DD8EB}
