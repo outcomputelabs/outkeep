@@ -1,10 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <ServerGarbageCollection>true</ServerGarbageCollection>
-    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Version>0.0.1</Version>
     <Authors>Jorge Candeias</Authors>
@@ -13,7 +11,7 @@
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <NeutralLanguage>en-GB</NeutralLanguage>
-    <UserSecretsId>e9e9ef0c-531b-4b37-93cf-4525e559687a</UserSecretsId>
+    <UserSecretsId>f3c6c147-f138-43ab-b8bc-2132ea361241</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Outkeep.Hosting.Azure\Outkeep.Hosting.Azure.csproj" />
+    <ProjectReference Include="..\Outkeep.Hosting.Standalone\Outkeep.Hosting.Standalone.csproj" />
   </ItemGroup>
 
   <ItemGroup>

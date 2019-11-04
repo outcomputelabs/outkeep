@@ -17,22 +17,20 @@ namespace Microsoft.Extensions.Hosting
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
+            OutkeepServerBuilder outkeep;
+            if (builder.Properties.TryGetValue(HostBuilderContextKey, out var current))
+            {
+                outkeep = (OutkeepServerBuilder)current;
+            }
+            else
+            {
+                outkeep = new OutkeepServerBuilder(builder);
+                builder.Properties[HostBuilderContextKey] = outkeep;
+            }
+
             return builder.ConfigureServices((context, services) =>
             {
-                OutkeepServerBuilder outkeep;
-                if (context.Properties.TryGetValue(HostBuilderContextKey, out var existing))
-                {
-                    outkeep = (OutkeepServerBuilder)existing;
-                }
-                else
-                {
-                    outkeep = new OutkeepServerBuilder();
-                    context.Properties[HostBuilderContextKey] = outkeep;
-                }
-
                 configure(context, outkeep);
-
-                outkeep.Build(builder, context, services);
             });
         }
     }
