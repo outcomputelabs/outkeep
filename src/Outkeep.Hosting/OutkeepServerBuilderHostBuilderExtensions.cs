@@ -26,12 +26,16 @@ namespace Microsoft.Extensions.Hosting
             {
                 outkeep = new OutkeepServerBuilder();
                 builder.Properties[HostBuilderContextKey] = outkeep;
+
+                builder.ConfigureServices((context, services) =>
+                {
+                    outkeep.Build(context, services);
+                });
             }
 
-            return builder.ConfigureServices((context, services) =>
-            {
-                configure(context, outkeep);
-            });
+            outkeep.ConfigureOutkeep(configure);
+
+            return builder;
         }
     }
 }

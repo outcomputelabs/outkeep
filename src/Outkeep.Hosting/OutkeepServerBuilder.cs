@@ -12,6 +12,7 @@ namespace Outkeep.Hosting
         private readonly IHostBuilder builder;
         private readonly List<Action<HostBuilderContext, IServiceCollection>> serviceConfigurators = new List<Action<HostBuilderContext, IServiceCollection>>();
         private readonly List<Action<HostBuilderContext, ISiloBuilder>> siloConfigurators = new List<Action<HostBuilderContext, ISiloBuilder>>();
+        private readonly List<Action<HostBuilderContext, IOutkeepServerBuilder>> outkeepConfigurators = new List<Action<HostBuilderContext, IOutkeepServerBuilder>>();
 
         public IOutkeepServerBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configure)
         {
@@ -31,16 +32,30 @@ namespace Outkeep.Hosting
             return this;
         }
 
-        public void Build(HostBuilder context, IServiceCollection services)
+        public IOutkeepServerBuilder ConfigureOutkeep(Action<HostBuilderContext, IOutkeepServerBuilder> configure)
+        {
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
+
+            outkeepConfigurators.Add(configure);
+
+            return this;
+        }
+
+        public void Build(HostBuilderContext context, IServiceCollection services)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (services == null) throw new ArgumentNullException(nameof(services));
 
             services.AddHostedService<OutkeepServerHostedService>();
 
-            foreach (var configurator in serviceConfigurators)
+            foreach (var configure in outkeepConfigurators)
             {
-                builder.ConfigureServices(configurator);
+                configure(context, this);
+            }
+
+            foreach (var configure in serviceConfigurators)
+            {
+                configure(context, services);
             }
 
             foreach (var configurator in siloConfigurators)
