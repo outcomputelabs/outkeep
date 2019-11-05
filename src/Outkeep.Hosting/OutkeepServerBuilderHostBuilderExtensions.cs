@@ -24,7 +24,7 @@ namespace Microsoft.Extensions.Hosting
             }
             else
             {
-                outkeep = new OutkeepServerBuilder(builder);
+                outkeep = new OutkeepServerBuilder();
                 builder.Properties[HostBuilderContextKey] = outkeep;
             }
 

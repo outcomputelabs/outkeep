@@ -8,24 +8,35 @@ namespace Outkeep.Hosting
     internal class OutkeepServerHostedService : IHostedService
     {
         private readonly ILogger<OutkeepServerHostedService> logger;
+        private readonly IHost host;
 
-        public OutkeepServerHostedService(ILogger<OutkeepServerHostedService> logger)
+        public OutkeepServerHostedService(ILogger<OutkeepServerHostedService> logger, IOutkeepServerBuilder outkeep)
         {
             this.logger = logger;
+
+            var builder = new HostBuilder()
+                .ConfigureContainer((context, container) =>
+                {
+                    
+                });
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
+            logger.LogOutkeepServerStarting();
+
+            await host.StartAsync().ConfigureAwait(false);
+
             logger.LogOutkeepServerStarted();
-
-            return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            logger.LogOutkeepServerStopped();
+            logger.LogOutkeepServerStopping();
 
-            return Task.CompletedTask;
+            await host.StopAsync().ConfigureAwait(false);
+
+            logger.LogOutkeepServerStopped();
         }
     }
 }

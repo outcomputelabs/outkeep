@@ -88,11 +88,29 @@ namespace Outkeep.Hosting.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Outkeep Server Starting.
+        /// </summary>
+        internal static string LogOutkeepServerStarting {
+            get {
+                return ResourceManager.GetString("LogOutkeepServerStarting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Outkeep Server Stopped.
         /// </summary>
         internal static string LogOutkeepServerStopped {
             get {
                 return ResourceManager.GetString("LogOutkeepServerStopped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outkeep Server Stopping.
+        /// </summary>
+        internal static string LogOutkeepServerStopping {
+            get {
+                return ResourceManager.GetString("LogOutkeepServerStopping", resourceCulture);
             }
         }
     }

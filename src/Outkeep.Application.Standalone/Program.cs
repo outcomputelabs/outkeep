@@ -5,6 +5,7 @@ using Serilog;
 using System;
 using System.Threading.Tasks;
 using Outkeep.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Outkeep.Application.Standalone
 {
@@ -31,6 +32,13 @@ namespace Outkeep.Application.Standalone
                             .WriteTo.Console()
                             .CreateLogger(),
                         true);
+                })
+                .ConfigureServices(services =>
+                {
+                    services.Configure<ConsoleLifetimeOptions>(options =>
+                    {
+                        options.SuppressStatusMessages = true;
+                    });
                 })
                 .UseOutkeepServer((context, outkeep) =>
                 {

@@ -126,7 +126,13 @@
   <data name="LogOutkeepServerStarted" xml:space="preserve">
     <value>Outkeep Server Started</value>
   </data>
+  <data name="LogOutkeepServerStarting" xml:space="preserve">
+    <value>Outkeep Server Starting</value>
+  </data>
   <data name="LogOutkeepServerStopped" xml:space="preserve">
     <value>Outkeep Server Stopped</value>
+  </data>
+  <data name="LogOutkeepServerStopping" xml:space="preserve">
+    <value>Outkeep Server Stopping</value>
   </data>
 </root>
