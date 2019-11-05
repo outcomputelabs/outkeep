@@ -3,6 +3,9 @@ using System;
 
 namespace Microsoft.Extensions.Logging
 {
+    /// <summary>
+    /// High-performance logging extension methods for high-frequency log calls.
+    /// </summary>
     internal static class LoggerExtensions
     {
         private static readonly Action<ILogger, Exception> OutkeepServerStarting = LoggerMessage.Define(LogLevel.Information, new EventId(0, nameof(OutkeepServerStarting)), Resources.LogOutkeepServerStarting);
