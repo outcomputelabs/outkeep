@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans.Hosting;
 using System;
+using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
 namespace Outkeep.Hosting
 {
@@ -9,6 +10,12 @@ namespace Outkeep.Hosting
     /// </summary>
     public interface IOutkeepServerBuilder
     {
+        /// <summary>
+        /// Configures the outkeep server instance.
+        /// This is a convenience method for optional extensions.
+        /// </summary>
+        IOutkeepServerBuilder ConfigureOutkeep(Action<HostBuilderContext, IOutkeepServerBuilder> configure);
+
         /// <summary>
         /// Configures services upon the outkeep server instance.
         /// </summary>
