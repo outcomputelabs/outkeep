@@ -9,6 +9,7 @@ namespace Outkeep.Hosting
         public static IOutkeepServerBuilder Configure<TOptions>(this IOutkeepServerBuilder builder, Action<TOptions> configure) where TOptions : class
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             return builder.ConfigureServices(services =>
             {

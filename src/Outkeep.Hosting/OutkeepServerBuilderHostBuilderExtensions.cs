@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Outkeep.Hosting;
+﻿using Outkeep.Hosting;
 using System;
 
 namespace Microsoft.Extensions.Hosting
@@ -26,18 +25,11 @@ namespace Microsoft.Extensions.Hosting
             else
             {
                 builder.Properties[HostBuilderContextKey] = outkeep = new OutkeepServerBuilder(builder);
-
-                // wire up services configuration at build time
-                builder.ConfigureServices((context, services) =>
-                {
-                    outkeep.Build(context, services);
-                });
             }
 
-            return builder.ConfigureServices((context, services) =>
-            {
-                configure(context, outkeep);
-            });
+            outkeep.ConfigureOutkeep(configure);
+
+            return builder;
         }
     }
 }

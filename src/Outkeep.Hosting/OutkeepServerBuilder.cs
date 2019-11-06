@@ -9,14 +9,48 @@ namespace Outkeep.Hosting
 {
     internal class OutkeepServerBuilder : IOutkeepServerBuilder
     {
-        private readonly IHostBuilder builder;
+        //private readonly IHostBuilder builder;
+
         private readonly List<Action<HostBuilderContext, IOutkeepServerBuilder>> outkeepConfigurators = new List<Action<HostBuilderContext, IOutkeepServerBuilder>>();
         private readonly List<Action<HostBuilderContext, IServiceCollection>> serviceConfigurators = new List<Action<HostBuilderContext, IServiceCollection>>();
         private readonly List<Action<HostBuilderContext, ISiloBuilder>> siloConfigurators = new List<Action<HostBuilderContext, ISiloBuilder>>();
 
         public OutkeepServerBuilder(IHostBuilder builder)
         {
-            this.builder = builder ?? throw new ArgumentNullException(nameof(builder));
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            //this.builder = builder ?? throw new ArgumentNullException(nameof(builder));
+
+            // wire up outkeep configuration
+            builder.ConfigureServices((context, services) =>
+            {
+                // outkeep configuration actions will populate service actions below
+                foreach (var configure in outkeepConfigurators)
+                {
+                    configure(context, this);
+                }
+
+                // apply all the service configuration actions now
+                foreach (var configure in serviceConfigurators)
+                {
+                    configure(context, services);
+                }
+            });
+
+            // wire up silo configuration
+            builder.UseOrleans((context, silo) =>
+            {
+                foreach (var configure in siloConfigurators)
+                {
+                    configure(context, silo);
+                }
+            });
+
+            // wire up the outkeep hosted service last to ensure it boots up after orleans
+            builder.ConfigureServices((context, services) =>
+            {
+                services.AddHostedService<OutkeepServerHostedService>();
+            });
         }
 
         public IOutkeepServerBuilder ConfigureOutkeep(Action<HostBuilderContext, IOutkeepServerBuilder> configure)
@@ -41,24 +75,9 @@ namespace Outkeep.Hosting
         {
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-            builder.UseOrleans(configure);
+            siloConfigurators.Add(configure);
 
             return this;
-        }
-
-        public void Build(HostBuilderContext context, IServiceCollection services)
-        {
-            services.AddHostedService<OutkeepServerHostedService>();
-
-            foreach (var configure in outkeepConfigurators)
-            {
-                configure(context, this);
-            }
-
-            foreach (var configure in serviceConfigurators)
-            {
-                configure(context, services);
-            }
         }
     }
 }
