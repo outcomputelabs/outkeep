@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Outkeep.Api.Rest\Outkeep.Api.Rest.csproj" />
     <ProjectReference Include="..\Outkeep.Hosting.Standalone\Outkeep.Hosting.Standalone.csproj" />
   </ItemGroup>
 

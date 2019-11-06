@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Outkeep.Hosting;
 using Outkeep.Implementations;
 using Serilog;
 using System;
 using System.Threading.Tasks;
-using Outkeep.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Outkeep.Application.Standalone
 {
@@ -44,7 +44,8 @@ namespace Outkeep.Application.Standalone
                         options.ExpirationPolicyEvaluationPeriod = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCache:ExpirationPolicyEvaluationPeriod");
                     });
 
-                    outkeep.UseStandaloneDefaults();
+                    outkeep.UseStandaloneClustering();
+                    outkeep.UseRestApi();
                 })
                 .RunConsoleAsync();
         }
