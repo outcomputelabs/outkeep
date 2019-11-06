@@ -14,9 +14,6 @@ namespace Outkeep.Application.Standalone
         private static Task Main(string[] args)
         {
             return new HostBuilder()
-                .ConfigureHostConfiguration(config =>
-                {
-                })
                 .ConfigureAppConfiguration((context, config) =>
                 {
                     config
@@ -46,6 +43,8 @@ namespace Outkeep.Application.Standalone
                     {
                         options.ExpirationPolicyEvaluationPeriod = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCache:ExpirationPolicyEvaluationPeriod");
                     });
+
+                    outkeep.UseStandaloneDefaults();
                 })
                 .RunConsoleAsync();
         }
