@@ -10,8 +10,14 @@ namespace Outkeep.Hosting
     internal class OutkeepServerBuilder : IOutkeepServerBuilder
     {
         private readonly IHostBuilder builder;
-        private readonly List<Action<HostBuilderContext, IServiceCollection>> serviceConfigurators = new List<Action<HostBuilderContext, IServiceCollection>>();
         private readonly List<Action<HostBuilderContext, IOutkeepServerBuilder>> outkeepConfigurators = new List<Action<HostBuilderContext, IOutkeepServerBuilder>>();
+        private readonly List<Action<HostBuilderContext, IServiceCollection>> serviceConfigurators = new List<Action<HostBuilderContext, IServiceCollection>>();
+        private readonly List<Action<HostBuilderContext, ISiloBuilder>> siloConfigurators = new List<Action<HostBuilderContext, ISiloBuilder>>();
+
+        public OutkeepServerBuilder(IHostBuilder builder)
+        {
+            this.builder = builder ?? throw new ArgumentNullException(nameof(builder));
+        }
 
         public IOutkeepServerBuilder ConfigureOutkeep(Action<HostBuilderContext, IOutkeepServerBuilder> configure)
         {
@@ -42,9 +48,6 @@ namespace Outkeep.Hosting
 
         public void Build(HostBuilderContext context, IServiceCollection services)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-            if (services == null) throw new ArgumentNullException(nameof(services));
-
             services.AddHostedService<OutkeepServerHostedService>();
 
             foreach (var configure in outkeepConfigurators)

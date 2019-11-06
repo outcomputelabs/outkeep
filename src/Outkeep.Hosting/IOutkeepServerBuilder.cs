@@ -11,12 +11,6 @@ namespace Outkeep.Hosting
     public interface IOutkeepServerBuilder
     {
         /// <summary>
-        /// Configures the outkeep server instance.
-        /// This is a convenience method for optional extensions.
-        /// </summary>
-        IOutkeepServerBuilder ConfigureOutkeep(Action<HostBuilderContext, IOutkeepServerBuilder> configure);
-
-        /// <summary>
         /// Configures services upon the outkeep server instance.
         /// </summary>
         IOutkeepServerBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configure);
