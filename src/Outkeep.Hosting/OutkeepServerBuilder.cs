@@ -9,8 +9,6 @@ namespace Outkeep.Hosting
 {
     internal class OutkeepServerBuilder : IOutkeepServerBuilder
     {
-        //private readonly IHostBuilder builder;
-
         private readonly List<Action<HostBuilderContext, IOutkeepServerBuilder>> outkeepConfigurators = new List<Action<HostBuilderContext, IOutkeepServerBuilder>>();
         private readonly List<Action<HostBuilderContext, IServiceCollection>> serviceConfigurators = new List<Action<HostBuilderContext, IServiceCollection>>();
         private readonly List<Action<HostBuilderContext, ISiloBuilder>> siloConfigurators = new List<Action<HostBuilderContext, ISiloBuilder>>();
@@ -18,8 +16,6 @@ namespace Outkeep.Hosting
         public OutkeepServerBuilder(IHostBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            //this.builder = builder ?? throw new ArgumentNullException(nameof(builder));
 
             // wire up outkeep configuration
             builder.ConfigureServices((context, services) =>
