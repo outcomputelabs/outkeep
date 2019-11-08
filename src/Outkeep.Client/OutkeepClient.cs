@@ -1,4 +1,5 @@
 ﻿using Orleans;
+using Orleans.Runtime;
 using Outkeep.Interfaces;
 using System;
 
@@ -13,8 +14,21 @@ namespace Outkeep.Client
             this.factory = factory;
         }
 
+        public Guid ActivityId
+        {
+            get
+            {
+                return RequestContext.ActivityId;
+            }
+            set
+            {
+                RequestContext.ActivityId = value;
+                RequestContext.PropagateActivityId = true;
+            }
+        }
+
         public IDistributedCacheGrain GetCacheGrain(string key) => factory.GetGrain<IDistributedCacheGrain>(key);
 
-        public IPingGrain GetPingGrain(Guid key) => factory.GetGrain<IPingGrain>(key);
+        public IEchoGrain GetEchoGrain() => factory.GetGrain<IEchoGrain>(Guid.Empty);
     }
 }

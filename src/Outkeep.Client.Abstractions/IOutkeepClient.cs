@@ -5,7 +5,9 @@ namespace Outkeep.Client
 {
     public interface IOutkeepClient
     {
-        IPingGrain GetPingGrain(Guid key);
+        Guid ActivityId { get; }
+
+        IEchoGrain GetEchoGrain();
 
         IDistributedCacheGrain GetCacheGrain(string key);
     }

@@ -61,11 +61,47 @@ namespace Outkeep.Api.Rest.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outkeep Rest API Started.
+        ///   Looks up a localized string similar to Outkeep REST API Started.
         /// </summary>
         internal static string OutkeepRestApiStarted {
             get {
                 return ResourceManager.GetString("OutkeepRestApiStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outkeep REST API Starting.
+        /// </summary>
+        internal static string OutkeepRestApiStarting {
+            get {
+                return ResourceManager.GetString("OutkeepRestApiStarting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outkeep REST API Stopped.
+        /// </summary>
+        internal static string OutkeepRestApiStopped {
+            get {
+                return ResourceManager.GetString("OutkeepRestApiStopped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outkeep REST API Stopping.
+        /// </summary>
+        internal static string OutkeepRestApiStopping {
+            get {
+                return ResourceManager.GetString("OutkeepRestApiStopping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting activity {ActivityId}.
+        /// </summary>
+        internal static string StartingActivity_X {
+            get {
+                return ResourceManager.GetString("StartingActivity_X", resourceCulture);
             }
         }
     }

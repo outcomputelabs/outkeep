@@ -45,7 +45,9 @@ namespace Outkeep.Application.Standalone
                     });
 
                     outkeep.UseStandaloneClustering();
-                    outkeep.UseRestApi();
+                    outkeep.UseRestApi(options =>
+                    {
+                    });
                 })
                 .RunConsoleAsync();
         }
