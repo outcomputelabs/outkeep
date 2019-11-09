@@ -61,6 +61,15 @@ namespace Outkeep.Api.Rest.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Outkeep REST API.
+        /// </summary>
+        internal static string OutkeepRestApi {
+            get {
+                return ResourceManager.GetString("OutkeepRestApi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Outkeep REST API Started.
         /// </summary>
         internal static string OutkeepRestApiStarted {

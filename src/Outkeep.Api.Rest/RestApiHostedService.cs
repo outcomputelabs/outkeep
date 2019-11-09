@@ -6,7 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Outkeep.Api.Rest.Properties;
 using Outkeep.Client;
+using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -45,11 +47,22 @@ namespace Outkeep.Api.Rest
                         .SetCompatibilityVersion(CompatibilityVersion.Latest)
                         .AddApplicationPart(GetType().Assembly)
                         .AddControllersAsServices();
+
+                    services.AddSwaggerGen(options =>
+                    {
+                        options.SwaggerDoc("v0", new Info
+                        {
+                            Title = Resources.OutkeepRestApi,
+                            Version = "v0"
+                        });
+                    });
                 })
                 .Configure(app =>
                 {
                     app.UseCors(nameof(RestApiHostedService));
-                    app.UseSwagger();
+                    app.UseSwagger(options =>
+                    {
+                    });
                     app.UseSwaggerUI(options =>
                     {
                         options.SwaggerEndpoint("/swagger/v0/swagger.json", nameof(Outkeep));
@@ -57,7 +70,7 @@ namespace Outkeep.Api.Rest
                     app.UseMiddleware<ActivityMiddleware>();
                     app.UseMvc();
                 })
-                .UseUrls(apiOptions.Value.Uri.AbsoluteUri)
+                .UseUrls("http://localhost:8081")
                 .Build();
         }
 
