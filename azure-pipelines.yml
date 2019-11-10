@@ -12,14 +12,14 @@ variables:
 steps:
 
 - task: DotNetCoreCLI@2
-  displayName: Install Report Generator Tool
+  displayName: "Install Report Generator Tool"
   inputs:
     command: 'custom'
     custom: 'tool'
     arguments: 'install -g dotnet-reportgenerator-globaltool'
 
 - task: DotNetCoreCLI@2
-  displayName: Install Sonar Scanner Tool
+  displayName: "Install Sonar Scanner Tool"
   inputs:
     command: 'custom'
     custom: 'tool'
