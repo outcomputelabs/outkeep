@@ -9,8 +9,12 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Application.Standalone
 {
-    internal class Program
+    internal sealed class Program
     {
+        private Program()
+        {
+        }
+
         private static Task Main(string[] args)
         {
             return new HostBuilder()
