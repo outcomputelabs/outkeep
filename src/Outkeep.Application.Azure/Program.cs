@@ -10,6 +10,10 @@ namespace Outkeep.Application.Azure
 {
     internal sealed class Program
     {
+        private Program()
+        {
+        }
+
         private static Task Main(string[] args)
         {
             return new HostBuilder()
