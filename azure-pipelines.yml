@@ -15,15 +15,15 @@ steps:
   displayName: Install Report Generator Tool
   inputs:
     command: 'custom'
-    custom: 'tool install'
-    arguments: '-g dotnet-reportgenerator-globaltool'
+    custom: 'tool'
+    arguments: 'install -g dotnet-reportgenerator-globaltool'
 
 - task: DotNetCoreCLI@2
   displayName: Install Sonar Scanner Tool
   inputs:
     command: 'custom'
-    custom: 'tool install'
-    arguments: '-g dotnet-sonarscanner'
+    custom: 'tool'
+    arguments: 'install -g dotnet-sonarscanner'
 
 - task: DotNetCoreCLI@2
   displayName: "Restore"
