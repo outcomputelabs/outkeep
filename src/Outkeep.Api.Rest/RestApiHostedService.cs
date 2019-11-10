@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Orleans;
 using Outkeep.Api.Rest.Properties;
 using Swashbuckle.AspNetCore.Swagger;
@@ -20,7 +19,7 @@ namespace Outkeep.Api.Rest
         private readonly ILogger<RestApiHostedService> logger;
         private readonly IWebHost host;
 
-        public RestApiHostedService(ILogger<RestApiHostedService> logger, IEnumerable<ILoggerProvider> loggerProviders, IGrainFactory factory, IOptions<RestApiServerOptions> apiOptions)
+        public RestApiHostedService(ILogger<RestApiHostedService> logger, IEnumerable<ILoggerProvider> loggerProviders, IGrainFactory factory)
         {
             this.logger = logger;
 
