@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Implementations
 {
-    internal class DistributedCacheGrain : Grain, IDistributedCacheGrain
+    internal class CacheGrain : Grain, ICacheGrain
     {
-        private readonly DistributedCacheOptions options;
+        private readonly CacheGrainOptions options;
         private readonly ITimerRegistry timerRegistry;
 
-        public DistributedCacheGrain(DistributedCacheOptions options, ITimerRegistry timerRegistry)
+        public CacheGrain(CacheGrainOptions options, ITimerRegistry timerRegistry)
         {
             this.options = options;
             this.timerRegistry = timerRegistry;

@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Orleans;
+using Orleans.Runtime;
 using Outkeep.Api.Rest.V1.Models;
-using Outkeep.Client;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 namespace Outkeep.Api.Rest.V1.Controllers
@@ -11,26 +12,27 @@ namespace Outkeep.Api.Rest.V1.Controllers
     [Route("api/[controller]")]
     public class EchoController : ControllerBase
     {
-        private readonly IOutkeepClient client;
+        private readonly IGrainFactory factory;
 
-        public EchoController(IOutkeepClient client)
+        public EchoController(IGrainFactory factory)
         {
-            this.client = client;
+            this.factory = factory;
         }
 
         [HttpGet]
         [SwaggerOperation(OperationId = "Echo")]
         public async Task<ActionResult<EchoResponse>> GetAsync([FromQuery] EchoRequest model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            Contract.Requires(model != null);
 
-            var reply = await client.GetEchoGrain()
+            var reply = await factory
+                .GetEchoGrain()
                 .EchoAsync(model.Message)
                 .ConfigureAwait(false);
 
             return Ok(new EchoResponse
             {
-                ActivityId = client.ActivityId,
+                ActivityId = RequestContext.ActivityId,
                 Message = reply
             });
         }

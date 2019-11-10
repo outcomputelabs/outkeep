@@ -39,7 +39,7 @@ namespace Outkeep.Application.Standalone
                 })
                 .UseOutkeepServer((context, outkeep) =>
                 {
-                    outkeep.Configure<DistributedCacheOptions>(options =>
+                    outkeep.Configure<CacheGrainOptions>(options =>
                     {
                         options.ExpirationPolicyEvaluationPeriod = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCache:ExpirationPolicyEvaluationPeriod");
                     });

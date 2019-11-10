@@ -15,8 +15,6 @@ namespace Outkeep.Hosting
 
         public OutkeepServerBuilder(IHostBuilder builder)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
             // wire up outkeep configuration
             builder.ConfigureServices((context, services) =>
             {
@@ -51,8 +49,6 @@ namespace Outkeep.Hosting
 
         public IOutkeepServerBuilder ConfigureOutkeep(Action<HostBuilderContext, IOutkeepServerBuilder> configure)
         {
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
-
             outkeepConfigurators.Add(configure);
 
             return this;
@@ -60,8 +56,6 @@ namespace Outkeep.Hosting
 
         public IOutkeepServerBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configure)
         {
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
-
             serviceConfigurators.Add(configure);
 
             return this;
@@ -69,8 +63,6 @@ namespace Outkeep.Hosting
 
         public IOutkeepServerBuilder ConfigureSilo(Action<HostBuilderContext, ISiloBuilder> configure)
         {
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
-
             siloConfigurators.Add(configure);
 
             return this;

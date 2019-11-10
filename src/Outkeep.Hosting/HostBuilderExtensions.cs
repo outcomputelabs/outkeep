@@ -1,9 +1,10 @@
 ﻿using Outkeep.Hosting;
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.Extensions.Hosting
 {
-    public static class OutkeepServerBuilderHostBuilderExtensions
+    public static class HostBuilderExtensions
     {
         private const string HostBuilderContextKey = nameof(OutkeepServerBuilder);
 
@@ -14,8 +15,7 @@ namespace Microsoft.Extensions.Hosting
 
         public static IHostBuilder UseOutkeepServer(this IHostBuilder builder, Action<HostBuilderContext, IOutkeepServerBuilder> configure)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
+            Contract.Requires(builder != null);
 
             OutkeepServerBuilder outkeep;
             if (builder.Properties.TryGetValue(HostBuilderContextKey, out var current))

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans.Hosting;
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Outkeep.Hosting
 {
@@ -8,9 +9,6 @@ namespace Outkeep.Hosting
     {
         public static IOutkeepServerBuilder Configure<TOptions>(this IOutkeepServerBuilder builder, Action<TOptions> configure) where TOptions : class
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
-
             return builder.ConfigureServices(services =>
             {
                 services.Configure(configure);
@@ -19,16 +17,14 @@ namespace Outkeep.Hosting
 
         public static IOutkeepServerBuilder ConfigureServices(this IOutkeepServerBuilder builder, Action<IServiceCollection> configure)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
+            Contract.Requires(builder != null);
 
             return builder.ConfigureServices((context, services) => configure(services));
         }
 
         public static IOutkeepServerBuilder ConfigureSilo(this IOutkeepServerBuilder builder, Action<ISiloBuilder> configure)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
+            Contract.Requires(builder != null);
 
             return builder.ConfigureSilo((context, silo) => configure(silo));
         }

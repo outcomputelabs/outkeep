@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using Orleans;
 using Orleans.Concurrency;
 using System;
 using System.Threading;
@@ -8,11 +9,11 @@ namespace Outkeep.Client
 {
     internal class OutkeepDistributedCache : IDistributedCache
     {
-        private readonly IOutkeepClient client;
+        private readonly IGrainFactory factory;
 
-        public OutkeepDistributedCache(IOutkeepClient client)
+        public OutkeepDistributedCache(IGrainFactory factory)
         {
-            this.client = client ?? throw new ArgumentNullException(nameof(client));
+            this.factory = factory;
         }
 
         public byte[] Get(string key)
@@ -22,7 +23,7 @@ namespace Outkeep.Client
 
         public async Task<byte[]> GetAsync(string key, CancellationToken token = default)
         {
-            var result = await client.GetCacheGrain(key).GetAsync().ConfigureAwait(false);
+            var result = await factory.GetCacheGrain(key).GetAsync().ConfigureAwait(false);
             return result.Value;
         }
 
@@ -33,7 +34,7 @@ namespace Outkeep.Client
 
         public Task RefreshAsync(string key, CancellationToken token = default)
         {
-            return client.GetCacheGrain(key).RefreshAsync();
+            return factory.GetCacheGrain(key).RefreshAsync();
         }
 
         public void Remove(string key)
@@ -43,7 +44,7 @@ namespace Outkeep.Client
 
         public Task RemoveAsync(string key, CancellationToken token = default)
         {
-            return client.GetCacheGrain(key).RemoveAsync();
+            return factory.GetCacheGrain(key).RemoveAsync();
         }
 
         public void Set(string key, byte[] value, DistributedCacheEntryOptions options)
@@ -72,7 +73,7 @@ namespace Outkeep.Client
                 expiration = null;
             }
 
-            return client.GetCacheGrain(key).SetAsync(value.AsImmutable(), expiration, options.SlidingExpiration);
+            return factory.GetCacheGrain(key).SetAsync(value.AsImmutable(), expiration, options.SlidingExpiration);
         }
     }
 }

@@ -6,10 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Orleans;
 using Outkeep.Api.Rest.Properties;
-using Outkeep.Client;
 using Swashbuckle.AspNetCore.Swagger;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,13 +20,9 @@ namespace Outkeep.Api.Rest
         private readonly ILogger<RestApiHostedService> logger;
         private readonly IWebHost host;
 
-        public RestApiHostedService(ILogger<RestApiHostedService> logger, IEnumerable<ILoggerProvider> loggerProviders, IOutkeepClient client, IOptions<RestApiServerOptions> apiOptions)
+        public RestApiHostedService(ILogger<RestApiHostedService> logger, IEnumerable<ILoggerProvider> loggerProviders, IGrainFactory factory, IOptions<RestApiServerOptions> apiOptions)
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            if (loggerProviders == null) throw new ArgumentNullException(nameof(loggerProviders));
-            if (client == null) throw new ArgumentNullException(nameof(client));
-            if (apiOptions == null) throw new ArgumentNullException(nameof(apiOptions));
+            this.logger = logger;
 
             host = WebHost
                 .CreateDefaultBuilder()
@@ -41,7 +36,7 @@ namespace Outkeep.Api.Rest
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddSingleton(client);
+                    services.AddSingleton(factory);
 
                     services.AddMvc()
                         .SetCompatibilityVersion(CompatibilityVersion.Latest)

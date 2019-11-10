@@ -4,12 +4,10 @@ using System;
 
 namespace Outkeep.Implementations
 {
-    internal class DistributedCacheOptionsValidator : IValidateOptions<DistributedCacheOptions>
+    internal class CacheOptionsValidator : IValidateOptions<CacheGrainOptions>
     {
-        public ValidateOptionsResult Validate(string name, DistributedCacheOptions options)
+        public ValidateOptionsResult Validate(string name, CacheGrainOptions options)
         {
-            if (options == null) throw new ArgumentNullException(nameof(options));
-
             if (options.ExpirationPolicyEvaluationPeriod <= TimeSpan.Zero)
                 return ValidateOptionsResult.Fail(Resources.ExceptionXMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)));
 

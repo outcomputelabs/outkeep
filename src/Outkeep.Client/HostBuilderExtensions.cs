@@ -1,24 +1,21 @@
 ﻿using Outkeep.Client;
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Microsoft.Extensions.Hosting
 {
-    public static class OutkeepClientBuilderHostBuilderExtensions
+    public static class HostBuilderExtensions
     {
         private const string HostBuilderContextKey = nameof(OutkeepClientBuilder);
 
         public static IHostBuilder UseOutkeepClient(this IHostBuilder builder, Action<IOutkeepClientBuilder> configure)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
-
             return builder.UseOutkeepClient((context, outkeep) => configure(outkeep));
         }
 
         public static IHostBuilder UseOutkeepClient(this IHostBuilder builder, Action<HostBuilderContext, IOutkeepClientBuilder> configure)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
+            Contract.Requires(builder != null);
 
             return builder.ConfigureServices((context, services) =>
             {

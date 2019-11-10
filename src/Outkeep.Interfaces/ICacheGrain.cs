@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Interfaces
 {
-    public interface IDistributedCacheGrain : IGrainWithStringKey
+    public interface ICacheGrain : IGrainWithStringKey
     {
         Task<Immutable<byte[]>> GetAsync();
 

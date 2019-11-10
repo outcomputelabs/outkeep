@@ -1,5 +1,5 @@
 ﻿using Orleans.Hosting;
-using System;
+using System.Diagnostics.Contracts;
 using System.Net;
 
 namespace Outkeep.Hosting
@@ -14,7 +14,7 @@ namespace Outkeep.Hosting
             string serviceId = "dev",
             string clusterId = "dev")
         {
-            if (outkeep == null) throw new ArgumentNullException(nameof(outkeep));
+            Contract.Requires(outkeep != null);
 
             outkeep.ConfigureSilo((context, silo) =>
             {

@@ -8,9 +8,6 @@ namespace Outkeep.Hosting
     {
         public static IOutkeepServerBuilder UseRestApi(this IOutkeepServerBuilder outkeep, Action<RestApiServerOptions> configure)
         {
-            if (outkeep == null) throw new ArgumentNullException(nameof(outkeep));
-            if (configure == null) throw new ArgumentNullException(nameof(configure));
-
             return outkeep.ConfigureServices(services =>
             {
                 services.AddHostedService<RestApiHostedService>();
