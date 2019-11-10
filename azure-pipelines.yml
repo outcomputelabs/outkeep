@@ -32,6 +32,13 @@ steps:
     feedsToUse: 'select'
 
 - task: DotNetCoreCLI@2
+  displayName: "Begin Sonar Scanner"
+  inputs:
+    command: 'custom'
+    custom: 'sonarscanner'
+    arguments: 'begin /k:"$(SonarQube.ProjectKey)" /o:"$(SonarQube.Organization)" /d:sonar.host.url="$(SonarQube.HostUrl)" /d:sonar.login="$(SonarQube.Token)" /d:sonar.flex.cobertura.reportPaths="**/coverage.cobertura.xml"'
+
+- task: DotNetCoreCLI@2
   displayName: "Build"
   inputs:
     command: 'build'
@@ -42,3 +49,10 @@ steps:
   inputs:
     command: 'test'
     arguments: '--no-build --collect:"XPlat Code Coverage" --configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: "End Sonar Scanner"
+  inputs:
+    command: 'custom'
+    custom: 'sonarscanner'
+    arguments: 'end /d:sonar.login="$(SonarQube.Token)"'
