@@ -41,7 +41,7 @@ steps:
   inputs:
     command: 'custom'
     custom: 'sonarscanner'
-    arguments: 'begin /k:"%SONARQUBEPROJECTKEY%" /o:"%SONARQUBEORGANIZATION%" /d:sonar.host.url="%SONARQUBEHOSTURL%" /d:sonar.login="%SONARQUBETOKEN%" /d:sonar.flex.cobertura.reportPaths="**/coverage.cobertura.xml"'
+    arguments: 'begin /k:"$(SonarQubeProjectKey)" /o:"$(SonarQubeOrganization)" /d:sonar.host.url="$(SonarQubeHostUrl)" /d:sonar.login="$(SonarQubeToken)" /d:sonar.flex.cobertura.reportPaths="**/coverage.cobertura.xml"'
 
 - task: DotNetCoreCLI@2
   displayName: "Build"
@@ -60,4 +60,4 @@ steps:
   inputs:
     command: 'custom'
     custom: 'sonarscanner'
-    arguments: 'end /d:sonar.login="$(SonarQube.Token)"'
+    arguments: 'end /d:sonar.login="$(SonarQubeToken)"'
