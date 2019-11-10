@@ -12,16 +12,19 @@ variables:
 steps:
 
 - task: DotNetCoreCLI@2
+  displayName: "Restore"
   inputs:
     command: 'restore'
     feedsToUse: 'select'
 
 - task: DotNetCoreCLI@2
+  displayName: "Build"
   inputs:
     command: 'build'
     arguments: '--no-restore --configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: "Test"
   inputs:
     command: 'test'
     arguments: '--no-build --collect:"XPlat Code Coverage" --configuration $(buildConfiguration)'
