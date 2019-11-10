@@ -1,0 +1,1 @@
+[![Build Status](https://dev.azure.com/outcompute/Outkeep/_apis/build/status/outcomputelabs.outkeep?branchName=master)](https://dev.azure.com/outcompute/Outkeep/_build/latest?definitionId=2&branchName=master)
