@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Outkeep.Hosting\Outkeep.Hosting.csproj" />
+    <ProjectReference Include="..\Outkeep.Interfaces\Outkeep.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>

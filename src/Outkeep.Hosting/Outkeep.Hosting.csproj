@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Outkeep.Implementations\Outkeep.Implementations.csproj" />
+    <ProjectReference Include="..\Outkeep.Grains\Outkeep.Grains.csproj" />
   </ItemGroup>
 
   <ItemGroup>

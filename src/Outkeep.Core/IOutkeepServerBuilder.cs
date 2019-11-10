@@ -3,7 +3,7 @@ using Orleans.Hosting;
 using System;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
-namespace Outkeep.Hosting
+namespace Outkeep
 {
     /// <summary>
     /// Offers a convenience integration point for optional extensions.

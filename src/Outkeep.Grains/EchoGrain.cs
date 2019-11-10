@@ -3,7 +3,7 @@ using Orleans.Concurrency;
 using Outkeep.Interfaces;
 using System.Threading.Tasks;
 
-namespace Outkeep.Implementations
+namespace Outkeep.Grains
 {
     [StatelessWorker(1)]
     internal class EchoGrain : Grain, IEchoGrain

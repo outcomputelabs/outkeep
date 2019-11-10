@@ -5,7 +5,7 @@ using Outkeep.Interfaces;
 using System;
 using System.Threading.Tasks;
 
-namespace Outkeep.Implementations
+namespace Outkeep.Grains
 {
     internal class CacheGrain : Grain, ICacheGrain
     {
@@ -33,8 +33,8 @@ namespace Outkeep.Implementations
         {
             var now = DateTimeOffset.UtcNow;
 
-            if ((absoluteExpiration.HasValue && absoluteExpiration.Value <= now) ||
-                (slidingExpiration.HasValue && accessed.Add(slidingExpiration.Value) <= now))
+            if (absoluteExpiration.HasValue && absoluteExpiration.Value <= now ||
+                slidingExpiration.HasValue && accessed.Add(slidingExpiration.Value) <= now)
             {
                 DeactivateOnIdle();
             }

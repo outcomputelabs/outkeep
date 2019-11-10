@@ -7,8 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddOutkeepServer(this IServiceCollection services)
         {
             return services
-                .AddHostedService<OutkeepServerHostedService>()
-                .AddCacheGrainOptions();
+                .AddHostedService<OutkeepServerHostedService>();
         }
     }
 }

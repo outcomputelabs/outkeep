@@ -1,4 +1,5 @@
-﻿using Outkeep.Hosting;
+﻿using Outkeep;
+using Outkeep.Hosting;
 using System;
 using System.Diagnostics.Contracts;
 

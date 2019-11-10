@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Outkeep.Implementations
+namespace Outkeep.Grains
 {
     public class CacheGrainOptions
     {

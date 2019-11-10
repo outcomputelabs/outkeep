@@ -2,7 +2,7 @@
 using Outkeep.Implementations.Properties;
 using System;
 
-namespace Outkeep.Implementations
+namespace Outkeep.Grains
 {
     internal class CacheOptionsValidator : IValidateOptions<CacheGrainOptions>
     {
