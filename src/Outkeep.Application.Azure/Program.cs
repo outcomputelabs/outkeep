@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Orleans.Hosting;
 using Outkeep.Grains;
 using Outkeep.Hosting;
 using Serilog;
