@@ -135,4 +135,7 @@
   <data name="LogOutkeepServerStopping" xml:space="preserve">
     <value>Outkeep Server Stopping</value>
   </data>
+  <data name="ThereAreNoFreePortsWithinTheInputRange" xml:space="preserve">
+    <value>There are no free ports within the input range</value>
+  </data>
 </root>

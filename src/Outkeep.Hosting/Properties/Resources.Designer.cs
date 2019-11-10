@@ -113,5 +113,14 @@ namespace Outkeep.Hosting.Properties {
                 return ResourceManager.GetString("LogOutkeepServerStopping", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no free ports within the input range.
+        /// </summary>
+        internal static string ThereAreNoFreePortsWithinTheInputRange {
+            get {
+                return ResourceManager.GetString("ThereAreNoFreePortsWithinTheInputRange", resourceCulture);
+            }
+        }
     }
 }

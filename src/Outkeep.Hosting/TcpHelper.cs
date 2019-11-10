@@ -13,7 +13,6 @@ namespace Outkeep.Hosting
             if (end >= (1 << 16)) throw new ArgumentOutOfRangeException(nameof(end));
             if (end < start) throw new ArgumentOutOfRangeException(nameof(end));
 
-            SocketException last = null;
             for (var port = start; port <= end; ++port)
             {
                 var listener = TcpListener.Create(port);
@@ -26,7 +25,7 @@ namespace Outkeep.Hosting
                 }
                 catch (SocketException exception)
                 {
-                    last = exception;
+                    SocketException last = exception;
                 }
                 finally
                 {
@@ -40,7 +39,7 @@ namespace Outkeep.Hosting
                 }
             }
 
-            throw last;
+            throw new InvalidOperationException(Resources.ThereAreNoFreePortsWithinTheInputRange);
         }
 
         public static int GetFreeDynamicPort()
