@@ -25,6 +25,7 @@ namespace Outkeep.Hosting
                 }
                 catch (SocketException)
                 {
+                    // noop
                 }
                 finally
                 {
@@ -34,6 +35,7 @@ namespace Outkeep.Hosting
                     }
                     catch (SocketException)
                     {
+                        // noop
                     }
                 }
             }
