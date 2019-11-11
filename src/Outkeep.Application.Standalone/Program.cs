@@ -15,7 +15,7 @@ namespace Outkeep.Application.Standalone
         {
         }
 
-        private static Task Main(string[] args)
+        private static Task Main()
         {
             return new HostBuilder()
                 .ConfigureAppConfiguration((context, config) =>
