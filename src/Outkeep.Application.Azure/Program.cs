@@ -14,7 +14,7 @@ namespace Outkeep.Application.Azure
         {
         }
 
-        private static Task Main(string[] args)
+        private static Task Main()
         {
             return new HostBuilder()
                 .ConfigureHostConfiguration(config =>
@@ -25,8 +25,7 @@ namespace Outkeep.Application.Azure
                     config
                         .AddJsonFile("appsettings.json")
                         .AddEnvironmentVariables(nameof(Outkeep))
-                        .AddUserSecrets<Program>()
-                        .AddCommandLine(args);
+                        .AddUserSecrets<Program>();
                 })
                 .ConfigureLogging((context, logging) =>
                 {
