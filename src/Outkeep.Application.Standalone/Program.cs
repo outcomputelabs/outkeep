@@ -23,8 +23,7 @@ namespace Outkeep.Application.Standalone
                     config
                         .AddJsonFile("appsettings.json")
                         .AddEnvironmentVariables(nameof(Outkeep))
-                        .AddUserSecrets<Program>()
-                        .AddCommandLine(args);
+                        .AddUserSecrets<Program>();
                 })
                 .ConfigureLogging((context, logging) =>
                 {
