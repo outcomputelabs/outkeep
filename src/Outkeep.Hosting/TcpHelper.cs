@@ -23,9 +23,8 @@ namespace Outkeep.Hosting
 
                     return ((IPEndPoint)listener.LocalEndpoint).Port;
                 }
-                catch (SocketException exception)
+                catch (SocketException)
                 {
-                    SocketException last = exception;
                 }
                 finally
                 {
