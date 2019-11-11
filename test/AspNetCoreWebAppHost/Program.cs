@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace AspNetCoreWebAppHost
 {
-    public sealed class Program
+    public static class Program
     {
         public static void Main()
         {
