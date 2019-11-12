@@ -1,4 +1,5 @@
-﻿using Orleans;
+﻿using Microsoft.Extensions.Options;
+using Orleans;
 using Orleans.Concurrency;
 using Orleans.Timers;
 using Outkeep.Interfaces;
@@ -12,9 +13,9 @@ namespace Outkeep.Grains
         private readonly CacheGrainOptions options;
         private readonly ITimerRegistry timerRegistry;
 
-        public CacheGrain(CacheGrainOptions options, ITimerRegistry timerRegistry)
+        public CacheGrain(IOptions<CacheGrainOptions> options, ITimerRegistry timerRegistry)
         {
-            this.options = options;
+            this.options = options?.Value;
             this.timerRegistry = timerRegistry;
         }
 
