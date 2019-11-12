@@ -1,4 +1,4 @@
-﻿using Outkeep.Api.Rest.Properties;
+﻿using Outkeep.Api.Http.Properties;
 using System;
 
 namespace Microsoft.Extensions.Logging
@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.Logging
             LoggerMessage.Define(
                 LogLevel.Information,
                 new EventId(0, nameof(OutkeepRestApiStarting)),
-                Resources.OutkeepRestApiStarting);
+                Resources.OutkeepHttpApiStarting);
 
         public static void LogOutkeepRestApiStarting(this ILogger logger) =>
             OutkeepRestApiStarting(logger, null);
@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.Logging
             LoggerMessage.Define(
                 LogLevel.Information,
                 new EventId(0, nameof(OutkeepRestApiStarted)),
-                Resources.OutkeepRestApiStarted);
+                Resources.OutkeepHttpApiStarted);
 
         public static void LogOutkeepRestApiStarted(this ILogger logger) =>
             OutkeepRestApiStarted(logger, null);
@@ -27,7 +27,7 @@ namespace Microsoft.Extensions.Logging
             LoggerMessage.Define(
                 LogLevel.Information,
                 new EventId(0, nameof(OutkeepRestApiStopping)),
-                Resources.OutkeepRestApiStopping);
+                Resources.OutkeepHttpApiStopping);
 
         public static void LogOutkeepRestApiStopping(this ILogger logger) =>
             OutkeepRestApiStopping(logger, null);
@@ -36,7 +36,7 @@ namespace Microsoft.Extensions.Logging
             LoggerMessage.Define(
                 LogLevel.Information,
                 new EventId(0, nameof(OutkeepRestApiStopped)),
-                Resources.OutkeepRestApiStopped);
+                Resources.OutkeepHttpApiStopped);
 
         public static void LogOutkeepRestApiStopped(this ILogger logger) =>
             OutkeepRestApiStopped(logger, null);

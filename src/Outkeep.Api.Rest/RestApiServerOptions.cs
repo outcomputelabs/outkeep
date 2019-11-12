@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Outkeep.Api.Rest
+namespace Outkeep.Api.Http
 {
     public class RestApiServerOptions
     {

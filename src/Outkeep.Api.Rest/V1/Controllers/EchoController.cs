@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Orleans.Runtime;
-using Outkeep.Api.Rest.V1.Models;
+using Outkeep.Api.Http.V1.Models;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
-namespace Outkeep.Api.Rest.V1.Controllers
+namespace Outkeep.Api.Http.V1.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

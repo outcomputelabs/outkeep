@@ -4,7 +4,7 @@ using Orleans.Runtime;
 using System;
 using System.Threading.Tasks;
 
-namespace Outkeep.Api.Rest
+namespace Outkeep.Api.Http
 {
     public class ActivityMiddleware : IMiddleware
     {

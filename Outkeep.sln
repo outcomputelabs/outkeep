@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Application.Standal
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Hosting.Standalone", "src\Outkeep.Hosting.Standalone\Outkeep.Hosting.Standalone.csproj", "{A3313255-A96C-495C-9275-D5FC7A9DE10C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Api.Rest", "src\Outkeep.Api.Rest\Outkeep.Api.Rest.csproj", "{7525B4EF-F889-4F12-A372-0BA3E4B4DEE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Api.Http", "src\Outkeep.Api.Rest\Outkeep.Api.Http.csproj", "{7525B4EF-F889-4F12-A372-0BA3E4B4DEE7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A4AAB70-E662-4055-9256-05A6C82F966F}"
 	ProjectSection(SolutionItems) = preProject

@@ -6,13 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
-using Outkeep.Api.Rest.Properties;
+using Outkeep.Api.Http.Properties;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Outkeep.Api.Rest
+namespace Outkeep.Api.Http
 {
     public class RestApiHostedService : IHostedService
     {
@@ -46,7 +46,7 @@ namespace Outkeep.Api.Rest
                     {
                         options.SwaggerDoc("v0", new Info
                         {
-                            Title = Resources.OutkeepRestApi,
+                            Title = Resources.OutkeepHttpApi,
                             Version = "v0"
                         });
                     });

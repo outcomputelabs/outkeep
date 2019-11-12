@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Outkeep.Api.Rest;
+using Outkeep.Api.Http;
 using System;
 using System.Diagnostics.Contracts;
 

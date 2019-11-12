@@ -117,20 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="OutkeepRestApi" xml:space="preserve">
-    <value>Outkeep REST API</value>
+  <data name="OutkeepHttpApi" xml:space="preserve">
+    <value>Outkeep HTTP API</value>
   </data>
-  <data name="OutkeepRestApiStarted" xml:space="preserve">
-    <value>Outkeep REST API Started</value>
+  <data name="OutkeepHttpApiStarted" xml:space="preserve">
+    <value>Outkeep HTTP API Started</value>
   </data>
-  <data name="OutkeepRestApiStarting" xml:space="preserve">
-    <value>Outkeep REST API Starting</value>
+  <data name="OutkeepHttpApiStarting" xml:space="preserve">
+    <value>Outkeep HTTP API Starting</value>
   </data>
-  <data name="OutkeepRestApiStopped" xml:space="preserve">
-    <value>Outkeep REST API Stopped</value>
+  <data name="OutkeepHttpApiStopped" xml:space="preserve">
+    <value>Outkeep HTTP API Stopped</value>
   </data>
-  <data name="OutkeepRestApiStopping" xml:space="preserve">
-    <value>Outkeep REST API Stopping</value>
+  <data name="OutkeepHttpApiStopping" xml:space="preserve">
+    <value>Outkeep HTTP API Stopping</value>
   </data>
   <data name="StartingActivity_X" xml:space="preserve">
     <value>Starting activity {ActivityId}</value>

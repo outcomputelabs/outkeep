@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Outkeep.Api.Rest.Properties {
+namespace Outkeep.Api.Http.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Outkeep.Api.Rest.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Outkeep.Api.Rest.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Outkeep.Api.Http.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,47 +61,47 @@ namespace Outkeep.Api.Rest.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outkeep REST API.
+        ///   Looks up a localized string similar to Outkeep HTTP API.
         /// </summary>
-        internal static string OutkeepRestApi {
+        internal static string OutkeepHttpApi {
             get {
-                return ResourceManager.GetString("OutkeepRestApi", resourceCulture);
+                return ResourceManager.GetString("OutkeepHttpApi", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outkeep REST API Started.
+        ///   Looks up a localized string similar to Outkeep HTTP API Started.
         /// </summary>
-        internal static string OutkeepRestApiStarted {
+        internal static string OutkeepHttpApiStarted {
             get {
-                return ResourceManager.GetString("OutkeepRestApiStarted", resourceCulture);
+                return ResourceManager.GetString("OutkeepHttpApiStarted", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outkeep REST API Starting.
+        ///   Looks up a localized string similar to Outkeep HTTP API Starting.
         /// </summary>
-        internal static string OutkeepRestApiStarting {
+        internal static string OutkeepHttpApiStarting {
             get {
-                return ResourceManager.GetString("OutkeepRestApiStarting", resourceCulture);
+                return ResourceManager.GetString("OutkeepHttpApiStarting", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outkeep REST API Stopped.
+        ///   Looks up a localized string similar to Outkeep HTTP API Stopped.
         /// </summary>
-        internal static string OutkeepRestApiStopped {
+        internal static string OutkeepHttpApiStopped {
             get {
-                return ResourceManager.GetString("OutkeepRestApiStopped", resourceCulture);
+                return ResourceManager.GetString("OutkeepHttpApiStopped", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Outkeep REST API Stopping.
+        ///   Looks up a localized string similar to Outkeep HTTP API Stopping.
         /// </summary>
-        internal static string OutkeepRestApiStopping {
+        internal static string OutkeepHttpApiStopping {
             get {
-                return ResourceManager.GetString("OutkeepRestApiStopping", resourceCulture);
+                return ResourceManager.GetString("OutkeepHttpApiStopping", resourceCulture);
             }
         }
         
