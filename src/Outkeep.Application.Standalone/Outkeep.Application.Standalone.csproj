@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Outkeep.Api.Rest\Outkeep.Api.Http.csproj" />
+    <ProjectReference Include="..\Outkeep.Api.Http\Outkeep.Api.Http.csproj" />
     <ProjectReference Include="..\Outkeep.Hosting.Standalone\Outkeep.Hosting.Standalone.csproj" />
   </ItemGroup>
 
