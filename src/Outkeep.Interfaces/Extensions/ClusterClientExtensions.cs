@@ -1,6 +1,5 @@
 ﻿using Outkeep.Interfaces;
 using System;
-using System.Diagnostics.Contracts;
 
 namespace Orleans
 {
@@ -8,15 +7,14 @@ namespace Orleans
     {
         public static ICacheGrain GetCacheGrain(this IClusterClient client, string key)
         {
-            Contract.Requires(client != null);
-            Contract.Requires(key != null);
+            if (client == null) throw new ArgumentNullException(nameof(client));
 
             return client.GetGrain<ICacheGrain>(key);
         }
 
         public static IEchoGrain GetEchoGrain(this IClusterClient client)
         {
-            Contract.Requires(client != null);
+            if (client == null) throw new ArgumentNullException(nameof(client));
 
             return client.GetGrain<IEchoGrain>(Guid.Empty);
         }

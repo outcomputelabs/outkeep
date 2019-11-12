@@ -3,7 +3,7 @@ using Orleans;
 using Orleans.Runtime;
 using Outkeep.Api.Http.V1.Models;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Diagnostics.Contracts;
+using System;
 using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http.V1.Controllers
@@ -23,7 +23,7 @@ namespace Outkeep.Api.Http.V1.Controllers
         [SwaggerOperation(OperationId = "Echo")]
         public async Task<ActionResult<EchoResponse>> GetAsync([FromQuery] EchoRequest model)
         {
-            Contract.Requires(model != null);
+            if (model == null) throw new ArgumentNullException(nameof(model));
 
             var reply = await factory
                 .GetEchoGrain()

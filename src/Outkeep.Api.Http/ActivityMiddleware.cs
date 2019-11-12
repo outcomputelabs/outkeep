@@ -13,6 +13,8 @@ namespace Outkeep.Api.Http
         public ActivityMiddleware(ILogger<ActivityMiddleware> logger)
         {
             this.logger = logger;
+
+            InvokeAsync(null, null).Wait();
         }
 
         public Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -22,7 +24,7 @@ namespace Outkeep.Api.Http
 
             logger.LogOutkeepActivityStarting(RequestContext.ActivityId);
 
-            return Task.CompletedTask;
+            return next?.Invoke(context);
         }
     }
 }

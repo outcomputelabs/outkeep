@@ -1,7 +1,6 @@
 ﻿using Outkeep;
 using Outkeep.Hosting;
 using System;
-using System.Diagnostics.Contracts;
 
 namespace Microsoft.Extensions.Hosting
 {
@@ -16,7 +15,7 @@ namespace Microsoft.Extensions.Hosting
 
         public static IHostBuilder UseOutkeepServer(this IHostBuilder builder, Action<HostBuilderContext, IOutkeepServerBuilder> configure)
         {
-            Contract.Requires(builder != null);
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             OutkeepServerBuilder outkeep;
             if (builder.Properties.TryGetValue(HostBuilderContextKey, out var current))

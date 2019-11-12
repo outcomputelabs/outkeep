@@ -1,6 +1,5 @@
 ﻿using Outkeep.Grains;
 using System;
-using System.Diagnostics.Contracts;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -8,8 +7,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddCacheGrainOptions(this IServiceCollection services, Action<CacheGrainOptions> configure)
         {
-            Contract.Requires(services != null);
-            Contract.Requires(configure != null);
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             return services
                 .Configure(configure)

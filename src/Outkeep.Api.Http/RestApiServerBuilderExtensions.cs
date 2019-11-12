@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Outkeep.Api.Http;
 using System;
-using System.Diagnostics.Contracts;
 
 namespace Outkeep.Hosting
 {
@@ -9,7 +8,7 @@ namespace Outkeep.Hosting
     {
         public static IOutkeepServerBuilder UseRestApi(this IOutkeepServerBuilder outkeep, Action<RestApiServerOptions> configure)
         {
-            Contract.Requires(outkeep != null);
+            if (outkeep == null) throw new ArgumentNullException(nameof(outkeep));
 
             return outkeep.ConfigureServices((context, services) =>
             {

@@ -2,13 +2,17 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Converters;
 using Orleans;
-using Outkeep.Api.Http.Properties;
-using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,7 +23,11 @@ namespace Outkeep.Api.Http
         private readonly ILogger<RestApiHostedService> logger;
         private readonly IWebHost host;
 
-        public RestApiHostedService(ILogger<RestApiHostedService> logger, IEnumerable<ILoggerProvider> loggerProviders, IGrainFactory factory)
+        public RestApiHostedService(
+            ILogger<RestApiHostedService> logger,
+            IOptions<RestApiServerOptions> apiOptions,
+            IEnumerable<ILoggerProvider> loggerProviders,
+            IGrainFactory factory)
         {
             this.logger = logger;
 
@@ -35,34 +43,80 @@ namespace Outkeep.Api.Http
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddSingleton(factory);
+                    // allow browser requests from anywhere for now
+                    services.AddCors(options =>
+                    {
+                        options.AddDefaultPolicy(policy =>
+                        {
+                            policy
+                                .AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                        });
+                    });
 
                     services.AddMvc()
                         .SetCompatibilityVersion(CompatibilityVersion.Latest)
                         .AddApplicationPart(GetType().Assembly)
-                        .AddControllersAsServices();
-
-                    services.AddSwaggerGen(options =>
-                    {
-                        options.SwaggerDoc("v0", new Info
+                        .AddControllersAsServices()
+                        .AddJsonOptions(options =>
                         {
-                            Title = Resources.OutkeepHttpApi,
-                            Version = "v0"
+                            options.SerializerSettings.Converters.Add(new StringEnumConverter());
                         });
+
+                    services.AddApiVersioning(options =>
+                    {
+                        options.ReportApiVersions = true;
+                        options.DefaultApiVersion = new ApiVersion(1, 0);
                     });
+
+                    services.AddVersionedApiExplorer(options =>
+                    {
+                        options.GroupNameFormat = "'v'VVV";
+                    });
+
+                    services.AddTransient<IConfigureOptions<SwaggerGenOptions>, VersionedApiExplorerSwaggerOptionsConfigurator>();
+                    services.AddSwaggerGen();
+
+                    services.AddSingleton(factory);
+
+                    // todo: make all these options configurable
+                    if (apiOptions.Value.EnableCompression)
+                    {
+                        services.AddResponseCompression();
+                        services.Configure<BrotliCompressionProviderOptions>(options =>
+                        {
+                            options.Level = CompressionLevel.Optimal;
+                        });
+                        services.Configure<GzipCompressionProviderOptions>(options =>
+                        {
+                            options.Level = CompressionLevel.Optimal;
+                        });
+                    }
+
+                    services.AddActivityMiddleware();
                 })
                 .Configure(app =>
                 {
-                    app.UseCors(nameof(RestApiHostedService));
-                    app.UseSwagger(options =>
+                    if (apiOptions.Value.EnableCompression)
                     {
-                    });
+                        app.UseResponseCompression();
+                    }
+                    app.UseCors();
+                    app.UseActivityMiddleware();
+                    app.UseMvc();
+                    app.UseSwagger();
+
+                    var provider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
                     app.UseSwaggerUI(options =>
                     {
-                        options.SwaggerEndpoint("/swagger/v0/swagger.json", nameof(Outkeep));
+                        foreach (var description in provider.ApiVersionDescriptions)
+                        {
+                            options.SwaggerEndpoint(
+                                $"/swagger/{description.GroupName}/swagger.json",
+                                description.GroupName.ToLowerInvariant());
+                        }
                     });
-                    app.UseMiddleware<ActivityMiddleware>();
-                    app.UseMvc();
                 })
                 .UseUrls("http://localhost:8081")
                 .Build();
