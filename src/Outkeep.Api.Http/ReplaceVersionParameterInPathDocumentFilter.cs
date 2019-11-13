@@ -22,7 +22,7 @@ namespace Outkeep.Api.Http
             var token = $"{{{ options.VersionParameterName }}}";
 
             swaggerDoc.Paths = swaggerDoc.Paths.ToDictionary(
-                path => path.Key.Replace(token, swaggerDoc.Info.Version),
+                path => path.Key.Replace(token, swaggerDoc.Info.Version, StringComparison.Ordinal),
                 path => path.Value);
         }
     }

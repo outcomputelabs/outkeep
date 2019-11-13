@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Converters;
 using Orleans;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http
 {
-    public class RestApiHostedService : IHostedService
+    internal class RestApiHostedService : IHostedService
     {
         private readonly ILogger<RestApiHostedService> logger;
         private readonly IWebHost host;
@@ -58,11 +57,7 @@ namespace Outkeep.Api.Http
                     services.AddMvc()
                         .SetCompatibilityVersion(CompatibilityVersion.Latest)
                         .AddApplicationPart(GetType().Assembly)
-                        .AddControllersAsServices()
-                        .AddJsonOptions(options =>
-                        {
-                            options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                        });
+                        .AddControllersAsServices();
 
                     services.AddApiVersioning(options =>
                     {
@@ -102,9 +97,13 @@ namespace Outkeep.Api.Http
                     {
                         app.UseResponseCompression();
                     }
+
+                    //app.UseRouting();
+                    //app.UseAuthentication();
+                    //app.UseAuthorization();
                     app.UseCors();
                     app.UseActivityMiddleware();
-                    app.UseMvc();
+
                     app.UseSwagger();
 
                     var provider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
@@ -114,11 +113,11 @@ namespace Outkeep.Api.Http
                         {
                             options.SwaggerEndpoint(
                                 $"/swagger/{description.GroupName}/swagger.json",
-                                description.GroupName.ToLowerInvariant());
+                                description.GroupName);
                         }
                     });
                 })
-                .UseUrls("http://localhost:8081")
+                .UseUrls(apiOptions.Value.ApiUri.ToString())
                 .Build();
         }
 
