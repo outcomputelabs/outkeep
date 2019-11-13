@@ -12,9 +12,9 @@ namespace Outkeep.Api.Http
     internal class VersionedApiExplorerSwaggerOptionsConfigurator : IConfigureOptions<SwaggerGenOptions>
     {
         private readonly IApiVersionDescriptionProvider provider;
-        private readonly RestApiServerOptions options;
+        private readonly OutkeepHttpApiServerOptions options;
 
-        public VersionedApiExplorerSwaggerOptionsConfigurator(IApiVersionDescriptionProvider provider, IOptions<RestApiServerOptions> options)
+        public VersionedApiExplorerSwaggerOptionsConfigurator(IApiVersionDescriptionProvider provider, IOptions<OutkeepHttpApiServerOptions> options)
         {
             this.provider = provider;
             this.options = options?.Value;

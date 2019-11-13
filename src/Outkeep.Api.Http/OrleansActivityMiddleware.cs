@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http
 {
-    public class ActivityMiddleware : IMiddleware
+    public class OrleansActivityMiddleware : IMiddleware
     {
-        private readonly ILogger<ActivityMiddleware> logger;
+        private readonly ILogger<OrleansActivityMiddleware> logger;
 
-        public ActivityMiddleware(ILogger<ActivityMiddleware> logger)
+        public OrleansActivityMiddleware(ILogger<OrleansActivityMiddleware> logger)
         {
             this.logger = logger;
 

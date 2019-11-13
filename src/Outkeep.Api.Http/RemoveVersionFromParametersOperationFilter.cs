@@ -6,9 +6,9 @@ namespace Outkeep.Api.Http
 {
     internal class RemoveVersionFromParametersOperationFilter : IOperationFilter
     {
-        private readonly RestApiServerOptions options;
+        private readonly OutkeepHttpApiServerOptions options;
 
-        public RemoveVersionFromParametersOperationFilter(IOptions<RestApiServerOptions> options)
+        public RemoveVersionFromParametersOperationFilter(IOptions<OutkeepHttpApiServerOptions> options)
         {
             this.options = options?.Value;
         }

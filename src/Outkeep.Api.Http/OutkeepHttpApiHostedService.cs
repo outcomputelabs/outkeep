@@ -17,14 +17,14 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http
 {
-    internal class RestApiHostedService : IHostedService
+    internal class OutkeepHttpApiHostedService : IHostedService
     {
-        private readonly ILogger<RestApiHostedService> logger;
+        private readonly ILogger<OutkeepHttpApiHostedService> logger;
         private readonly IWebHost host;
 
-        public RestApiHostedService(
-            ILogger<RestApiHostedService> logger,
-            IOptions<RestApiServerOptions> apiOptions,
+        public OutkeepHttpApiHostedService(
+            ILogger<OutkeepHttpApiHostedService> logger,
+            IOptions<OutkeepHttpApiServerOptions> apiOptions,
             IEnumerable<ILoggerProvider> loggerProviders,
             IGrainFactory factory)
         {

@@ -8,9 +8,9 @@ namespace Outkeep.Api.Http
 {
     public class ReplaceVersionParameterInPathDocumentFilter : IDocumentFilter
     {
-        private readonly RestApiServerOptions options;
+        private readonly OutkeepHttpApiServerOptions options;
 
-        public ReplaceVersionParameterInPathDocumentFilter(IOptions<RestApiServerOptions> options)
+        public ReplaceVersionParameterInPathDocumentFilter(IOptions<OutkeepHttpApiServerOptions> options)
         {
             this.options = options?.Value;
         }

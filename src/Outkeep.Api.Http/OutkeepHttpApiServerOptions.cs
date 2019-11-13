@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Outkeep.Api.Http
 {
-    public class RestApiServerOptions
+    public class OutkeepHttpApiServerOptions
     {
         [Required]
         public Uri ApiUri { get; set; }

@@ -12,7 +12,7 @@ namespace Outkeep.Api.Http.Tests
         public void Applies()
         {
             // arrange
-            var options = new RestApiServerOptions
+            var options = new OutkeepHttpApiServerOptions
             {
                 VersionParameterName = "version"
             };

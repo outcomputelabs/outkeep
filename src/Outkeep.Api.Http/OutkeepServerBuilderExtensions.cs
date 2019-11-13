@@ -4,16 +4,16 @@ using System;
 
 namespace Outkeep.Hosting
 {
-    public static class RestApiServerBuilderExtensions
+    public static class OutkeepServerBuilderExtensions
     {
-        public static IOutkeepServerBuilder UseRestApi(this IOutkeepServerBuilder outkeep, Action<RestApiServerOptions> configure)
+        public static IOutkeepServerBuilder UseRestApi(this IOutkeepServerBuilder outkeep, Action<OutkeepHttpApiServerOptions> configure)
         {
             if (outkeep == null) throw new ArgumentNullException(nameof(outkeep));
 
             return outkeep.ConfigureServices((context, services) =>
             {
-                services.AddHostedService<RestApiHostedService>();
-                services.AddOptions<RestApiServerOptions>()
+                services.AddHostedService<OutkeepHttpApiHostedService>();
+                services.AddOptions<OutkeepHttpApiServerOptions>()
                     .Configure(configure)
                     .ValidateDataAnnotations();
             });
