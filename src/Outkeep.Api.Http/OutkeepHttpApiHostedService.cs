@@ -123,20 +123,20 @@ namespace Outkeep.Api.Http
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            logger.LogOutkeepRestApiStarting();
+            logger.LogOutkeepHttpApiStarting();
 
             await host.StartAsync(cancellationToken).ConfigureAwait(false);
 
-            logger.LogOutkeepRestApiStarted();
+            logger.LogOutkeepHttpApiStarted();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            logger.LogOutkeepRestApiStopping();
+            logger.LogOutkeepHttpApiStopping();
 
             await host.StopAsync(cancellationToken).ConfigureAwait(false);
 
-            logger.LogOutkeepRestApiStopped();
+            logger.LogOutkeepHttpApiStopped();
         }
     }
 }

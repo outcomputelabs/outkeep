@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.Logging
                 new EventId(0, nameof(OutkeepHttpApiStarting)),
                 Resources.OutkeepHttpApiStarting);
 
-        public static void LogOutkeepRestApiStarting(this ILogger logger) =>
+        public static void LogOutkeepHttpApiStarting(this ILogger logger) =>
             OutkeepHttpApiStarting(logger, null);
 
         private static readonly Action<ILogger, Exception> OutkeepHttpApiStarted =
@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.Logging
                 new EventId(0, nameof(OutkeepHttpApiStarted)),
                 Resources.OutkeepHttpApiStarted);
 
-        public static void LogOutkeepRestApiStarted(this ILogger logger) =>
+        public static void LogOutkeepHttpApiStarted(this ILogger logger) =>
             OutkeepHttpApiStarted(logger, null);
 
         private static readonly Action<ILogger, Exception> OutkeepHttpApiStopping =
@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.Logging
                 new EventId(0, nameof(OutkeepHttpApiStopping)),
                 Resources.OutkeepHttpApiStopping);
 
-        public static void LogOutkeepRestApiStopping(this ILogger logger) =>
+        public static void LogOutkeepHttpApiStopping(this ILogger logger) =>
             OutkeepHttpApiStopping(logger, null);
 
         private static readonly Action<ILogger, Exception> OutkeepHttpApiStopped =
@@ -38,7 +38,7 @@ namespace Microsoft.Extensions.Logging
                 new EventId(0, nameof(OutkeepHttpApiStopped)),
                 Resources.OutkeepHttpApiStopped);
 
-        public static void LogOutkeepRestApiStopped(this ILogger logger) =>
+        public static void LogOutkeepHttpApiStopped(this ILogger logger) =>
             OutkeepHttpApiStopped(logger, null);
 
         private static readonly Action<ILogger, Guid, Exception> OutkeepActivityStarting =
