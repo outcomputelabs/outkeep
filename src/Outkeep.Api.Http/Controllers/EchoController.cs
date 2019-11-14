@@ -20,6 +20,12 @@ namespace Outkeep.Api.Http.Controllers
             this.factory = factory;
         }
 
+        /// <summary>
+        /// Echoes back the given message along with the api version that fulfilled the request.
+        /// For testing basic connectivity and routing to the API.
+        /// </summary>
+        /// <param name="model.Message">qqq</param>
+        /// <returns>Returns the input message along with the api version that fulfilled the request.</returns>
         [HttpGet]
         [SwaggerOperation(OperationId = "Echo")]
         public async Task<ActionResult<EchoResponse>> GetAsync([FromQuery] EchoRequest model)
