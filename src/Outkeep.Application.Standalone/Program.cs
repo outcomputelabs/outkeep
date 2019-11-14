@@ -48,7 +48,7 @@ namespace Outkeep.Application.Standalone
                     });
 
                     outkeep.UseStandaloneClustering();
-                    outkeep.UseRestApi(options =>
+                    outkeep.UseHttpApi(options =>
                     {
                         options.ApiUri = new Uri(context.Configuration["Outkeep:Http:ApiUri"]);
                         options.SwaggerUiUri = new Uri(context.Configuration["Outkeep:Http:SwaggerUiUri"], UriKind.Relative);
