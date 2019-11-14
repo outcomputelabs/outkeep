@@ -5,41 +5,41 @@ namespace Microsoft.Extensions.Logging
 {
     internal static class LoggerExtensions
     {
-        private static readonly Action<ILogger, Exception> OutkeepRestApiStarting =
+        private static readonly Action<ILogger, Exception> OutkeepHttpApiStarting =
             LoggerMessage.Define(
                 LogLevel.Information,
-                new EventId(0, nameof(OutkeepRestApiStarting)),
+                new EventId(0, nameof(OutkeepHttpApiStarting)),
                 Resources.OutkeepHttpApiStarting);
 
         public static void LogOutkeepRestApiStarting(this ILogger logger) =>
-            OutkeepRestApiStarting(logger, null);
+            OutkeepHttpApiStarting(logger, null);
 
-        private static readonly Action<ILogger, Exception> OutkeepRestApiStarted =
+        private static readonly Action<ILogger, Exception> OutkeepHttpApiStarted =
             LoggerMessage.Define(
                 LogLevel.Information,
-                new EventId(0, nameof(OutkeepRestApiStarted)),
+                new EventId(0, nameof(OutkeepHttpApiStarted)),
                 Resources.OutkeepHttpApiStarted);
 
         public static void LogOutkeepRestApiStarted(this ILogger logger) =>
-            OutkeepRestApiStarted(logger, null);
+            OutkeepHttpApiStarted(logger, null);
 
-        private static readonly Action<ILogger, Exception> OutkeepRestApiStopping =
+        private static readonly Action<ILogger, Exception> OutkeepHttpApiStopping =
             LoggerMessage.Define(
                 LogLevel.Information,
-                new EventId(0, nameof(OutkeepRestApiStopping)),
+                new EventId(0, nameof(OutkeepHttpApiStopping)),
                 Resources.OutkeepHttpApiStopping);
 
         public static void LogOutkeepRestApiStopping(this ILogger logger) =>
-            OutkeepRestApiStopping(logger, null);
+            OutkeepHttpApiStopping(logger, null);
 
-        private static readonly Action<ILogger, Exception> OutkeepRestApiStopped =
+        private static readonly Action<ILogger, Exception> OutkeepHttpApiStopped =
             LoggerMessage.Define(
                 LogLevel.Information,
-                new EventId(0, nameof(OutkeepRestApiStopped)),
+                new EventId(0, nameof(OutkeepHttpApiStopped)),
                 Resources.OutkeepHttpApiStopped);
 
         public static void LogOutkeepRestApiStopped(this ILogger logger) =>
-            OutkeepRestApiStopped(logger, null);
+            OutkeepHttpApiStopped(logger, null);
 
         private static readonly Action<ILogger, Guid, Exception> OutkeepActivityStarting =
             LoggerMessage.Define<Guid>(
