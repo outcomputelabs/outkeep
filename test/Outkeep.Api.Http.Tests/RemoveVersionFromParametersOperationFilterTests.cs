@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using Moq;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using Xunit;
 
@@ -12,18 +11,14 @@ namespace Outkeep.Api.Http.Tests
         public void Applies()
         {
             // arrange
-            var options = new OutkeepHttpApiServerOptions
+            var filter = new RemoveVersionFromParametersOperationFilter();
+            var operation = new OpenApiOperation
             {
-                VersionParameterName = "version"
-            };
-            var filter = new RemoveVersionFromParametersOperationFilter(Options.Create(options));
-            var operation = new Operation
-            {
-                Parameters = new List<IParameter>
+                Parameters = new List<OpenApiParameter>
                 {
-                    Mock.Of<IParameter>(x => x.Name == "first"),
-                    Mock.Of<IParameter>(x => x.Name == options.VersionParameterName),
-                    Mock.Of<IParameter>(x => x.Name == "last")
+                    new OpenApiParameter { Name = "first" },
+                    new OpenApiParameter { Name = "version" },
+                    new OpenApiParameter { Name = "last"}
                 }
             };
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Outkeep.Api.Http.V1.Models
+namespace Outkeep.Api.Http.Models
 {
     public class EchoRequest
     {

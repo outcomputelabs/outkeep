@@ -1,23 +1,15 @@
-﻿using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Outkeep.Api.Http
 {
     internal class RemoveVersionFromParametersOperationFilter : IOperationFilter
     {
-        private readonly OutkeepHttpApiServerOptions options;
-
-        public RemoveVersionFromParametersOperationFilter(IOptions<OutkeepHttpApiServerOptions> options)
-        {
-            this.options = options?.Value;
-        }
-
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             foreach (var parameter in operation.Parameters)
             {
-                if (parameter.Name == options.VersionParameterName)
+                if (parameter.Name == "version")
                 {
                     operation.Parameters.Remove(parameter);
                     return;

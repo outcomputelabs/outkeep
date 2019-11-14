@@ -338,3 +338,4 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/src/Outkeep.Api.Http/Outkeep.Api.Http.xml

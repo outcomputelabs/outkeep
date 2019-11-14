@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Outkeep.Api.Http;
 using Outkeep.Grains;
 using Outkeep.Hosting;
 using Serilog;
@@ -15,9 +17,9 @@ namespace Outkeep.Application.Standalone
         {
         }
 
-        private static Task Main()
+        private static async Task Main()
         {
-            return new HostBuilder()
+            var host = new HostBuilder()
                 .ConfigureAppConfiguration((context, config) =>
                 {
                     config
@@ -51,10 +53,19 @@ namespace Outkeep.Application.Standalone
                     outkeep.UseHttpApi(options =>
                     {
                         options.ApiUri = new Uri(context.Configuration["Outkeep:Http:ApiUri"]);
-                        options.SwaggerUiUri = new Uri(context.Configuration["Outkeep:Http:SwaggerUiUri"], UriKind.Relative);
                     });
                 })
-                .RunConsoleAsync();
+                .UseConsoleLifetime()
+                .Build();
+
+            if (Environment.UserInteractive)
+            {
+                var apiOptions = host.Services.GetRequiredService<IOptions<OutkeepHttpApiServerOptions>>().Value;
+
+                Console.Title = $"HttpApi: {apiOptions.ApiUri.Port}";
+            }
+
+            await host.RunAsync().ConfigureAwait(false);
         }
     }
 }
