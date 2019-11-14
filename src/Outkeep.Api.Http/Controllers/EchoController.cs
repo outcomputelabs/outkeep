@@ -10,6 +10,7 @@ namespace Outkeep.Api.Http.Controllers
 {
     [ApiController]
     [ApiVersion("1")]
+    [ControllerName("echo")]
     [Route("api/v{version:apiVersion}/echo")]
     public class EchoV1Controller : ControllerBase
     {
@@ -48,6 +49,7 @@ namespace Outkeep.Api.Http.Controllers
 
     [ApiController]
     [ApiVersion("2")]
+    [ControllerName("echo")]
     [Route("api/v{version:apiVersion}/echo")]
     public class EchoV2Controller : ControllerBase
     {
