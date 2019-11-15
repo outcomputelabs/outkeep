@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Outkeep.Api.Http.Models
+namespace Outkeep.Api.Http.Models.V0
 {
     /// <summary>
     /// Represents a request to echo a message back.

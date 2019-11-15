@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Outkeep.Api.Http.Models
+namespace Outkeep.Api.Http.Models.V0
 {
     public class EchoResponse
     {
