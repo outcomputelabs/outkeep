@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -64,7 +63,6 @@ namespace Outkeep.Api.Http
                                 options.ReportApiVersions = true;
                                 options.DefaultApiVersion = new ApiVersion(1, 0);
                                 options.AssumeDefaultVersionWhenUnspecified = true;
-                                options.ApiVersionReader = new HeaderApiVersionReader("x-api-version");
                             });
 
                             services.AddVersionedApiExplorer(options =>
