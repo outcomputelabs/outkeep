@@ -19,7 +19,7 @@ namespace Outkeep.Grains
             this.timerRegistry = timerRegistry;
         }
 
-        private Task<Immutable<byte[]>> value;
+        private Task<Immutable<byte[]>> value = EmptyValueTask;
         private DateTimeOffset accessed;
         private DateTimeOffset? absoluteExpiration;
         private TimeSpan? slidingExpiration;
@@ -71,5 +71,7 @@ namespace Outkeep.Grains
             accessed = DateTimeOffset.UtcNow;
             return Task.CompletedTask;
         }
+
+        private static readonly Task<Immutable<byte[]>> EmptyValueTask = Task.FromResult(((byte[])null).AsImmutable());
     }
 }
