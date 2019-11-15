@@ -22,6 +22,8 @@ namespace Outkeep.Api.Http
 
         public void Configure(SwaggerGenOptions swagger)
         {
+            swagger.DescribeAllParametersInCamelCase();
+
             // add a swagger page for each api version
             foreach (var description in provider.ApiVersionDescriptions)
             {
