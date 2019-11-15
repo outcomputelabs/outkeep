@@ -2,21 +2,21 @@
 using Microsoft.Extensions.Logging;
 using Orleans.Runtime;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http
 {
-    public class OrleansActivityMiddleware : IMiddleware
+    internal class OrleansActivityMiddleware : IMiddleware
     {
         private readonly ILogger<OrleansActivityMiddleware> logger;
 
         public OrleansActivityMiddleware(ILogger<OrleansActivityMiddleware> logger)
         {
             this.logger = logger;
-
-            InvokeAsync(null, null).Wait();
         }
 
+        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "N/A")]
         public Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             RequestContext.ActivityId = Guid.NewGuid();
@@ -24,7 +24,7 @@ namespace Outkeep.Api.Http
 
             logger.LogOutkeepActivityStarting(RequestContext.ActivityId);
 
-            return next?.Invoke(context);
+            return next.Invoke(context);
         }
     }
 }

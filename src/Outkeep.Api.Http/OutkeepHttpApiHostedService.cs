@@ -98,6 +98,7 @@ namespace Outkeep.Api.Http
                                 }
                             });
 
+                            app.UseActivityMiddleware();
                             app.UseEndpoints(endpoints =>
                             {
                                 endpoints.MapControllers();
