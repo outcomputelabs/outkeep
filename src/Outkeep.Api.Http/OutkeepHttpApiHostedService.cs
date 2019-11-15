@@ -11,6 +11,7 @@ using Orleans;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -92,7 +93,7 @@ namespace Outkeep.Api.Http
                             app.UseSwagger();
                             app.UseSwaggerUI(options =>
                             {
-                                foreach (var description in app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>().ApiVersionDescriptions)
+                                foreach (var description in app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>().ApiVersionDescriptions.OrderByDescending(v => v.ApiVersion))
                                 {
                                     var vx = description.GroupName.ToLowerInvariant();
                                     options.SwaggerEndpoint($"/swagger/{vx}/swagger.json", vx);
