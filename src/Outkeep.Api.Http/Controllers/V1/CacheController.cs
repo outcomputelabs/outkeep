@@ -62,7 +62,7 @@ namespace Outkeep.Api.Http.Controllers.V1
         [HttpPut]
         [SwaggerOperation(OperationId = "SetCache")]
         [Route("{key}")]
-        [SwaggerResponse(StatusCodes.Status200OK, "cache item set")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Cache entry set")]
         [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "N/A")]
         public async Task<ActionResult> SetAsync(
             [Required] [MaxLength(128)] string key,
@@ -91,7 +91,7 @@ namespace Outkeep.Api.Http.Controllers.V1
         [HttpDelete]
         [SwaggerOperation(OperationId = "RemoveCache")]
         [Route("{key}")]
-        [SwaggerResponse(StatusCodes.Status200OK, Description = "entry removed")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Cache entry removed")]
         public async Task<ActionResult> RemoveAsync(
             [Required] [MaxLength(128)] string key)
         {
