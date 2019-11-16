@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Outkeep.Api.Http.Models.V1
+namespace Outkeep.Api.Http.Models.V0
 {
-    public class EchoResponse
+    public class Echo
     {
         public Guid ActivityId { get; set; }
         public string Message { get; set; }

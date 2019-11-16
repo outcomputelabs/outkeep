@@ -3,7 +3,7 @@ using Orleans;
 using Orleans.Runtime;
 using Outkeep.Api.Http.Models.V1;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http.Controllers.V1
@@ -25,20 +25,19 @@ namespace Outkeep.Api.Http.Controllers.V1
         /// Echoes back the given message along with the api version that fulfilled the request.
         /// For testing basic connectivity and routing to the API.
         /// </summary>
-        /// <param name="model.Message">qqq</param>
+        /// <param name="message">The message to echo.</param>
         /// <returns>Returns the input message along with the api version that fulfilled the request.</returns>
         [HttpGet]
         [SwaggerOperation(OperationId = "Echo")]
-        public async Task<ActionResult<EchoResponse>> GetAsync([FromQuery] EchoRequest model)
+        public async Task<ActionResult<Echo>> GetAsync(
+            [Required] [MaxLength(100)] string message)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
-
             var reply = await factory
                 .GetEchoGrain()
-                .EchoAsync(model.Message)
+                .EchoAsync(message)
                 .ConfigureAwait(false);
 
-            return Ok(new EchoResponse
+            return Ok(new Echo
             {
                 ActivityId = RequestContext.ActivityId,
                 Message = reply,
