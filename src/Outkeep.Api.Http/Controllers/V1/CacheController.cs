@@ -49,6 +49,14 @@ namespace Outkeep.Api.Http.Controllers.V1
             return Ok(reply.Value);
         }
 
+        /// <summary>
+        /// Caches a value with the given key
+        /// </summary>
+        /// <param name="key">The key to identify the value with</param>
+        /// <param name="absoluteExpiration">The absolute date and time at which the value will expire</param>
+        /// <param name="slidingExpiration">The sliding time span at which the value will expire if not accessed</param>
+        /// <param name="value">The value to cache</param>
+        /// <returns></returns>
         [HttpPost]
         [SwaggerOperation(OperationId = "SetCache")]
         [Route("{key}")]
