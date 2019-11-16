@@ -33,6 +33,8 @@ namespace Outkeep.Api.Http.Controllers.V1
         [HttpGet]
         [SwaggerOperation(OperationId = "GetCache")]
         [Route("{key}")]
+        [SwaggerResponse(StatusCodes.Status200OK, Description = "Cache entry retrieved")]
+        [SwaggerResponse(StatusCodes.Status204NoContent, Description = "Cache entry not found")]
         public async Task<ActionResult<byte[]>> GetAsync(
             [Required] [MaxLength(128)] string key)
         {
@@ -76,6 +78,25 @@ namespace Outkeep.Api.Http.Controllers.V1
             await factory
                 .GetCacheGrain(key)
                 .SetAsync(bytes.AsImmutable(), absoluteExpiration, slidingExpiration)
+                .ConfigureAwait(false);
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Removes a cache entry
+        /// </summary>
+        /// <param name="key">The key of the entry to remove</param>
+        [HttpDelete]
+        [SwaggerOperation(OperationId = "RemoveCache")]
+        [Route("{key}")]
+        [SwaggerResponse(StatusCodes.Status200OK, Description = "entry removed")]
+        public async Task<ActionResult> RemoveAsync(
+            [Required] [MaxLength(128)] string key)
+        {
+            await factory
+                .GetCacheGrain(key)
+                .RemoveAsync()
                 .ConfigureAwait(false);
 
             return Ok();
