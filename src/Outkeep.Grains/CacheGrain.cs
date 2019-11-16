@@ -66,12 +66,20 @@ namespace Outkeep.Grains
             return Task.CompletedTask;
         }
 
-        public Task RefreshAsync()
+        public Task<bool> RefreshAsync()
         {
+            if (value == EmptyValueTask)
+            {
+                DeactivateOnIdle();
+                return FalseTask;
+            }
+
             accessed = DateTimeOffset.UtcNow;
-            return Task.CompletedTask;
+            return TrueTask;
         }
 
         private static readonly Task<Immutable<byte[]>> EmptyValueTask = Task.FromResult(((byte[])null).AsImmutable());
+        private static readonly Task<bool> FalseTask = Task.FromResult(false);
+        private static readonly Task<bool> TrueTask = Task.FromResult(true);
     }
 }

@@ -102,5 +102,30 @@ namespace Outkeep.Api.Http.Controllers.V1
 
             return Ok();
         }
+
+        /// <summary>
+        /// Refreshes a cache entry
+        /// </summary>
+        /// <param name="key">The key of the entry to refresh</param>
+        [HttpPatch]
+        [Route("{key}")]
+        [SwaggerOperation(OperationId = "RefreshCache")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Cache entry refreshed")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Cache entry not found")]
+        public async Task<ActionResult> RefreshAsync(
+            [Required] [MaxLength(128)] string key)
+        {
+            var refreshed = await factory
+                .GetCacheGrain(key)
+                .RefreshAsync()
+                .ConfigureAwait(false);
+
+            if (refreshed)
+            {
+                return Ok();
+            }
+
+            return NotFound();
+        }
     }
 }

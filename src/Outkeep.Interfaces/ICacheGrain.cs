@@ -13,6 +13,6 @@ namespace Outkeep.Interfaces
 
         Task SetAsync(Immutable<byte[]> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration);
 
-        Task RefreshAsync();
+        Task<bool> RefreshAsync();
     }
 }
