@@ -57,7 +57,7 @@ namespace Outkeep.Api.Http.Controllers.V1
         /// <param name="slidingExpiration">The sliding time span at which the value will expire if not accessed</param>
         /// <param name="value">The value to cache</param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [SwaggerOperation(OperationId = "SetCache")]
         [Route("{key}")]
         [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "N/A")]
