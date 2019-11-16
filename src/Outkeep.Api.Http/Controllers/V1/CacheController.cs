@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Orleans.Concurrency;
 using Swashbuckle.AspNetCore.Annotations;
@@ -32,7 +33,8 @@ namespace Outkeep.Api.Http.Controllers.V1
         [HttpGet]
         [SwaggerOperation(OperationId = "GetCache")]
         [Route("{key}")]
-        public async Task<ActionResult<byte[]>> GetAsync([FromRoute] [Required] [MaxLength(128)] string key)
+        public async Task<ActionResult<byte[]>> GetAsync(
+            [Required] [MaxLength(128)] string key)
         {
             var reply = await factory
                 .GetCacheGrain(key)
@@ -52,14 +54,21 @@ namespace Outkeep.Api.Http.Controllers.V1
         [Route("{key}")]
         [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "N/A")]
         public async Task<ActionResult> SetAsync(
-            [FromRoute] [Required] [MaxLength(128)] string key,
-            [FromForm] [Required] byte[] value,
-            [FromForm] DateTimeOffset? absoluteExpiration,
-            [FromForm] TimeSpan? slidingExpiration)
+            [Required] [MaxLength(128)] string key,
+            DateTimeOffset? absoluteExpiration,
+            TimeSpan? slidingExpiration,
+            [Required] IFormFile value)
         {
+            var bytes = new byte[value.Length];
+            using (var stream = value.OpenReadStream())
+            {
+                await stream.ReadAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+            }
+
+            // push the data portion to orleans
             await factory
                 .GetCacheGrain(key)
-                .SetAsync(value.AsImmutable(), absoluteExpiration, slidingExpiration)
+                .SetAsync(bytes.AsImmutable(), absoluteExpiration, slidingExpiration)
                 .ConfigureAwait(false);
 
             return Ok();
