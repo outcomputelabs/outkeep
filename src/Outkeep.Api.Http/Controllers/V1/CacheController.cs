@@ -65,7 +65,6 @@ namespace Outkeep.Api.Http.Controllers.V1
                 await stream.ReadAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
             }
 
-            // push the data portion to orleans
             await factory
                 .GetCacheGrain(key)
                 .SetAsync(bytes.AsImmutable(), absoluteExpiration, slidingExpiration)
