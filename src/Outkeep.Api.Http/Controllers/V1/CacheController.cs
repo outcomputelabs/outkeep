@@ -62,6 +62,7 @@ namespace Outkeep.Api.Http.Controllers.V1
         [HttpPut]
         [SwaggerOperation(OperationId = "SetCache")]
         [Route("{key}")]
+        [SwaggerResponse(StatusCodes.Status200OK, "cache item set")]
         [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "N/A")]
         public async Task<ActionResult> SetAsync(
             [Required] [MaxLength(128)] string key,
