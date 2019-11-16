@@ -79,11 +79,6 @@ namespace Outkeep.Api.Http
                         })
                         .Configure((context, app) =>
                         {
-                            if (context.HostingEnvironment.IsDevelopment())
-                            {
-                                app.UseDeveloperExceptionPage();
-                            }
-
                             app.UseHttpsRedirection();
                             app.UseRouting();
                             app.UseAuthentication();
