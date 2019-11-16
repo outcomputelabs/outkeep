@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Orleans;
+using Orleans.Concurrency;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http.Controllers.V1
@@ -42,6 +45,24 @@ namespace Outkeep.Api.Http.Controllers.V1
             }
 
             return Ok(reply.Value);
+        }
+
+        [HttpPost]
+        [SwaggerOperation(OperationId = "SetCache")]
+        [Route("{key}")]
+        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "N/A")]
+        public async Task<ActionResult> SetAsync(
+            [FromRoute] [Required] [MaxLength(128)] string key,
+            [FromForm] [Required] byte[] value,
+            [FromForm] DateTimeOffset? absoluteExpiration,
+            [FromForm] TimeSpan? slidingExpiration)
+        {
+            await factory
+                .GetCacheGrain(key)
+                .SetAsync(value.AsImmutable(), absoluteExpiration, slidingExpiration)
+                .ConfigureAwait(false);
+
+            return Ok();
         }
     }
 }
