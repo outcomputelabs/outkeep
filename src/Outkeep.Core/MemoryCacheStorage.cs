@@ -21,7 +21,7 @@ namespace Outkeep.Core
             {
                 return Task.FromResult<(byte[], DateTimeOffset?, TimeSpan?)?>(value);
             }
-            return null;
+            return NotFoundTask;
         }
 
         public Task WriteAsync(string key, byte[] value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
@@ -29,5 +29,8 @@ namespace Outkeep.Core
             storage[key] = (value, absoluteExpiration, slidingExpiration);
             return Task.CompletedTask;
         }
+
+        private static readonly Task<(byte[], DateTimeOffset?, TimeSpan?)?> NotFoundTask =
+            Task.FromResult<(byte[], DateTimeOffset?, TimeSpan?)?>(null);
     }
 }
