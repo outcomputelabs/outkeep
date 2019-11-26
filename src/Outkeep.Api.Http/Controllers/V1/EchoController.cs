@@ -16,6 +16,9 @@ namespace Outkeep.Api.Http.Controllers.V1
     {
         private readonly IGrainFactory factory;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="EchoController"/>.
+        /// </summary>
         public EchoController(IGrainFactory factory)
         {
             this.factory = factory;
