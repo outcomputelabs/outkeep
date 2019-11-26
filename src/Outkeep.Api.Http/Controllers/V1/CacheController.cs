@@ -21,6 +21,9 @@ namespace Outkeep.Api.Http.Controllers.V1
     {
         private readonly IGrainFactory factory;
 
+        /// <summary>
+        /// Creates a new instance of <see cref="CacheController"/>.
+        /// </summary>
         public CacheController(IGrainFactory factory)
         {
             this.factory = factory;
