@@ -1,19 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Orleans;
 using Orleans.Concurrency;
 using Outkeep.Api.Http.Controllers.V1;
 using Outkeep.Interfaces;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Xunit;
+using System.Linq;
 
 namespace Outkeep.Api.Http.Tests
 {
     public class CacheControllerV1Tests
     {
         private static readonly byte[] absent = null;
-        private static readonly byte[] present = Array.Empty<byte>();
+        private static readonly byte[] present = Guid.NewGuid().ToByteArray();
 
         [Fact]
         public async Task GettingNonExistingKeyReturnsNoContent()
@@ -39,6 +42,23 @@ namespace Outkeep.Api.Http.Tests
             var ok = Assert.IsType<OkObjectResult>(result.Result);
             var content = Assert.IsType<byte[]>(ok.Value);
             Assert.Same(present, content);
+        }
+
+        [Fact]
+        public async Task SetsKeyContent()
+        {
+            var key = Guid.NewGuid().ToString();
+            var value = Guid.NewGuid().ToByteArray();
+            var absoluteExpiration = DateTimeOffset.UtcNow.AddHours(1);
+            var slidingExpiration = TimeSpan.FromMinutes(1);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(It.Is<Immutable<byte[]>>(v => v.Value.SequenceEqual(value)), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
+            var controller = new CacheController(factory);
+
+            var file = Mock.Of<IFormFile>(x => x.OpenReadStream() == new MemoryStream(value) && x.Length == value.Length);
+            var result = await controller.SetAsync(key, absoluteExpiration, slidingExpiration, file).ConfigureAwait(false);
+
+            Mock.Get(factory).VerifyAll();
+            Assert.IsType<OkResult>(result);
         }
     }
 }
