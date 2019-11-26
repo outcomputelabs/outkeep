@@ -111,21 +111,15 @@ namespace Outkeep.Api.Http.Controllers.V1
         [Route("{key}")]
         [SwaggerOperation(OperationId = "RefreshCache")]
         [SwaggerResponse(StatusCodes.Status200OK, "Cache entry refreshed")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Cache entry not found")]
         public async Task<ActionResult> RefreshAsync(
             [Required] [MaxLength(128)] string key)
         {
-            var refreshed = await factory
+            await factory
                 .GetCacheGrain(key)
                 .RefreshAsync()
                 .ConfigureAwait(false);
 
-            if (refreshed)
-            {
-                return Ok();
-            }
-
-            return NotFound();
+            return Ok();
         }
     }
 }

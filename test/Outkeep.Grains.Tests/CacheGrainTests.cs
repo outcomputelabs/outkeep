@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
+using Orleans.Core;
 using Orleans.Timers;
+using Outkeep.Core;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -12,11 +15,13 @@ namespace Outkeep.Grains.Tests
         [Fact]
         public async Task RegistersTimerOnActivation()
         {
-            var options = Options.Create(new CacheGrainOptions
-            {
-            });
+            var options = Options.Create(new CacheGrainOptions { });
+            var logger = Mock.Of<ILogger<CacheGrain>>();
             var timers = Mock.Of<ITimerRegistry>();
-            var grain = new CacheGrain(options, timers);
+            var storage = Mock.Of<ICacheStorage>();
+            var clock = Mock.Of<ISystemClock>();
+            var identity = Mock.Of<IGrainIdentity>();
+            var grain = new CacheGrain(options, logger, timers, storage, clock, identity);
 
             await grain.OnActivateAsync().ConfigureAwait(false);
 
