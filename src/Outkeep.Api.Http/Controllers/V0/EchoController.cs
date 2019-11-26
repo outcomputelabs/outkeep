@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http.Controllers.V0
 {
+    /// <summary>
+    /// Echoes back messages to facilitate basic connectivity testing.
+    /// </summary>
     [ApiController]
     [ApiVersion("0")]
     [Route("api/v{version:apiVersion}/echo")]
