@@ -20,31 +20,31 @@ namespace Outkeep.Api.Http
             this.options = options?.Value;
         }
 
-        public void Configure(SwaggerGenOptions swagger)
+        public void Configure(SwaggerGenOptions options)
         {
-            swagger.DescribeAllParametersInCamelCase();
+            options.DescribeAllParametersInCamelCase();
 
             // add a swagger page for each api version
             foreach (var description in provider.ApiVersionDescriptions)
             {
-                swagger.SwaggerDoc(description.GroupName, new OpenApiInfo
+                options.SwaggerDoc(description.GroupName, new OpenApiInfo
                 {
-                    Title = options.Title,
+                    Title = this.options.Title,
                     Version = description.ApiVersion.ToString()
                 });
             }
 
             // remove the version number as a parameter from swagger
-            swagger.OperationFilter<RemoveVersionFromParametersOperationFilter>();
+            options.OperationFilter<RemoveVersionFromParametersOperationFilter>();
 
             // show the version number in the endpoint description
-            swagger.DocumentFilter<ReplaceVersionParameterInPathDocumentFilter>();
+            options.DocumentFilter<ReplaceVersionParameterInPathDocumentFilter>();
 
             // add assembly comments to swagger
-            swagger.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
 
             // allow swagger annotations in the controllers
-            swagger.EnableAnnotations();
+            options.EnableAnnotations();
         }
     }
 }
