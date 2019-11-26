@@ -16,7 +16,7 @@ namespace Outkeep.Api.Http.Tests
         private static readonly byte[] present = Array.Empty<byte>();
 
         [Fact]
-        public async Task GetNonExistingKeyReturnsNoContent()
+        public async Task GettingNonExistingKeyReturnsNoContent()
         {
             var key = Guid.NewGuid().ToString();
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == Task.FromResult(absent.AsImmutable()));
@@ -28,7 +28,7 @@ namespace Outkeep.Api.Http.Tests
         }
 
         [Fact]
-        public async Task GetExistingKeyReturnsOk()
+        public async Task GettingExistingKeyReturnsOk()
         {
             var key = Guid.NewGuid().ToString();
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == Task.FromResult(present.AsImmutable()));
