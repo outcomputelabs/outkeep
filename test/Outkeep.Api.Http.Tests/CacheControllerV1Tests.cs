@@ -74,5 +74,18 @@ namespace Outkeep.Api.Http.Tests
             Mock.Get(factory).VerifyAll();
             Assert.IsType<OkResult>(result);
         }
+
+        [Fact]
+        public async Task RefreshesKey()
+        {
+            var key = Guid.NewGuid().ToString();
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).RefreshAsync() == Task.CompletedTask);
+            var controller = new CacheController(factory);
+
+            var result = await controller.RefreshAsync(key).ConfigureAwait(false);
+
+            Mock.Get(factory).VerifyAll();
+            Assert.IsType<OkResult>(result);
+        }
     }
 }
