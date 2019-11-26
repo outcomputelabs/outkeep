@@ -7,22 +7,20 @@ using Outkeep.Api.Http.Controllers.V1;
 using Outkeep.Interfaces;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using System.Linq;
 
 namespace Outkeep.Api.Http.Tests
 {
     public class CacheControllerV1Tests
     {
-        private static readonly byte[] absent = null;
-        private static readonly byte[] present = Guid.NewGuid().ToByteArray();
-
         [Fact]
         public async Task GettingNonExistingKeyReturnsNoContent()
         {
             var key = Guid.NewGuid().ToString();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == Task.FromResult(absent.AsImmutable()));
+            byte[] value = null;
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == Task.FromResult(value.AsImmutable()));
             var controller = new CacheController(factory);
 
             var result = await controller.GetAsync(key).ConfigureAwait(false);
@@ -34,14 +32,16 @@ namespace Outkeep.Api.Http.Tests
         public async Task GettingExistingKeyReturnsOk()
         {
             var key = Guid.NewGuid().ToString();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == Task.FromResult(present.AsImmutable()));
+            var value = Guid.NewGuid().ToByteArray();
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == Task.FromResult(value.AsImmutable()));
             var controller = new CacheController(factory);
 
             var result = await controller.GetAsync(key).ConfigureAwait(false);
 
+            Mock.Get(factory).VerifyAll();
             var ok = Assert.IsType<OkObjectResult>(result.Result);
             var content = Assert.IsType<byte[]>(ok.Value);
-            Assert.Same(present, content);
+            Assert.Same(value, content);
         }
 
         [Fact]
