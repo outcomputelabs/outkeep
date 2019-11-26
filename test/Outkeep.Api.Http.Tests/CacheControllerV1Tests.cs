@@ -25,6 +25,7 @@ namespace Outkeep.Api.Http.Tests
 
             var result = await controller.GetAsync(key).ConfigureAwait(false);
 
+            Mock.Get(factory).VerifyAll();
             Assert.IsType<NoContentResult>(result.Result);
         }
 
