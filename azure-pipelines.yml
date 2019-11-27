@@ -55,6 +55,12 @@ steps:
     command: 'test'
     arguments: '--no-build --collect:"XPlat Code Coverage" --configuration $(buildConfiguration)'
 
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.cobertura.xml'
+    failIfCoverageEmpty: true
+
 - task: DotNetCoreCLI@2
   displayName: "End Sonar Scanner"
   inputs:
