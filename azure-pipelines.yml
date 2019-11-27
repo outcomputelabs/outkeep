@@ -34,7 +34,7 @@ steps:
   inputs:
     command: 'custom'
     custom: 'sonarscanner'
-    arguments: 'begin /k:"$(SonarQubeProjectKey)" /o:"$(SonarQubeOrganization)" /d:sonar.host.url="$(SonarQubeHostUrl)" /d:sonar.login="$(SonarQubeToken)" /d:sonar.flex.cobertura.reportPaths="$(Agent.TempDirectory)/**/coverage.cobertura.xml"'
+    arguments: 'begin /k:"$(SonarQubeProjectKey)" /o:"$(SonarQubeOrganization)" /d:sonar.host.url="$(SonarQubeHostUrl)" /d:sonar.login="$(SonarQubeToken)" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"'
 
 - task: DotNetCoreCLI@2
   displayName: "Build"
@@ -46,7 +46,7 @@ steps:
   displayName: "Test"
   inputs:
     command: 'test'
-    arguments: '--no-build --collect:"XPlat Code Coverage" --configuration $(buildConfiguration)'
+    arguments: '--no-build /p:CollectCoverage=true /p:CoverletOutput=coverage.opencover.xml /p:CoverletOutputFormat=opencover --configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: "End Sonar Scanner"
