@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Moq;
 using Orleans;
 using Orleans.Concurrency;
 using Outkeep.Interfaces;
@@ -46,6 +47,26 @@ namespace Outkeep.Client.Tests
             await cache.RemoveAsync(key).ConfigureAwait(false);
 
             Mock.Get(factory).VerifyAll();
+        }
+
+        [Fact]
+        public async Task SetAsyncCallsGrain()
+        {
+            var key = Guid.NewGuid().ToString();
+            var value = Guid.NewGuid().ToByteArray();
+            var absoluteExpiration = DateTimeOffset.UtcNow.AddHours(1);
+            var slidingExpiration = TimeSpan.FromMinutes(1);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(value.AsImmutable(), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
+            var cache = new OutkeepDistributedCache(factory);
+
+            var options = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpiration = absoluteExpiration,
+                SlidingExpiration = slidingExpiration
+            };
+            await cache.SetAsync(key, value, options).ConfigureAwait(false);
+
+            Mock.VerifyAll();
         }
     }
 }
