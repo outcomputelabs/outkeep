@@ -6,7 +6,7 @@ namespace Outkeep.Client.Tests
     public class HostBuilderExtensionsTests
     {
         [Fact]
-        public void UseOutkeepClientCallsActions()
+        public void UseOutkeepClientCallsActionsOnBuild()
         {
             var builder = new HostBuilder();
             var called = false;
@@ -15,6 +15,8 @@ namespace Outkeep.Client.Tests
             {
                 called = true;
             });
+
+            Assert.False(called);
 
             builder.Build();
 
