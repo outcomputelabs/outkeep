@@ -8,7 +8,7 @@
     <Product>Outkeep</Product>
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <NeutralLanguage>en-GB</NeutralLanguage>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
   </PropertyGroup>
 
