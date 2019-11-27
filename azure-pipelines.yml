@@ -50,6 +50,12 @@ steps:
     arguments: '--no-restore --configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--no-build --configuration $(buildConfiguration)'''
+
+- task: DotNetCoreCLI@2
   displayName: "Test"
   inputs:
     command: 'test'
