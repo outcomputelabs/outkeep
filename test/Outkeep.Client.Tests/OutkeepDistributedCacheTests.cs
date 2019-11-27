@@ -35,5 +35,17 @@ namespace Outkeep.Client.Tests
 
             Mock.Get(factory).VerifyAll();
         }
+
+        [Fact]
+        public async Task RemoveAsyncCallsGrain()
+        {
+            var key = Guid.NewGuid().ToString();
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).RemoveAsync() == Task.CompletedTask);
+            var cache = new OutkeepDistributedCache(factory);
+
+            await cache.RemoveAsync(key).ConfigureAwait(false);
+
+            Mock.Get(factory).VerifyAll();
+        }
     }
 }
