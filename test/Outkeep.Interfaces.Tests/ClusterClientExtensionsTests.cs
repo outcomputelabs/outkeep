@@ -18,5 +18,16 @@ namespace Outkeep.Interfaces.Tests
 
             Assert.Same(grain, result);
         }
+
+        [Fact]
+        public void GetEchoGrainReturnsEchoGrain()
+        {
+            var grain = Mock.Of<IEchoGrain>();
+            var client = Mock.Of<IClusterClient>(x => x.GetGrain<IEchoGrain>(Guid.Empty, null) == grain);
+
+            var result = client.GetEchoGrain();
+
+            Assert.Same(grain, result);
+        }
     }
 }
