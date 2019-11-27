@@ -23,5 +23,17 @@ namespace Outkeep.Client.Tests
             Assert.Same(value, result);
             Mock.Get(factory).VerifyAll();
         }
+
+        [Fact]
+        public async Task RefreshAsyncCallsGrain()
+        {
+            var key = Guid.NewGuid().ToString();
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).RefreshAsync() == Task.CompletedTask);
+            var cache = new OutkeepDistributedCache(factory);
+
+            await cache.RefreshAsync(key).ConfigureAwait(false);
+
+            Mock.Get(factory).VerifyAll();
+        }
     }
 }
