@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using Outkeep.Implementations.Properties;
+using Outkeep.Grains.Properties;
 using System;
 
 namespace Outkeep.Grains
