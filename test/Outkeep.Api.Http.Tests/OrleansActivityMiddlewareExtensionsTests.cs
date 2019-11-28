@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using Xunit;
@@ -18,6 +19,17 @@ namespace Outkeep.Api.Http.Tests
 
             Mock.Get(builder).VerifyAll();
             Assert.Same(builder, result);
+        }
+
+        [Fact]
+        public void AddActivityMiddleware()
+        {
+            var services = new ServiceCollection();
+
+            var result = services.AddActivityMiddleware();
+
+            Assert.Same(services, result);
+            Assert.Single(services, x => x.ServiceType == typeof(OrleansActivityMiddleware) && x.ImplementationType == typeof(OrleansActivityMiddleware) && x.Lifetime == ServiceLifetime.Transient);
         }
     }
 }
