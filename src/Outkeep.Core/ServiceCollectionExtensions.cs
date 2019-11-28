@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using System;
+using System.Linq;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -11,13 +12,16 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds <typeparamref name="T"/> as an <see cref="IHostedService"/> to the <see cref="IServiceCollection"/> if it is not yet present.
         /// </summary>
-        public static void TryAddHostedService<T>(this IServiceCollection services)
+        public static IServiceCollection TryAddHostedService<T>(this IServiceCollection services) where T : class, IHostedService
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            var service = new ServiceDescriptor(typeof(IHostedService), typeof(T), ServiceLifetime.Singleton);
-            if (services.Contains(service)) return;
-            services.Add(service);
+            if (!services.Any(x => x.ServiceType == typeof(IHostedService) && x.ImplementationType == typeof(T)))
+            {
+                services.AddHostedService<T>();
+            }
+
+            return services;
         }
     }
 }
