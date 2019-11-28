@@ -31,5 +31,28 @@ namespace Outkeep.Api.Http.Tests
             Assert.Same(services, result);
             Assert.Single(services, x => x.ServiceType == typeof(OrleansActivityMiddleware) && x.ImplementationType == typeof(OrleansActivityMiddleware) && x.Lifetime == ServiceLifetime.Transient);
         }
+
+        [Fact]
+        public void TryAddActivityMiddlewareAddsMiddleware()
+        {
+            var services = new ServiceCollection();
+
+            var result = services.TryAddActivityMiddleware();
+
+            Assert.Same(services, result);
+            Assert.Single(services, x => x.ServiceType == typeof(OrleansActivityMiddleware) && x.ImplementationType == typeof(OrleansActivityMiddleware) && x.Lifetime == ServiceLifetime.Transient);
+        }
+
+        [Fact]
+        public void TryAddActivityMiddlewareSkipsAdding()
+        {
+            var services = new ServiceCollection();
+            services.AddActivityMiddleware();
+
+            var result = services.TryAddActivityMiddleware();
+
+            Assert.Same(services, result);
+            Assert.Single(services, x => x.ServiceType == typeof(OrleansActivityMiddleware) && x.ImplementationType == typeof(OrleansActivityMiddleware) && x.Lifetime == ServiceLifetime.Transient);
+        }
     }
 }
