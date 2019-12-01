@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Outkeep.Core
@@ -9,13 +10,13 @@ namespace Outkeep.Core
         private readonly ConcurrentDictionary<string, (byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)> storage =
             new ConcurrentDictionary<string, (byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)>();
 
-        public Task ClearAsync(string key)
+        public Task ClearAsync(string key, CancellationToken cancellationToken = default)
         {
             storage.TryRemove(key, out _);
             return Task.CompletedTask;
         }
 
-        public Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> TryReadAsync(string key)
+        public Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> TryReadAsync(string key, CancellationToken cancellationToken = default)
         {
             if (storage.TryGetValue(key, out var value))
             {
@@ -24,7 +25,7 @@ namespace Outkeep.Core
             return NotFoundTask;
         }
 
-        public Task WriteAsync(string key, byte[] value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
+        public Task WriteAsync(string key, byte[] value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration, CancellationToken cancellationToken = default)
         {
             storage[key] = (value, absoluteExpiration, slidingExpiration);
             return Task.CompletedTask;
