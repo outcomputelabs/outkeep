@@ -16,14 +16,14 @@ namespace Outkeep.Core.Tests
             var storage = new MemoryCacheStorage();
 
             // attempt to read empty state
-            var result = await storage.TryReadAsync(key).ConfigureAwait(false);
+            var result = await storage.ReadAsync(key).ConfigureAwait(false);
             Assert.False(result.HasValue);
 
             // write some state
             await storage.WriteAsync(key, value, absoluteExpiration, slidingExpiration).ConfigureAwait(false);
 
             // attempt to read that state
-            result = await storage.TryReadAsync(key).ConfigureAwait(false);
+            result = await storage.ReadAsync(key).ConfigureAwait(false);
             Assert.True(result.HasValue);
             Assert.Same(value, result.Value.Value);
             Assert.Equal(absoluteExpiration, result.Value.AbsoluteExpiration);
@@ -33,7 +33,7 @@ namespace Outkeep.Core.Tests
             await storage.ClearAsync(key).ConfigureAwait(false);
 
             // attempt to read the cleared state
-            result = await storage.TryReadAsync(key).ConfigureAwait(false);
+            result = await storage.ReadAsync(key).ConfigureAwait(false);
             Assert.False(result.HasValue);
         }
     }

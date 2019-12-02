@@ -16,7 +16,7 @@ namespace Outkeep.Core
             return Task.CompletedTask;
         }
 
-        public Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> TryReadAsync(string key, CancellationToken cancellationToken = default)
+        public Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> ReadAsync(string key, CancellationToken cancellationToken = default)
         {
             if (storage.TryGetValue(key, out var value))
             {

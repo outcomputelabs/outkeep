@@ -6,7 +6,7 @@ namespace Outkeep.Core
 {
     public interface ICacheStorage
     {
-        Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> TryReadAsync(string key, CancellationToken cancellationToken = default);
+        Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> ReadAsync(string key, CancellationToken cancellationToken = default);
 
         Task ClearAsync(string key, CancellationToken cancellationToken = default);
 

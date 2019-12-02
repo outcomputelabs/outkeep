@@ -84,7 +84,7 @@ namespace Outkeep.Grains
         private async Task<Immutable<byte[]>> LoadAsync()
         {
             // attempt to read the value from storage as a best effort
-            var saved = await storage.TryReadAsync(identity.PrimaryKeyString).ConfigureAwait(true);
+            var saved = await storage.ReadAsync(identity.PrimaryKeyString).ConfigureAwait(true);
             if (saved.HasValue)
             {
                 valueAsTask = Task.FromResult(saved.Value.Value.AsImmutable());
