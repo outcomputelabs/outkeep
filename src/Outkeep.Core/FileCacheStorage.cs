@@ -43,15 +43,17 @@ namespace Outkeep.Core
             {
                 // this will attempt to open and close the file while letting the operating system delete it upon close
                 // we do this instead of file.delete to attempt to use the underlying platform overlapped i/o capability
-                using var stream = new FileStream(
+                // todo: test if this happens at all across all platforms
+                using (var stream = new FileStream(
                     path,
                     FileMode.Open,
                     FileAccess.Write,
                     FileShare.None,
                     default,
-                    FileOptions.DeleteOnClose | FileOptions.Asynchronous);
-
-                await stream.DisposeAsync();
+                    FileOptions.DeleteOnClose | FileOptions.Asynchronous))
+                {
+                    await stream.DisposeAsync();
+                }
             }
             catch (FileNotFoundException)
             {
@@ -73,62 +75,60 @@ namespace Outkeep.Core
         public async Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> ReadAsync(string key, CancellationToken cancellationToken = default)
         {
             var path = KeyToFileName(key);
+            string readKey = null;
+            byte[] value = null;
+            DateTimeOffset? absoluteExpiration = null;
+            TimeSpan? slidingExpiration = null;
+
             try
             {
-                using var stream = new FileStream(
+                using (var stream = new FileStream(
                     path,
                     FileMode.Open,
                     FileAccess.Read,
                     FileShare.Read,
                     default,
-                    FileOptions.Asynchronous);
-
-                using var document = await JsonDocument.ParseAsync(stream, default, cancellationToken).ConfigureAwait(false);
-
-                string readKey = null;
-                byte[] value = null;
-                DateTimeOffset? absoluteExpiration = null;
-                TimeSpan? slidingExpiration = null;
-
-                if (document.RootElement.TryGetProperty(KeyPropertyName, out var keyValue))
+                    FileOptions.Asynchronous))
                 {
-                    readKey = keyValue.GetString();
-
-                    if (readKey != key)
+                    using (var document = await JsonDocument.ParseAsync(stream, default, cancellationToken).ConfigureAwait(false))
                     {
-                        throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ContainsKey_X_YetWeExpected_X.Format(path, readKey, key), path, key, readKey);
+                        if (document.RootElement.TryGetProperty(KeyPropertyName, out var keyValue))
+                        {
+                            readKey = keyValue.GetString();
+
+                            if (readKey != key)
+                            {
+                                throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ContainsKey_X_YetWeExpected_X.Format(path, readKey, key), path, key, readKey);
+                            }
+                        }
+                        else
+                        {
+                            throw new FileCacheStorageException(Resources.Exception_CacheFile_X_DoesNotContainExpectedKey_X.Format(path, key), path, key);
+                        }
+
+                        if (document.RootElement.TryGetProperty(ValuePropertyName, out var valueValue))
+                        {
+                            value = valueValue.GetBytesFromBase64();
+                        }
+                        else
+                        {
+                            throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ForKey_X_DoesNotContainValue.Format(path, key));
+                        }
+
+                        if (document.RootElement.TryGetProperty(AbsoluteExpirationPropertyName, out var absoluteExpirationValue))
+                        {
+                            absoluteExpiration = absoluteExpirationValue.GetDateTimeOffset();
+                        }
+
+                        if (document.RootElement.TryGetProperty(SlidingExpirationPropertyName, out var slidingExpirationValue))
+                        {
+                            // todo: refactor this into non-allocating code if/when the json reader supports timespan or at least writing to a span
+                            slidingExpiration = TimeSpan.Parse(slidingExpirationValue.GetString(), CultureInfo.InvariantCulture);
+                        }
                     }
-                }
-                else
-                {
-                    throw new FileCacheStorageException(Resources.Exception_CacheFile_X_DoesNotContainExpectedKey_X.Format(path, key), path, key);
-                }
 
-                if (document.RootElement.TryGetProperty(ValuePropertyName, out var valueValue))
-                {
-                    value = valueValue.GetBytesFromBase64();
+                    await stream.DisposeAsync();
                 }
-                else
-                {
-                    throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ForKey_X_DoesNotContainValue.Format(path, key));
-                }
-
-                if (document.RootElement.TryGetProperty(AbsoluteExpirationPropertyName, out var absoluteExpirationValue))
-                {
-                    absoluteExpiration = absoluteExpirationValue.GetDateTimeOffset();
-                }
-
-                if (document.RootElement.TryGetProperty(SlidingExpirationPropertyName, out var slidingExpirationValue))
-                {
-                    // todo: refactor this into non-allocating code if/when the json reader supports timespan or at least writing to a span
-                    slidingExpiration = TimeSpan.Parse(slidingExpirationValue.GetString(), CultureInfo.InvariantCulture);
-                }
-
-                await stream.DisposeAsync();
-
-                Log.ReadFile(logger, path, key, value.Length);
-
-                return (value, absoluteExpiration, slidingExpiration);
             }
             catch (FileNotFoundException)
             {
@@ -149,6 +149,9 @@ namespace Outkeep.Core
                 Log.Failed(logger, path, key, error);
                 throw error;
             }
+
+            Log.ReadFile(logger, path, key, value.Length);
+            return (value, absoluteExpiration, slidingExpiration);
         }
 
         public async Task WriteAsync(string key, byte[] value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration, CancellationToken cancellationToken = default)
@@ -160,46 +163,50 @@ namespace Outkeep.Core
             try
             {
                 // open the storage file for async writing
-                using var stream = new FileStream(
+                using (var stream = new FileStream(
                     path,
                     FileMode.OpenOrCreate,
                     FileAccess.ReadWrite,
                     FileShare.None,
                     default,
-                    FileOptions.Asynchronous | FileOptions.SequentialScan | FileOptions.WriteThrough);
-
-                // clear any existing data
-                stream.SetLength(0);
-
-                // todo: the writer supports resetting to a new stream so create a pool to reduce allocations
-                using var writer = new Utf8JsonWriter(stream);
-                writer.WriteStartObject();
-
-                writer.WriteString(KeyPropertyName, key);
-                writer.WriteBase64String(ValuePropertyName, value);
-
-                if (absoluteExpiration.HasValue)
+                    FileOptions.Asynchronous | FileOptions.SequentialScan | FileOptions.WriteThrough))
                 {
-                    writer.WriteString(AbsoluteExpirationPropertyName, absoluteExpiration.Value);
-                }
+                    // clear any existing data
+                    stream.SetLength(0);
 
-                if (slidingExpiration.HasValue)
-                {
-                    // temporary approach to reduce allocations due to lack of timespan support from the writer
-                    using var buffer = MemoryPool<char>.Shared.Rent(100);
-                    if (slidingExpiration.Value.TryFormat(buffer.Memory.Span, out var charsWritten))
+                    // todo: the writer supports resetting to a new stream so create an ownership pool to reduce allocations
+                    using (var writer = new Utf8JsonWriter(stream))
                     {
-                        writer.WriteString(SlidingExpirationPropertyName, buffer.Memory.Span.Slice(0, charsWritten));
+                        writer.WriteStartObject();
+
+                        writer.WriteString(KeyPropertyName, key);
+                        writer.WriteBase64String(ValuePropertyName, value);
+
+                        if (absoluteExpiration.HasValue)
+                        {
+                            writer.WriteString(AbsoluteExpirationPropertyName, absoluteExpiration.Value);
+                        }
+
+                        if (slidingExpiration.HasValue)
+                        {
+                            // temporary approach to reduce allocations due to lack of timespan support from the writer
+                            using var buffer = MemoryPool<char>.Shared.Rent(100);
+                            if (slidingExpiration.Value.TryFormat(buffer.Memory.Span, out var charsWritten))
+                            {
+                                writer.WriteString(SlidingExpirationPropertyName, buffer.Memory.Span.Slice(0, charsWritten));
+                            }
+                        }
+
+                        writer.WriteEndObject();
+
+                        await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+                        size = writer.BytesCommitted;
+
+                        await writer.DisposeAsync();
                     }
+
+                    await stream.DisposeAsync();
                 }
-
-                writer.WriteEndObject();
-
-                await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
-                size = writer.BytesCommitted;
-
-                await writer.DisposeAsync();
-                await stream.DisposeAsync();
             }
             catch (Exception ex)
             {
@@ -276,7 +283,7 @@ namespace Outkeep.Core
             public static void FileNotFound(ILogger logger, string path, string key) =>
                 _fileNotFound(logger, path, key, null);
 
-            #endregion
+            #endregion FileNotFound
         }
     }
 }
