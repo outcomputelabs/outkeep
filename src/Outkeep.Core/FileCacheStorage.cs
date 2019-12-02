@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using Outkeep.Core.Properties;
 using System;
 using System.Buffers;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -18,6 +20,9 @@ namespace Outkeep.Core
         private const string ValuePropertyName = "value";
         private const string AbsoluteExpirationPropertyName = "absoluteExpiration";
         private const string SlidingExpirationPropertyName = "slidingExpiration";
+        private const string Extension = ".json";
+        private const char InvalidFileNameReplacementChar = '_';
+        private static readonly ImmutableHashSet<char> InvalidFileNameChars = Path.GetInvalidFileNameChars().ToImmutableHashSet();
 
         public FileCacheStorage(ILogger<FileCacheStorage> logger, IOptions<FileCacheStorageOptions> options)
         {
@@ -28,14 +33,25 @@ namespace Outkeep.Core
         private readonly ILogger<FileCacheStorage> logger;
         private readonly FileCacheStorageOptions options;
 
+        [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "N/A")]
         private string KeyToFileName(string key)
         {
-            // todo: refactor this allocation happy code into span based formatting
-            return $"{Path.Combine(options.StorageDirectory, BitConverter.ToString(Encoding.UTF8.GetBytes(key)))}.json";
+            Span<char> title = stackalloc char[key.Length + Extension.Length];
+            for (var i = 0; i < key.Length; ++i)
+            {
+                title[i] = InvalidFileNameChars.Contains(key[i]) ?
+                    InvalidFileNameReplacementChar :
+                    key[i];
+            }
+            Extension.AsSpan().CopyTo(title.Slice(key.Length));
+
+            return Path.Join(options.StorageDirectory, title);
         }
 
         public async Task ClearAsync(string key, CancellationToken cancellationToken = default)
         {
+            if (key == null) throw new ArgumentNullException(nameof(key));
+
             // attempt to delete the file in an async fashion as not to block the caller thread
             // todo: benchmark this to make sure it works across different platforms
             var path = KeyToFileName(key);
@@ -47,9 +63,9 @@ namespace Outkeep.Core
                 using (var stream = new FileStream(
                     path,
                     FileMode.Open,
-                    FileAccess.Write,
-                    FileShare.None,
-                    default,
+                    FileAccess.Read,
+                    FileShare.Read,
+                    options.BufferSize,
                     FileOptions.DeleteOnClose | FileOptions.Asynchronous))
                 {
                     await stream.DisposeAsync();
