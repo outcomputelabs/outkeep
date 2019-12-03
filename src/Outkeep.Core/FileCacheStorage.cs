@@ -93,12 +93,12 @@ namespace Outkeep.Core
             {
                 // this will attempt to open and close the file while letting the operating system delete it upon close
                 // we do this instead of file.delete to attempt to use the underlying platform overlapped i/o capability
-                // todo: test if this happens at all across all platforms
+                // todo: test if this happens at all across all platforms and in slower network storage
                 using (var stream = new FileStream(
                     path,
                     FileMode.Open,
                     FileAccess.Read,
-                    FileShare.Read,
+                    FileShare.None,
                     options.BufferSize,
                     FileOptions.DeleteOnClose | FileOptions.Asynchronous))
                 {
