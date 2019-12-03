@@ -86,5 +86,32 @@ namespace Outkeep.Core.Tests
 
             Assert.False(File.Exists(path));
         }
+
+        [Fact]
+        public async Task ClearFailsOnError()
+        {
+            var key = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
+            var title = KeyToFileTitle(key);
+            var directory = Path.GetTempPath();
+            var path = Path.Combine(directory, title);
+
+            // keep the file open
+            using (var file = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.DeleteOnClose))
+            {
+                Assert.True(File.Exists(path));
+
+                var logger = new NullLogger<FileCacheStorage>();
+                var options = new FileCacheStorageOptions
+                {
+                    StorageDirectory = directory
+                };
+                var storage = new FileCacheStorage(logger, Options.Create(options));
+
+                var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ClearAsync(key))
+                    .ConfigureAwait(false);
+
+                Assert.IsType<IOException>(error.InnerException);
+            }
+        }
     }
 }
