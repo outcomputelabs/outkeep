@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Orleans;
 using Outkeep.Core.Properties;
 using System;
 using System.Buffers;
@@ -7,7 +8,6 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +22,7 @@ namespace Outkeep.Core
         private const string SlidingExpirationPropertyName = "slidingExpiration";
         private const string Extension = ".json";
         private const char InvalidFileNameReplacementChar = '_';
+        private const char HashSeparator = '.';
         private static readonly ImmutableHashSet<char> InvalidFileNameChars = Path.GetInvalidFileNameChars().ToImmutableHashSet();
 
         public FileCacheStorage(ILogger<FileCacheStorage> logger, IOptions<FileCacheStorageOptions> options)
@@ -36,16 +37,49 @@ namespace Outkeep.Core
         [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "N/A")]
         private string KeyToFileName(string key)
         {
-            Span<char> title = stackalloc char[key.Length + Extension.Length];
+            Span<char> path = stackalloc char[1 << 10];
+
+            // format the storage directory into the file path
+            options.StorageDirectory.AsSpan().CopyTo(path);
+            var count = options.StorageDirectory.Length;
+
+            // add in the path separator if not there yet
+            if (path[count - 1] != Path.DirectorySeparatorChar && path[count - 1] != Path.AltDirectorySeparatorChar)
+            {
+                path[count] = Path.DirectorySeparatorChar;
+            }
+
+            // format the key into the title by replacing invalid characters
             for (var i = 0; i < key.Length; ++i)
             {
-                title[i] = InvalidFileNameChars.Contains(key[i]) ?
+                path[count + i] = InvalidFileNameChars.Contains(key[i]) ?
                     InvalidFileNameReplacementChar :
                     key[i];
             }
-            Extension.AsSpan().CopyTo(title.Slice(key.Length));
+            count += key.Length;
 
-            return Path.Join(options.StorageDirectory, title);
+            // add in the hash separator
+            path[count] = HashSeparator;
+            ++count;
+
+            // add in the hash itself
+            if (!JenkinsHash.ComputeHash(key).TryFormat(path.Slice(count), out var charsWritten))
+            {
+                ThrowInvalidOperationException();
+            }
+            count += charsWritten;
+
+            // add the file extension
+            if (!Extension.AsSpan().TryCopyTo(path.Slice(count)))
+            {
+                ThrowInvalidOperationException();
+            }
+            count += Extension.Length;
+
+            // all done
+            return path.Slice(0, count).ToString();
+
+            static void ThrowInvalidOperationException() => throw new InvalidOperationException();
         }
 
         public async Task ClearAsync(string key, CancellationToken cancellationToken = default)

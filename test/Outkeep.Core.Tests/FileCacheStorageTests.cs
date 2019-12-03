@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Orleans;
 using System;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -13,11 +15,10 @@ namespace Outkeep.Core.Tests
     {
         private static readonly ImmutableHashSet<char> InvalidFileNameChars = Path.GetInvalidFileNameChars().ToImmutableHashSet();
         private const char InvalidFileNameReplacementChar = '_';
-        private const string Extension = ".json";
 
-        private static string KeyToFileTitle(string key)
+        private static string ReplaceInvalidFileNameChars(string str)
         {
-            return string.Create(key.Length + Extension.Length, key, (output, input) =>
+            return string.Create(str.Length, str, (output, input) =>
             {
                 for (var i = 0; i < input.Length; ++i)
                 {
@@ -25,9 +26,13 @@ namespace Outkeep.Core.Tests
                         InvalidFileNameReplacementChar :
                         input[i];
                 }
-
-                Extension.AsSpan().CopyTo(output.Slice(input.Length));
             });
+        }
+
+        private static string KeyToFileTitle(string key)
+        {
+            var hash = JenkinsHash.ComputeHash(key);
+            return $"{ReplaceInvalidFileNameChars(key)}.{hash}.json";
         }
 
         [Fact]
