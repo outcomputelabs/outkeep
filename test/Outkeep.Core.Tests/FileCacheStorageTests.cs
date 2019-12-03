@@ -5,7 +5,9 @@ using System;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -113,6 +115,53 @@ namespace Outkeep.Core.Tests
                 Assert.Equal(key, error.Key);
                 Assert.Equal(path, error.Path);
                 Assert.IsType<IOException>(error.InnerException);
+            }
+        }
+
+        [Fact]
+        public async Task ReadReturnsCorrectContent()
+        {
+            var key = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
+            var title = KeyToFileTitle(key);
+            var directory = Path.GetTempPath();
+            var path = Path.Combine(directory, title);
+            var value = Guid.NewGuid().ToByteArray();
+            var absoluteExpiration = DateTimeOffset.UtcNow;
+            var slidingExpiration = TimeSpan.FromMinutes(1);
+
+            using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous))
+            using (var writer = new Utf8JsonWriter(stream))
+            {
+                writer.WriteStartObject();
+                writer.WriteString(nameof(key), key);
+                writer.WriteString(nameof(absoluteExpiration), absoluteExpiration);
+                writer.WriteString(nameof(slidingExpiration), slidingExpiration.ToString());
+                writer.WriteBase64String(nameof(value), value);
+                writer.WriteEndObject();
+
+                await writer.DisposeAsync();
+                await stream.DisposeAsync();
+            }
+
+            try
+            {
+                var logger = new NullLogger<FileCacheStorage>();
+                var options = new FileCacheStorageOptions
+                {
+                    StorageDirectory = directory
+                };
+                var storage = new FileCacheStorage(logger, Options.Create(options));
+
+                var result = await storage.ReadAsync(key).ConfigureAwait(false);
+
+                Assert.True(result.HasValue);
+                Assert.Equal(absoluteExpiration, result.Value.AbsoluteExpiration);
+                Assert.Equal(slidingExpiration, result.Value.SlidingExpiration);
+                Assert.True(value.SequenceEqual(result.Value.Value));
+            }
+            finally
+            {
+                File.Delete(path);
             }
         }
     }

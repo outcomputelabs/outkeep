@@ -124,8 +124,9 @@ namespace Outkeep.Core
 
         public async Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> ReadAsync(string key, CancellationToken cancellationToken = default)
         {
+            if (key == null) throw new ArgumentNullException(nameof(key));
+
             var path = KeyToFileName(key);
-            string readKey = null;
             byte[] value = null;
             DateTimeOffset? absoluteExpiration = null;
             TimeSpan? slidingExpiration = null;
@@ -137,14 +138,14 @@ namespace Outkeep.Core
                     FileMode.Open,
                     FileAccess.Read,
                     FileShare.Read,
-                    default,
+                    options.BufferSize,
                     FileOptions.Asynchronous))
                 {
                     using (var document = await JsonDocument.ParseAsync(stream, default, cancellationToken).ConfigureAwait(false))
                     {
                         if (document.RootElement.TryGetProperty(KeyPropertyName, out var keyValue))
                         {
-                            readKey = keyValue.GetString();
+                            string readKey = keyValue.GetString();
 
                             if (readKey != key)
                             {
