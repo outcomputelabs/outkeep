@@ -36,7 +36,7 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public async Task ClearDeletesFile()
+        public async Task ClearDeletesExistingFile()
         {
             var key = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             var title = KeyToFileTitle(key);
@@ -63,6 +63,28 @@ namespace Outkeep.Core.Tests
             {
                 File.Delete(path);
             }
+        }
+
+        [Fact]
+        public async Task ClearIgnoresNonExistingFile()
+        {
+            var key = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
+            var title = KeyToFileTitle(key);
+            var directory = Path.GetTempPath();
+            var path = Path.Combine(directory, title);
+
+            Assert.False(File.Exists(path));
+
+            var logger = new NullLogger<FileCacheStorage>();
+            var options = new FileCacheStorageOptions
+            {
+                StorageDirectory = directory
+            };
+            var storage = new FileCacheStorage(logger, Options.Create(options));
+
+            await storage.ClearAsync(key).ConfigureAwait(false);
+
+            Assert.False(File.Exists(path));
         }
     }
 }
