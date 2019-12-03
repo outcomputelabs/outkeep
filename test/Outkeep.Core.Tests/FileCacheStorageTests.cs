@@ -110,6 +110,8 @@ namespace Outkeep.Core.Tests
                 var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ClearAsync(key))
                     .ConfigureAwait(false);
 
+                Assert.Equal(key, error.Key);
+                Assert.Equal(path, error.Path);
                 Assert.IsType<IOException>(error.InnerException);
             }
         }
