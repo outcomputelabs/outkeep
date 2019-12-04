@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using Xunit;
 
 namespace Outkeep.Core.Tests
@@ -8,7 +10,7 @@ namespace Outkeep.Core.Tests
         [Fact]
         public void Constructs()
         {
-            // act
+            // arrange
             var exception = new FileCacheStorageException();
 
             // assert
@@ -21,7 +23,7 @@ namespace Outkeep.Core.Tests
         [Fact]
         public void ConstructsWithMessage()
         {
-            // act
+            // arrange
             var message = "SomeMessage";
             var exception = new FileCacheStorageException(message);
 
@@ -35,7 +37,7 @@ namespace Outkeep.Core.Tests
         [Fact]
         public void ConstructsWithBaseParameters()
         {
-            // act
+            // arrange
             var message = "SomeMessage";
             var path = "SomePath";
             var key = "SomeKey";
@@ -51,7 +53,7 @@ namespace Outkeep.Core.Tests
         [Fact]
         public void ConstructsWithExtraParameters()
         {
-            // act
+            // arrange
             var message = "SomeMessage";
             var path = "SomePath";
             var key = "SomeKey";
@@ -68,7 +70,7 @@ namespace Outkeep.Core.Tests
         [Fact]
         public void ConstructsWithMessageAndInnerException()
         {
-            // act
+            // arrange
             var message = "SomeMessage";
             var inner = new Exception();
             var exception = new FileCacheStorageException(message, inner);
@@ -84,7 +86,7 @@ namespace Outkeep.Core.Tests
         [Fact]
         public void ConstructsWithBaseParametersAndInnerException()
         {
-            // act
+            // arrange
             var message = "SomeMessage";
             var path = "SomePath";
             var key = "SomeKey";
@@ -102,7 +104,7 @@ namespace Outkeep.Core.Tests
         [Fact]
         public void ConstructsWithExtraParametersAndInnerException()
         {
-            // act
+            // arrange
             var message = "SomeMessage";
             var path = "SomePath";
             var key = "SomeKey";
@@ -116,6 +118,37 @@ namespace Outkeep.Core.Tests
             Assert.Equal(otherKey, exception.OtherKey);
             Assert.Same(inner, exception.InnerException);
             Assert.Equal(message, exception.Message);
+        }
+
+        [Fact]
+        public void CanSerialize()
+        {
+            // act
+            var message = "SomeMessage";
+            var path = "SomePath";
+            var key = "SomeKey";
+            var otherKey = "SomeOtherKey";
+            var inner = new Exception("Some Inner Exception");
+            var exception = new FileCacheStorageException(message, path, key, otherKey, inner);
+            var formatter = new BinaryFormatter();
+
+            // act
+            object obj;
+            using (var stream = new MemoryStream())
+            {
+                formatter.Serialize(stream, exception);
+                stream.Position = 0;
+                obj = formatter.Deserialize(stream);
+            }
+
+            // assert
+            Assert.NotNull(obj);
+            var result = Assert.IsType<FileCacheStorageException>(obj);
+            Assert.Equal(path, result.Path);
+            Assert.Equal(key, result.Key);
+            Assert.Equal(otherKey, result.OtherKey);
+            Assert.Equal(inner.Message, result.InnerException.Message);
+            Assert.Equal(message, result.Message);
         }
 
         [Fact]
