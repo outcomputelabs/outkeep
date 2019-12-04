@@ -27,5 +27,16 @@ namespace Outkeep.Hosting.Tests
             // act and assert
             Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1, 1 << 16 + 1));
         }
+
+        [Fact]
+        public void RefusesOverlappedEndPort()
+        {
+            // arrange
+            var factory = Mock.Of<ITcpListenerWrapperFactory>();
+            var helper = new TcpHelper(factory);
+
+            // act and assert
+            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1 << 16 + 1, 1 << 16));
+        }
     }
 }
