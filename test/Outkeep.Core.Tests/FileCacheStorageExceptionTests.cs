@@ -117,5 +117,24 @@ namespace Outkeep.Core.Tests
             Assert.Same(inner, exception.InnerException);
             Assert.Equal(message, exception.Message);
         }
+
+        [Fact]
+        public void ToStringOutputsString()
+        {
+            // arrange
+            var key = "SomeKey";
+            var otherKey = "SomeOtherKey";
+            var path = "SomePath";
+            var message = "SomeMessage";
+            var innerException = new Exception("Some Inner Exception Message");
+            var expected = $"{nameof(FileCacheStorageException)}: Key='{key}', OtherKey='{otherKey}', Path='{path}', Message='{message}', InnerException='{innerException}'";
+            var exception = new FileCacheStorageException(message, path, key, otherKey, innerException);
+
+            // act
+            var result = exception.ToString();
+
+            // assert
+            Assert.Equal(expected, result);
+        }
     }
 }
