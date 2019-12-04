@@ -7,10 +7,12 @@ namespace Outkeep.Core
     public class FileCacheStorageException : StorageException
     {
         public FileCacheStorageException()
+            : this(null, null, null, null, null)
         {
         }
 
-        public FileCacheStorageException(string message) : base(message)
+        public FileCacheStorageException(string message)
+            : this(message, null, null, null, null)
         {
         }
 
@@ -24,14 +26,14 @@ namespace Outkeep.Core
         {
         }
 
-        public FileCacheStorageException(string message, Exception innerException) : base(message, innerException)
+        public FileCacheStorageException(string message, Exception innerException)
+            : this(message, null, null, null, innerException)
         {
         }
 
-        public FileCacheStorageException(string message, string path, string key, Exception innerException) : base(message, innerException)
+        public FileCacheStorageException(string message, string path, string key, Exception innerException)
+            : this(message, path, key, null, innerException)
         {
-            Path = path;
-            Key = key;
         }
 
         public FileCacheStorageException(string message, string path, string key, string otherKey, Exception innerException) : base(message, innerException)
