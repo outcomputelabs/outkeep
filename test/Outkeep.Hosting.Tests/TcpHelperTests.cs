@@ -1,5 +1,6 @@
 ﻿using Moq;
 using System;
+using System.Net.Sockets;
 using Xunit;
 
 namespace Outkeep.Hosting.Tests
@@ -14,7 +15,7 @@ namespace Outkeep.Hosting.Tests
             var helper = new TcpHelper(factory);
 
             // act and assert
-            Assert.Throws<ArgumentOutOfRangeException>("start", () => helper.GetFreePort(0, 60000));
+            Assert.Throws<ArgumentOutOfRangeException>("start", () => helper.GetFreePort(0, 1 << 16 - 1));
         }
 
         [Fact]
@@ -25,7 +26,7 @@ namespace Outkeep.Hosting.Tests
             var helper = new TcpHelper(factory);
 
             // act and assert
-            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1, 1 << 16 + 1));
+            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1, 1 << 16));
         }
 
         [Fact]
@@ -36,7 +37,25 @@ namespace Outkeep.Hosting.Tests
             var helper = new TcpHelper(factory);
 
             // act and assert
-            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1 << 16 + 1, 1 << 16));
+            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1 << 16, 1 << 16 - 1));
+        }
+
+        [Fact]
+        public void GetsFirstFreePort()
+        {
+            // arrange
+            var factory = Mock.Of<ITcpListenerWrapperFactory>();
+            Mock.Get(factory).Setup(x => x.Create(1, true).Start()).Throws(new SocketException());
+            Mock.Get(factory).Setup(x => x.Create(2, true).Start()).Throws(new SocketException());
+            Mock.Get(factory).Setup(x => x.Create(3, true)).Returns(Mock.Of<ITcpListenerWrapper>());
+
+            var helper = new TcpHelper(factory);
+
+            // act
+            var port = helper.GetFreePort(1, 1 << 16 - 1);
+
+            // assert
+            Assert.Equal(3, port);
         }
     }
 }

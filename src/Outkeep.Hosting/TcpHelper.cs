@@ -26,7 +26,7 @@ namespace Outkeep.Hosting
                 try
                 {
                     listener.Start();
-                    return ((IPEndPoint)listener.LocalEndpoint).Port;
+                    return port;
                 }
                 catch (SocketException)
                 {
