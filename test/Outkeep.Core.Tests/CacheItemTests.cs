@@ -98,5 +98,21 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.False(result);
         }
+
+        [Fact]
+        public void DoesNotEqualsOtherItemWithDifferentSlidingExpiration()
+        {
+            // arrange
+            var value = Guid.NewGuid().ToByteArray();
+            var absolute = DateTimeOffset.UtcNow;
+            var item = new CacheItem(value, absolute, TimeSpan.MinValue);
+            var other = new CacheItem(value, absolute, TimeSpan.MaxValue);
+
+            // act
+            var result = item.Equals(other);
+
+            // assert
+            Assert.False(result);
+        }
     }
 }
