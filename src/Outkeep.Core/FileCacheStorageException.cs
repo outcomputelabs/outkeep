@@ -14,10 +14,9 @@ namespace Outkeep.Core
         {
         }
 
-        public FileCacheStorageException(string message, string path, string key) : base(message)
+        public FileCacheStorageException(string message, string path, string key)
+            : this(message, path, key, null, null)
         {
-            Path = path;
-            Key = key;
         }
 
         public FileCacheStorageException(string message, string path, string key, string otherKey) : base(message)
