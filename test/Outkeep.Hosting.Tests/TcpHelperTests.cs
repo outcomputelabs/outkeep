@@ -91,5 +91,19 @@ namespace Outkeep.Hosting.Tests
             // assert
             Assert.Equal(port, result);
         }
+
+        [Fact]
+        public void GetFreeDynamicPortThrowsOnUnexpectedEndPointType()
+        {
+            // arrange
+            var port = 51234;
+            var factory = Mock.Of<ITcpListenerWrapperFactory>(x =>
+                x.Create(0, true).LocalEndpoint == new DnsEndPoint("localhost", port));
+            var helper = new TcpHelper(factory);
+
+            // act and assert
+            var error = Assert.Throws<InvalidOperationException>(() => helper.GetFreeDynamicPort());
+            Assert.Equal(Resources.ExceptionUnexpectedEndpointType, error.Message);
+        }
     }
 }
