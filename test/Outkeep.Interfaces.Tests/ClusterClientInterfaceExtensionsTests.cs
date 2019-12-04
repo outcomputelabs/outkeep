@@ -37,5 +37,13 @@ namespace Outkeep.Interfaces.Tests
 
             Assert.Same(grain, result);
         }
+
+        [Fact]
+        public void GetEchoGrainThrowsOnNullClient()
+        {
+            IClusterClient client = null;
+
+            Assert.Throws<ArgumentNullException>(nameof(client), () => client.GetEchoGrain());
+        }
     }
 }
