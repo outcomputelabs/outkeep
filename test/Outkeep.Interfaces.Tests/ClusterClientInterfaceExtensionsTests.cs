@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Outkeep.Interfaces.Tests
 {
-    public class ClusterClientExtensionsTests
+    public class ClusterClientInterfaceExtensionsTests
     {
         [Fact]
         public void GetCacheGrainReturnsCacheGrain()
