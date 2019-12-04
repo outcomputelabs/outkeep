@@ -82,5 +82,21 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.False(result);
         }
+
+        [Fact]
+        public void DoesNotEqualsOtherItemWithDifferentAbsoluteExpiration()
+        {
+            // arrange
+            var value = Guid.NewGuid().ToByteArray();
+            var sliding = TimeSpan.MaxValue;
+            var item = new CacheItem(value, DateTimeOffset.UtcNow.AddDays(1), sliding);
+            var other = new CacheItem(value, DateTimeOffset.UtcNow.AddDays(2), sliding);
+
+            // act
+            var result = item.Equals(other);
+
+            // assert
+            Assert.False(result);
+        }
     }
 }
