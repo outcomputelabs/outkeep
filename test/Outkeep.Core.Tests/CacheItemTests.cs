@@ -148,5 +148,22 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.True(result);
         }
+
+        [Fact]
+        public void OperatorNotEqualsOtherItem()
+        {
+            // arrange
+            var value = Guid.NewGuid().ToByteArray();
+            var absolute = DateTimeOffset.UtcNow;
+            var sliding = TimeSpan.MaxValue;
+            var item = new CacheItem(value.ToArray(), absolute, sliding);
+            var other = new CacheItem(value.ToArray(), absolute, sliding);
+
+            // act
+            var result = item != other;
+
+            // assert
+            Assert.True(result);
+        }
     }
 }
