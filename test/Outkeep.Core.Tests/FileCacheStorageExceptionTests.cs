@@ -80,5 +80,23 @@ namespace Outkeep.Core.Tests
             Assert.Same(inner, exception.InnerException);
             Assert.Equal(message, exception.Message);
         }
+
+        [Fact]
+        public void ConstructsWithBaseParametersAndInnerException()
+        {
+            // act
+            var message = "SomeMessage";
+            var path = "SomePath";
+            var key = "SomeKey";
+            var inner = new Exception();
+            var exception = new FileCacheStorageException(message, path, key, inner);
+
+            // assert
+            Assert.Equal(path, exception.Path);
+            Assert.Equal(key, exception.Key);
+            Assert.Null(exception.OtherKey);
+            Assert.Same(inner, exception.InnerException);
+            Assert.Equal(message, exception.Message);
+        }
     }
 }
