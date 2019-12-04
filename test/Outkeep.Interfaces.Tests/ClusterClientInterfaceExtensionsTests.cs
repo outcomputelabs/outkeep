@@ -20,6 +20,14 @@ namespace Outkeep.Interfaces.Tests
         }
 
         [Fact]
+        public void GetCacheGrainThrowsOnNullClient()
+        {
+            IClusterClient client = null;
+
+            Assert.Throws<ArgumentNullException>(nameof(client), () => client.GetCacheGrain("SomeKey"));
+        }
+
+        [Fact]
         public void GetEchoGrainReturnsEchoGrain()
         {
             var grain = Mock.Of<IEchoGrain>();
