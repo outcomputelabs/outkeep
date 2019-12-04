@@ -19,8 +19,8 @@ namespace Outkeep.Hosting
             outkeep.ConfigureSilo((context, silo) =>
             {
                 silo.UseLocalhostClustering(
-                    TcpHelper.GetFreePort(siloStartPort, siloEndPort),
-                    TcpHelper.GetFreePort(gatewayStartPort, gatewayEndPort),
+                    TcpHelper.Default.GetFreePort(siloStartPort, siloEndPort),
+                    TcpHelper.Default.GetFreePort(gatewayStartPort, gatewayEndPort),
                     new IPEndPoint(IPAddress.Loopback, siloStartPort),
                     serviceId,
                     clusterId);

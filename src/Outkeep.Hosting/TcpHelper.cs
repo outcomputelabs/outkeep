@@ -5,9 +5,16 @@ using System.Net.Sockets;
 
 namespace Outkeep.Hosting
 {
-    public static class TcpHelper
+    public sealed class TcpHelper
     {
-        public static int GetFreePort(int start, int end)
+        private readonly ITcpListenerWrapperFactory _factory;
+
+        public TcpHelper(ITcpListenerWrapperFactory factory)
+        {
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+        }
+
+        public int GetFreePort(int start, int end)
         {
             if (start < 1) throw new ArgumentOutOfRangeException(nameof(start));
             if (end >= (1 << 16)) throw new ArgumentOutOfRangeException(nameof(end));
@@ -15,12 +22,10 @@ namespace Outkeep.Hosting
 
             for (var port = start; port <= end; ++port)
             {
-                var listener = TcpListener.Create(port);
+                var listener = _factory.Create(port, true);
                 try
                 {
-                    listener.ExclusiveAddressUse = true;
                     listener.Start();
-
                     return ((IPEndPoint)listener.LocalEndpoint).Port;
                 }
                 catch (SocketException)
@@ -43,10 +48,9 @@ namespace Outkeep.Hosting
             throw new InvalidOperationException(Resources.ThereAreNoFreePortsWithinTheInputRange);
         }
 
-        public static int GetFreeDynamicPort()
+        public int GetFreeDynamicPort()
         {
-            var listener = TcpListener.Create(0);
-            listener.ExclusiveAddressUse = true;
+            var listener = _factory.Create(0, true);
 
             try
             {
@@ -69,5 +73,7 @@ namespace Outkeep.Hosting
                 listener.Stop();
             }
         }
+
+        public static readonly TcpHelper Default = new TcpHelper(TcpListenerWrapperFactory.Default);
     }
 }
