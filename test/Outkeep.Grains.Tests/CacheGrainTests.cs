@@ -29,7 +29,7 @@ namespace Outkeep.Grains.Tests
         }
 
         [Fact]
-        public async Task GetReturnsEmptyValueFromStorage()
+        public async Task GetReturnsNullValueFromStorage()
         {
             // arrange
             var key = "SomeKey";
@@ -38,7 +38,7 @@ namespace Outkeep.Grains.Tests
             var timers = Mock.Of<ITimerRegistry>();
 
             var storage = Mock.Of<ICacheStorage>(x =>
-                x.ReadAsync(key, default) == Task.FromResult<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?>(null));
+                x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(null));
 
             var clock = Mock.Of<ISystemClock>();
 

@@ -20,7 +20,7 @@ namespace Outkeep.Core.Tests
             Assert.False(result.HasValue);
 
             // write some state
-            await storage.WriteAsync(key, value, absoluteExpiration, slidingExpiration).ConfigureAwait(false);
+            await storage.WriteAsync(key, new CacheItem(value, absoluteExpiration, slidingExpiration)).ConfigureAwait(false);
 
             // attempt to read that state
             result = await storage.ReadAsync(key).ConfigureAwait(false);

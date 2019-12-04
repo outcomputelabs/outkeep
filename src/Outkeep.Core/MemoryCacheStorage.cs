@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,8 +6,8 @@ namespace Outkeep.Core
 {
     public class MemoryCacheStorage : ICacheStorage
     {
-        private readonly ConcurrentDictionary<string, (byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)> storage =
-            new ConcurrentDictionary<string, (byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)>();
+        private readonly ConcurrentDictionary<string, CacheItem> storage =
+            new ConcurrentDictionary<string, CacheItem>();
 
         public Task ClearAsync(string key, CancellationToken cancellationToken = default)
         {
@@ -16,22 +15,20 @@ namespace Outkeep.Core
             return Task.CompletedTask;
         }
 
-        public Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> ReadAsync(string key, CancellationToken cancellationToken = default)
+        public Task<CacheItem?> ReadAsync(string key, CancellationToken cancellationToken = default)
         {
-            if (storage.TryGetValue(key, out var value))
-            {
-                return Task.FromResult<(byte[], DateTimeOffset?, TimeSpan?)?>(value);
-            }
-            return NotFoundTask;
+            return storage.TryGetValue(key, out var value)
+                ? Task.FromResult<CacheItem?>(value)
+                : NotFoundTask;
         }
 
-        public Task WriteAsync(string key, byte[] value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration, CancellationToken cancellationToken = default)
+        public Task WriteAsync(string key, CacheItem item, CancellationToken cancellationToken = default)
         {
-            storage[key] = (value, absoluteExpiration, slidingExpiration);
+            storage[key] = item;
             return Task.CompletedTask;
         }
 
-        private static readonly Task<(byte[], DateTimeOffset?, TimeSpan?)?> NotFoundTask =
-            Task.FromResult<(byte[], DateTimeOffset?, TimeSpan?)?>(null);
+        private static readonly Task<CacheItem?> NotFoundTask =
+            Task.FromResult<CacheItem?>(null);
     }
 }

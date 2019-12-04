@@ -122,7 +122,7 @@ namespace Outkeep.Core
             Log.DeletedFile(logger, path, key);
         }
 
-        public async Task<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?> ReadAsync(string key, CancellationToken cancellationToken = default)
+        public async Task<CacheItem?> ReadAsync(string key, CancellationToken cancellationToken = default)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
@@ -202,10 +202,10 @@ namespace Outkeep.Core
             }
 
             Log.ReadFile(logger, path, key, value.Length);
-            return (value, absoluteExpiration, slidingExpiration);
+            return new CacheItem(value, absoluteExpiration, slidingExpiration);
         }
 
-        public async Task WriteAsync(string key, byte[] value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration, CancellationToken cancellationToken = default)
+        public async Task WriteAsync(string key, CacheItem item, CancellationToken cancellationToken = default)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
@@ -231,18 +231,18 @@ namespace Outkeep.Core
                         writer.WriteStartObject();
 
                         writer.WriteString(KeyPropertyName, key);
-                        writer.WriteBase64String(ValuePropertyName, value);
+                        writer.WriteBase64String(ValuePropertyName, item.Value);
 
-                        if (absoluteExpiration.HasValue)
+                        if (item.AbsoluteExpiration.HasValue)
                         {
-                            writer.WriteString(AbsoluteExpirationPropertyName, absoluteExpiration.Value);
+                            writer.WriteString(AbsoluteExpirationPropertyName, item.AbsoluteExpiration.Value);
                         }
 
-                        if (slidingExpiration.HasValue)
+                        if (item.SlidingExpiration.HasValue)
                         {
                             // temporary approach to reduce allocations due to lack of timespan support from the writer
                             using var buffer = MemoryPool<char>.Shared.Rent(100);
-                            if (slidingExpiration.Value.TryFormat(buffer.Memory.Span, out var charsWritten))
+                            if (item.SlidingExpiration.Value.TryFormat(buffer.Memory.Span, out var charsWritten))
                             {
                                 writer.WriteString(SlidingExpirationPropertyName, buffer.Memory.Span.Slice(0, charsWritten));
                             }

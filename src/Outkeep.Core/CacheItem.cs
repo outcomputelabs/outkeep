@@ -1,21 +1,34 @@
-﻿using Orleans.Concurrency;
-using System;
-using System.Collections.Immutable;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Outkeep.Interfaces
+namespace Outkeep.Core
 {
-    [Immutable]
+    /// <summary>
+    /// Represents a cached item.
+    /// </summary>
     public readonly struct CacheItem : IEquatable<CacheItem>
     {
-        public CacheItem(ImmutableArray<byte> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
+        public CacheItem(byte[] value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
             Value = value;
             AbsoluteExpiration = absoluteExpiration;
             SlidingExpiration = slidingExpiration;
         }
 
-        public ImmutableArray<byte> Value { get; }
+        /// <summary>
+        /// The cached binary payload.
+        /// </summary>
+        [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "DTO")]
+        public byte[] Value { get; }
+
+        /// <summary>
+        /// The absolute expiration schedule for this cache item.
+        /// </summary>
         public DateTimeOffset? AbsoluteExpiration { get; }
+
+        /// <summary>
+        /// The sliding expiration period for this cache item.
+        /// </summary>
         public TimeSpan? SlidingExpiration { get; }
 
         public override bool Equals(object obj)

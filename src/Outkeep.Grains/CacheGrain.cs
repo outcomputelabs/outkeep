@@ -93,7 +93,7 @@ namespace Outkeep.Grains
             }
             else
             {
-                valueAsTask = EmptyValueTask;
+                valueAsTask = NullValueTask;
                 absoluteExpiration = null;
                 slidingExpiration = null;
             }
@@ -109,7 +109,7 @@ namespace Outkeep.Grains
         public Task RemoveAsync()
         {
             // reset the in-memory value
-            valueAsTask = EmptyValueTask;
+            valueAsTask = NullValueTask;
 
             // also attempt to clear storage
             return storage.ClearAsync(identity.PrimaryKeyString);
@@ -127,7 +127,7 @@ namespace Outkeep.Grains
             accessed = clock.UtcNow;
 
             // also attempt to save to storage
-            return storage.WriteAsync(identity.PrimaryKeyString, value.Value, absoluteExpiration, slidingExpiration);
+            return storage.WriteAsync(identity.PrimaryKeyString, new CacheItem(value.Value, absoluteExpiration, slidingExpiration));
         }
 
         /// <summary>
@@ -164,6 +164,6 @@ namespace Outkeep.Grains
             }
         }
 
-        private static readonly Task<Immutable<byte[]>> EmptyValueTask = Task.FromResult(((byte[])null).AsImmutable());
+        private static readonly Task<Immutable<byte[]>> NullValueTask = Task.FromResult(new Immutable<byte[]>());
     }
 }
