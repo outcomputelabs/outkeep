@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Outkeep.Hosting.Properties;
 using System;
 using System.Net.Sockets;
 using Xunit;
@@ -47,7 +48,7 @@ namespace Outkeep.Hosting.Tests
             var factory = Mock.Of<ITcpListenerWrapperFactory>();
             Mock.Get(factory).Setup(x => x.Create(1, true).Start()).Throws(new SocketException());
             Mock.Get(factory).Setup(x => x.Create(2, true).Start()).Throws(new SocketException());
-            Mock.Get(factory).Setup(x => x.Create(3, true)).Returns(Mock.Of<ITcpListenerWrapper>());
+            Mock.Get(factory).Setup(x => x.Create(3, true).Stop()).Throws(new SocketException());
 
             var helper = new TcpHelper(factory);
 
@@ -56,6 +57,22 @@ namespace Outkeep.Hosting.Tests
 
             // assert
             Assert.Equal(3, port);
+        }
+
+        [Fact]
+        public void ThrowsOnNoFreePort()
+        {
+            // arrange
+            var factory = Mock.Of<ITcpListenerWrapperFactory>();
+            Mock.Get(factory).Setup(x => x.Create(1, true).Start()).Throws(new SocketException());
+            Mock.Get(factory).Setup(x => x.Create(2, true).Start()).Throws(new SocketException());
+            Mock.Get(factory).Setup(x => x.Create(3, true).Start()).Throws(new SocketException());
+
+            var helper = new TcpHelper(factory);
+
+            // act and assert
+            var error = Assert.Throws<InvalidOperationException>(() => helper.GetFreePort(1, 3));
+            Assert.Equal(Resources.ThereAreNoFreePortsWithinTheInputRange, error.Message);
         }
     }
 }
