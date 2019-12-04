@@ -105,5 +105,20 @@ namespace Outkeep.Hosting.Tests
             var error = Assert.Throws<InvalidOperationException>(() => helper.GetFreeDynamicPort());
             Assert.Equal(Resources.ExceptionUnexpectedEndpointType, error.Message);
         }
+
+        [Fact]
+        public void GetFreeDynamicPortThrowsOnSocketError()
+        {
+            // arrange
+            var ex = new SocketException();
+            var factory = Mock.Of<ITcpListenerWrapperFactory>();
+            Mock.Get(factory).Setup(x => x.Create(0, true).Start()).Throws(ex);
+            var helper = new TcpHelper(factory);
+
+            // act and assert
+            var error = Assert.Throws<InvalidOperationException>(() => helper.GetFreeDynamicPort());
+            Assert.Equal(Resources.ExceptionCouldNotOpenADynamicPortForExclusiveUse, error.Message);
+            Assert.Same(ex, error.InnerException);
+        }
     }
 }
