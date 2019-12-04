@@ -120,5 +120,11 @@ namespace Outkeep.Hosting.Tests
             Assert.Equal(Resources.ExceptionCouldNotOpenADynamicPortForExclusiveUse, error.Message);
             Assert.Same(ex, error.InnerException);
         }
+
+        [Fact]
+        public void HasDefault()
+        {
+            Assert.NotNull(TcpHelper.Default);
+        }
     }
 }
