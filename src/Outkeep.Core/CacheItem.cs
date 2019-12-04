@@ -38,25 +38,17 @@ namespace Outkeep.Core
             return false;
         }
 
-        public override int GetHashCode() => HashCode.Combine(Value, AbsoluteExpiration, SlidingExpiration);
-
-        public static bool operator ==(CacheItem left, CacheItem right)
-        {
-            return left.Value == right.Value
-                && left.AbsoluteExpiration == right.AbsoluteExpiration
-                && left.SlidingExpiration == right.SlidingExpiration;
-        }
-
-        public static bool operator !=(CacheItem left, CacheItem right)
-        {
-            return left.Value != right.Value
-                || left.AbsoluteExpiration != right.AbsoluteExpiration
-                || left.SlidingExpiration != right.SlidingExpiration;
-        }
-
         public bool Equals(CacheItem other)
         {
-            return this == other;
+            return Value == other.Value
+                && AbsoluteExpiration == other.AbsoluteExpiration
+                && SlidingExpiration == other.SlidingExpiration;
         }
+
+        public override int GetHashCode() => HashCode.Combine(Value, AbsoluteExpiration, SlidingExpiration);
+
+        public static bool operator ==(CacheItem left, CacheItem right) => left.Equals(right);
+
+        public static bool operator !=(CacheItem left, CacheItem right) => !left.Equals(right);
     }
 }
