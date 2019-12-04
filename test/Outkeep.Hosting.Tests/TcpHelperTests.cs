@@ -1,6 +1,7 @@
 ﻿using Moq;
 using Outkeep.Hosting.Properties;
 using System;
+using System.Net;
 using System.Net.Sockets;
 using Xunit;
 
@@ -73,6 +74,22 @@ namespace Outkeep.Hosting.Tests
             // act and assert
             var error = Assert.Throws<InvalidOperationException>(() => helper.GetFreePort(1, 3));
             Assert.Equal(Resources.ThereAreNoFreePortsWithinTheInputRange, error.Message);
+        }
+
+        [Fact]
+        public void GetsFreeDynamicPort()
+        {
+            // arrange
+            var port = 51234;
+            var factory = Mock.Of<ITcpListenerWrapperFactory>(x =>
+                x.Create(0, true).LocalEndpoint == new IPEndPoint(IPAddress.Loopback, port));
+            var helper = new TcpHelper(factory);
+
+            // act
+            var result = helper.GetFreeDynamicPort();
+
+            // assert
+            Assert.Equal(port, result);
         }
     }
 }
