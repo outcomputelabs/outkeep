@@ -57,7 +57,7 @@ namespace Outkeep.Grains.Tests
         }
 
         [Fact]
-        public async Task GetReturnsEmptyValueFromStorage()
+        public async Task GetReturnsCorrectValueFromStorage()
         {
             // arrange
             var key = "SomeKey";
@@ -65,8 +65,9 @@ namespace Outkeep.Grains.Tests
             var logger = Mock.Of<ILogger<CacheGrain>>();
             var timers = Mock.Of<ITimerRegistry>();
 
+            var value = Guid.NewGuid().ToByteArray();
             var storage = Mock.Of<ICacheStorage>(x =>
-                x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(new CacheItem(Array.Empty<byte>(), null, null)));
+                x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(new CacheItem(value, null, null)));
 
             var clock = Mock.Of<ISystemClock>();
 
@@ -81,7 +82,7 @@ namespace Outkeep.Grains.Tests
 
             // assert
             Assert.NotNull(result.Value);
-            Assert.Empty(result.Value);
+            Assert.Same(value, result.Value);
             Mock.Get(storage).VerifyAll();
         }
     }
