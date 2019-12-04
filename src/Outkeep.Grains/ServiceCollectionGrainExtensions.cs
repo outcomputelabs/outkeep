@@ -1,9 +1,10 @@
-﻿using Outkeep.Grains;
+﻿using Microsoft.Extensions.Options;
+using Outkeep.Grains;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceCollectionExtensions
+    public static class ServiceCollectionGrainExtensions
     {
         public static IServiceCollection AddCacheGrainOptions(this IServiceCollection services, Action<CacheGrainOptions> configure)
         {
@@ -12,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services
                 .Configure(configure)
-                .AddSingleton<CacheOptionsValidator>();
+                .AddSingleton<IValidateOptions<CacheGrainOptions>, CacheOptionsValidator>();
         }
     }
 }
