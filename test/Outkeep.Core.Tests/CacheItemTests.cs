@@ -131,5 +131,22 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(hash, result);
         }
+
+        [Fact]
+        public void OperatorEqualsOtherItem()
+        {
+            // arrange
+            var value = Guid.NewGuid().ToByteArray();
+            var absolute = DateTimeOffset.UtcNow;
+            var sliding = TimeSpan.MaxValue;
+            var item = new CacheItem(value, absolute, sliding);
+            var other = new CacheItem(value, absolute, sliding);
+
+            // act
+            var result = item == other;
+
+            // assert
+            Assert.True(result);
+        }
     }
 }
