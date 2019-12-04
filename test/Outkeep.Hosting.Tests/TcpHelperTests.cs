@@ -7,7 +7,7 @@ namespace Outkeep.Hosting.Tests
     public class TcpHelperTests
     {
         [Fact]
-        public void RefusesLowPort()
+        public void RefusesLowStartPort()
         {
             // arrange
             var factory = Mock.Of<ITcpListenerWrapperFactory>();
@@ -15,6 +15,17 @@ namespace Outkeep.Hosting.Tests
 
             // act and assert
             Assert.Throws<ArgumentOutOfRangeException>("start", () => helper.GetFreePort(0, 60000));
+        }
+
+        [Fact]
+        public void RefusesHighEndPort()
+        {
+            // arrange
+            var factory = Mock.Of<ITcpListenerWrapperFactory>();
+            var helper = new TcpHelper(factory);
+
+            // act and assert
+            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1, 1 << 16 + 1));
         }
     }
 }
