@@ -114,5 +114,22 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.False(result);
         }
+
+        [Fact]
+        public void GetsHashCode()
+        {
+            // arrange
+            var value = Guid.NewGuid().ToByteArray();
+            var absolute = DateTimeOffset.UtcNow;
+            var sliding = TimeSpan.MaxValue;
+            var item = new CacheItem(value, absolute, sliding);
+            var hash = HashCode.Combine(value, absolute, sliding);
+
+            // act
+            var result = item.GetHashCode();
+
+            // assert
+            Assert.Equal(hash, result);
+        }
     }
 }
