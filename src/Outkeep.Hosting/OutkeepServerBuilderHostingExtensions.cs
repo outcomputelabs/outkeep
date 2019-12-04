@@ -4,7 +4,7 @@ using System;
 
 namespace Outkeep.Hosting
 {
-    public static class OutkeepServerBuilderExtensions
+    public static class OutkeepServerBuilderHostingExtensions
     {
         public static IOutkeepServerBuilder Configure<TOptions>(this IOutkeepServerBuilder builder, Action<TOptions> configure) where TOptions : class
         {

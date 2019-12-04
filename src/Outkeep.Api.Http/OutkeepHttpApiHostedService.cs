@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -18,8 +19,9 @@ namespace Outkeep.Api.Http
 {
     internal class OutkeepHttpApiHostedService : IHostedService
     {
-        private readonly ILogger<OutkeepHttpApiHostedService> logger;
-        private readonly IHost host;
+        private readonly ILogger<OutkeepHttpApiHostedService> _logger;
+        private readonly IHost _host;
+        private readonly OutkeepHttpApiServerOptions _options;
 
         [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "N/A")]
         public OutkeepHttpApiHostedService(
@@ -28,9 +30,10 @@ namespace Outkeep.Api.Http
             IEnumerable<ILoggerProvider> loggerProviders,
             IGrainFactory factory)
         {
-            this.logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = apiOptions?.Value ?? throw new ArgumentNullException(nameof(apiOptions));
 
-            host = Host
+            _host = Host
                 .CreateDefaultBuilder()
                 .ConfigureLogging(logging =>
                 {
@@ -42,84 +45,85 @@ namespace Outkeep.Api.Http
                 })
                 .ConfigureWebHostDefaults(web =>
                 {
-                    web
-                        .ConfigureServices(services =>
+                    web.ConfigureServices(services =>
+                    {
+                        services.AddControllers();
+
+                        services.AddCors(options =>
                         {
-                            services.AddControllers();
-
-                            services.AddCors(options =>
+                            options.AddDefaultPolicy(policy =>
                             {
-                                options.AddDefaultPolicy(policy =>
-                                {
-                                    policy
-                                        .AllowAnyOrigin()
-                                        .AllowAnyHeader()
-                                        .AllowAnyMethod();
-                                });
+                                policy
+                                    .AllowAnyOrigin()
+                                    .AllowAnyHeader()
+                                    .AllowAnyMethod();
                             });
+                        });
 
-                            services.AddApiVersioning(options =>
-                            {
-                                options.ReportApiVersions = true;
-                                options.DefaultApiVersion = new ApiVersion(1, 0);
-                                options.AssumeDefaultVersionWhenUnspecified = true;
-                            });
-
-                            services.AddVersionedApiExplorer(options =>
-                            {
-                                options.GroupNameFormat = "'v'VVV";
-                            });
-
-                            services.AddSwaggerGen()
-                                .AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigurator>();
-
-                            services.AddSingleton(factory);
-
-                            services.AddActivityMiddleware();
-                        })
-                        .Configure((context, app) =>
+                        services.AddApiVersioning(options =>
                         {
-                            app.UseHttpsRedirection();
-                            app.UseRouting();
-                            app.UseAuthentication();
-                            app.UseAuthorization();
-                            app.UseSwagger();
-                            app.UseSwaggerUI(options =>
-                            {
-                                foreach (var description in app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>().ApiVersionDescriptions.OrderByDescending(v => v.ApiVersion))
-                                {
-                                    var vx = description.GroupName.ToLowerInvariant();
-                                    options.SwaggerEndpoint($"/swagger/{vx}/swagger.json", vx);
-                                }
-                            });
+                            options.ReportApiVersions = true;
+                            options.DefaultApiVersion = new ApiVersion(1, 0);
+                            options.AssumeDefaultVersionWhenUnspecified = true;
+                        });
 
-                            app.UseActivityMiddleware();
-                            app.UseEndpoints(endpoints =>
+                        services.AddVersionedApiExplorer(options =>
+                        {
+                            options.GroupNameFormat = "'v'VVV";
+                        });
+
+                        services.AddSwaggerGen()
+                            .AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerGenOptionsConfigurator>();
+
+                        services.AddSingleton(factory);
+
+                        services.AddActivityMiddleware();
+                    });
+
+                    web.Configure((context, app) =>
+                    {
+                        app.UseHttpsRedirection();
+                        app.UseRouting();
+                        app.UseAuthentication();
+                        app.UseAuthorization();
+                        app.UseSwagger();
+                        app.UseSwaggerUI(options =>
+                        {
+                            foreach (var description in app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>().ApiVersionDescriptions.OrderByDescending(v => v.ApiVersion))
                             {
-                                endpoints.MapControllers();
-                            });
-                        })
-                        .UseUrls(apiOptions.Value.ApiUri.ToString());
+                                var vx = description.GroupName.ToLowerInvariant();
+                                options.SwaggerEndpoint($"/swagger/{vx}/swagger.json", vx);
+                            }
+                        });
+
+                        app.UseActivityMiddleware();
+                        app.UseEndpoints(endpoints =>
+                        {
+                            endpoints.MapControllers();
+                        });
+                    });
+
+                    web.UseUrls(_options.ApiUri.ToString());
                 })
                 .Build();
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            logger.LogOutkeepHttpApiStarting();
+            _logger.LogOutkeepHttpApiStarting();
 
-            await host.StartAsync(cancellationToken).ConfigureAwait(false);
+            await _host.StartAsync(cancellationToken).ConfigureAwait(false);
 
-            logger.LogOutkeepHttpApiStarted();
+            _logger.LogOutkeepHttpApiStarted();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            logger.LogOutkeepHttpApiStopping();
+            _logger.LogOutkeepHttpApiStopping();
 
-            await host.StopAsync(cancellationToken).ConfigureAwait(false);
+            await _host.StopAsync(cancellationToken).ConfigureAwait(false);
 
-            logger.LogOutkeepHttpApiStopped();
+            _logger.LogOutkeepHttpApiStopped();
         }
     }
 }
