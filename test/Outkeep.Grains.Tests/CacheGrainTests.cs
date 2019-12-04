@@ -27,5 +27,33 @@ namespace Outkeep.Grains.Tests
 
             Mock.Get(timers).Verify(x => x.RegisterTimer(grain, It.IsAny<Func<object, Task>>(), null, options.Value.ExpirationPolicyEvaluationPeriod, options.Value.ExpirationPolicyEvaluationPeriod));
         }
+
+        [Fact]
+        public async Task GetReturnsEmptyValueFromStorage()
+        {
+            // arrange
+            var key = "SomeKey";
+            var options = Options.Create(new CacheGrainOptions { });
+            var logger = Mock.Of<ILogger<CacheGrain>>();
+            var timers = Mock.Of<ITimerRegistry>();
+
+            var storage = Mock.Of<ICacheStorage>(x =>
+                x.ReadAsync(key, default) == Task.FromResult<(byte[] Value, DateTimeOffset? AbsoluteExpiration, TimeSpan? SlidingExpiration)?>(null));
+
+            var clock = Mock.Of<ISystemClock>();
+
+            var identity = Mock.Of<IGrainIdentity>(x =>
+                x.PrimaryKeyString == key);
+
+            var grain = new CacheGrain(options, logger, timers, storage, clock, identity);
+            await grain.OnActivateAsync().ConfigureAwait(false);
+
+            // act
+            var result = await grain.GetAsync().ConfigureAwait(false);
+
+            // assert
+            Assert.Null(result.Value);
+            Mock.Get(storage).VerifyAll();
+        }
     }
 }
