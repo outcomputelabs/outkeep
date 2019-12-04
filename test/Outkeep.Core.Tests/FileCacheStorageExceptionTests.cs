@@ -46,5 +46,22 @@ namespace Outkeep.Core.Tests
             Assert.Null(exception.OtherKey);
             Assert.Equal(message, exception.Message);
         }
+
+        [Fact]
+        public void ConstructsWithExtraParameters()
+        {
+            // act
+            var message = "SomeMessage";
+            var path = "SomePath";
+            var key = "SomeKey";
+            var otherKey = "SomeOtherKey";
+            var exception = new FileCacheStorageException(message, path, key, otherKey);
+
+            // assert
+            Assert.Equal(path, exception.Path);
+            Assert.Equal(key, exception.Key);
+            Assert.Equal(otherKey, exception.OtherKey);
+            Assert.Equal(message, exception.Message);
+        }
     }
 }
