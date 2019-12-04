@@ -16,5 +16,19 @@ namespace Outkeep.Core.Tests
             Assert.Null(exception.OtherKey);
             Assert.NotNull(exception.Message);
         }
+
+        [Fact]
+        public void ConstructsWithMessage()
+        {
+            // act
+            var message = "SomeMessage";
+            var exception = new FileCacheStorageException(message);
+
+            // assert
+            Assert.Null(exception.Path);
+            Assert.Null(exception.Key);
+            Assert.Null(exception.OtherKey);
+            Assert.Equal(message, exception.Message);
+        }
     }
 }
