@@ -21,5 +21,31 @@ namespace Outkeep.Core.Tests
             Assert.Equal(absoluteExpiration, item.AbsoluteExpiration);
             Assert.Equal(slidingExpiration, item.SlidingExpiration);
         }
+
+        [Fact]
+        public void DoesNotEqualNull()
+        {
+            // arrange
+            var item = new CacheItem();
+
+            // act
+            var result = item.Equals(null);
+
+            // assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void DoesNotEqualOtherType()
+        {
+            // arrange
+            var item = new CacheItem();
+
+            // act
+            var result = item.Equals(new object());
+
+            // assert
+            Assert.False(result);
+        }
     }
 }
