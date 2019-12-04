@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Outkeep.Core.Tests
 {
@@ -61,6 +62,22 @@ namespace Outkeep.Core.Tests
             Assert.Equal(path, exception.Path);
             Assert.Equal(key, exception.Key);
             Assert.Equal(otherKey, exception.OtherKey);
+            Assert.Equal(message, exception.Message);
+        }
+
+        [Fact]
+        public void ConstructsWithMessageAndInnerException()
+        {
+            // act
+            var message = "SomeMessage";
+            var inner = new Exception();
+            var exception = new FileCacheStorageException(message, inner);
+
+            // assert
+            Assert.Null(exception.Path);
+            Assert.Null(exception.Key);
+            Assert.Null(exception.OtherKey);
+            Assert.Same(inner, exception.InnerException);
             Assert.Equal(message, exception.Message);
         }
     }
