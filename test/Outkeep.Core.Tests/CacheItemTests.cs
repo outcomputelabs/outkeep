@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Xunit;
 
 namespace Outkeep.Core.Tests
@@ -63,6 +64,23 @@ namespace Outkeep.Core.Tests
 
             // assert
             Assert.True(result);
+        }
+
+        [Fact]
+        public void DoesNotEqualsOtherItemWithDifferentArray()
+        {
+            // arrange
+            var value = Guid.NewGuid().ToByteArray();
+            var absolute = DateTimeOffset.UtcNow;
+            var sliding = TimeSpan.MaxValue;
+            var item = new CacheItem(value.ToArray(), absolute, sliding);
+            var other = new CacheItem(value.ToArray(), absolute, sliding);
+
+            // act
+            var result = item.Equals(other);
+
+            // assert
+            Assert.False(result);
         }
     }
 }
