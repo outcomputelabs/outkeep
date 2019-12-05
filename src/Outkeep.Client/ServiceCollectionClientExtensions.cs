@@ -3,7 +3,7 @@ using Outkeep.Client;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceCollectionExtensions
+    public static class ServiceCollectionClientExtensions
     {
         public static IServiceCollection AddOutkeepDistributedCache(this IServiceCollection services)
         {
