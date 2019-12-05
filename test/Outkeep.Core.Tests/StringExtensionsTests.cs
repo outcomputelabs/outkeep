@@ -53,5 +53,23 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(expected, result);
         }
+
+        [Fact]
+        public void FormatsParamsArguments()
+        {
+            // arrange
+            var arg0 = "Zero";
+            var arg1 = "One";
+            var arg2 = "Two";
+            var arg3 = "Three";
+            var format = "Args {0} {1} {2} {3}";
+            var expected = string.Format(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1, arg2, arg3 });
+
+            // act
+            var result = format.Format(new object[] { arg0, arg1, arg2, arg3 });
+
+            // assert
+            Assert.Equal(expected, result);
+        }
     }
 }
