@@ -82,10 +82,15 @@ namespace Outkeep.Core
             static void ThrowInvalidOperationException() => throw new InvalidOperationException();
         }
 
-        public async Task ClearAsync(string key, CancellationToken cancellationToken = default)
+        public Task ClearAsync(string key, CancellationToken cancellationToken = default)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
+            return InnerClearAsync(key);
+        }
+
+        private async Task InnerClearAsync(string key)
+        {
             // attempt to delete the file in an async fashion as not to block the caller thread
             // todo: benchmark this to make sure it works across different platforms
             var path = KeyToFileName(key);
