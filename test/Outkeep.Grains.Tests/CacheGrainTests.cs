@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Orleans.Core;
@@ -84,6 +85,39 @@ namespace Outkeep.Grains.Tests
             Assert.NotNull(result.Value);
             Assert.Same(value, result.Value);
             Mock.Get(storage).VerifyAll();
+        }
+
+        [Fact]
+        public async Task GetReturnsCorrectValueFromMemory()
+        {
+            // arrange
+            var key = "SomeKey";
+            var value = Guid.NewGuid().ToByteArray();
+
+            var storage = Mock.Of<ICacheStorage>();
+            Mock.Get(storage).Setup(x => x.ReadAsync(key, default)).Returns(Task.FromResult<CacheItem?>(new CacheItem(value, null, null)));
+
+            var grain = new CacheGrain(
+                Options.Create(new CacheGrainOptions { }),
+                new NullLogger<CacheGrain>(),
+                Mock.Of<ITimerRegistry>(),
+                storage,
+                Mock.Of<ISystemClock>(),
+                Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key));
+
+            await grain.OnActivateAsync().ConfigureAwait(false);
+
+            // act - this will load from storage
+            var result = await grain.GetAsync().ConfigureAwait(false);
+
+            // arrange - clear storage
+            Mock.Get(storage).Setup(x => x.ReadAsync(key, default)).Returns(Task.FromResult<CacheItem?>(null));
+
+            // act - this must reuse the value in memory
+            result = await grain.GetAsync().ConfigureAwait(false);
+
+            // assert
+            Assert.Same(value, result.Value);
         }
     }
 }
