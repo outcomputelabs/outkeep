@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Orleans;
 using Orleans.Concurrency;
+using Outkeep.Core;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,10 +11,12 @@ namespace Outkeep.Client
     internal class OutkeepDistributedCache : IDistributedCache
     {
         private readonly IGrainFactory factory;
+        private readonly ISystemClock clock;
 
-        public OutkeepDistributedCache(IGrainFactory factory)
+        public OutkeepDistributedCache(IGrainFactory factory, ISystemClock clock)
         {
-            this.factory = factory;
+            this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            this.clock = clock ?? throw new ArgumentNullException(nameof(clock));
         }
 
         public byte[] Get(string key)
@@ -66,7 +69,7 @@ namespace Outkeep.Client
             }
             else if (options.AbsoluteExpirationRelativeToNow.HasValue)
             {
-                expiration = DateTimeOffset.UtcNow.Add(options.AbsoluteExpirationRelativeToNow.Value);
+                expiration = clock.UtcNow.Add(options.AbsoluteExpirationRelativeToNow.Value);
             }
             else
             {

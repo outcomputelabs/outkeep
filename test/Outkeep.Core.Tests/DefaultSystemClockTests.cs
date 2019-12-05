@@ -9,9 +9,7 @@ namespace Outkeep.Interfaces.Tests
         [Fact]
         public void ReturnsUtcNow()
         {
-            var clock = new DefaultSystemClock();
-
-            var result = clock.UtcNow;
+            var result = DefaultSystemClock.Instance.UtcNow;
             var now = DateTimeOffset.UtcNow;
 
             Assert.InRange(result, now.AddMilliseconds(-100), now.AddMilliseconds(100));

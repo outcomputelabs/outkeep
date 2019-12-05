@@ -7,6 +7,12 @@ namespace Outkeep.Core
     /// </summary>
     public class DefaultSystemClock : ISystemClock
     {
+        private DefaultSystemClock()
+        {
+        }
+
         public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
+
+        public static readonly DefaultSystemClock Instance = new DefaultSystemClock();
     }
 }
