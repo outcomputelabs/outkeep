@@ -14,5 +14,19 @@ namespace Outkeep.Core.Tests
             Assert.NotNull(exception.Message);
             Assert.Null(exception.InnerException);
         }
+
+        [Fact]
+        public void ConstructsWithMessage()
+        {
+            // arrange
+            var message = "Some Message";
+
+            // act
+            var exception = new StorageException(message);
+
+            // assert
+            Assert.Equal(message, exception.Message);
+            Assert.Null(exception.InnerException);
+        }
     }
 }
