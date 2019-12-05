@@ -109,7 +109,7 @@ namespace Outkeep.Client.Tests
         }
 
         [Fact]
-        public async Task SetAsyncCallsGrainWithRelativeAbsolute()
+        public async Task SetAsyncCallsGrainWithRelativeAbsoluteExpiration()
         {
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
@@ -124,6 +124,24 @@ namespace Outkeep.Client.Tests
             var options = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = absoluteExpirationRelativeToNow,
+                SlidingExpiration = slidingExpiration
+            };
+            await cache.SetAsync(key, value, options).ConfigureAwait(false);
+
+            Mock.VerifyAll();
+        }
+
+        [Fact]
+        public async Task SetAsyncCallsGrainWithNoExpiration()
+        {
+            var key = Guid.NewGuid().ToString();
+            var value = Guid.NewGuid().ToByteArray();
+            var slidingExpiration = TimeSpan.FromMinutes(1);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(value.AsImmutable(), null, slidingExpiration) == Task.CompletedTask);
+            var cache = new OutkeepDistributedCache(factory, DefaultSystemClock.Instance);
+
+            var options = new DistributedCacheEntryOptions
+            {
                 SlidingExpiration = slidingExpiration
             };
             await cache.SetAsync(key, value, options).ConfigureAwait(false);
