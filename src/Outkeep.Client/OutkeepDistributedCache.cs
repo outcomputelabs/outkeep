@@ -57,9 +57,9 @@ namespace Outkeep.Client
 
         public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default)
         {
-            if (key == null) ThrowKeyNull();
-            if (value == null) ThrowValueNull();
-            if (options == null) ThrowOptionsNull();
+            if (key == null) throw new ArgumentNullException(nameof(key));
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (options == null) throw new ArgumentNullException(nameof(options));
 
             DateTimeOffset? expiration;
 
@@ -77,10 +77,6 @@ namespace Outkeep.Client
             }
 
             return factory.GetCacheGrain(key).SetAsync(value.AsImmutable(), expiration, options.SlidingExpiration);
-
-            void ThrowKeyNull() => throw new ArgumentNullException(nameof(key));
-            void ThrowValueNull() => throw new ArgumentNullException(nameof(value));
-            void ThrowOptionsNull() => throw new ArgumentNullException(nameof(options));
         }
     }
 }
