@@ -7,7 +7,5 @@ namespace Outkeep.Client
     public interface IOutkeepClientBuilder
     {
         IOutkeepClientBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configure);
-
-        IOutkeepClientBuilder ConfigureServices(Action<IServiceCollection> configure);
     }
 }

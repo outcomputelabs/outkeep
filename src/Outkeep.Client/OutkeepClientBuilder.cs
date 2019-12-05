@@ -9,13 +9,6 @@ namespace Outkeep.Client
     {
         private readonly List<Action<HostBuilderContext, IServiceCollection>> configurators = new List<Action<HostBuilderContext, IServiceCollection>>();
 
-        public IOutkeepClientBuilder ConfigureServices(Action<IServiceCollection> configure)
-        {
-            configurators.Add((context, services) => configure(services));
-
-            return this;
-        }
-
         public IOutkeepClientBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configure)
         {
             configurators.Add(configure);
