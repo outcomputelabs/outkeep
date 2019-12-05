@@ -215,10 +215,15 @@ namespace Outkeep.Core
             return new CacheItem(value, absoluteExpiration, slidingExpiration);
         }
 
-        public async Task WriteAsync(string key, CacheItem item, CancellationToken cancellationToken = default)
+        public Task WriteAsync(string key, CacheItem item, CancellationToken cancellationToken = default)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
+            return InnerWriteAsync(key, item, cancellationToken);
+        }
+
+        private async Task InnerWriteAsync(string key, CacheItem item, CancellationToken cancellationToken)
+        {
             var path = KeyToFileName(key);
             long size;
             try
