@@ -4,10 +4,12 @@ using Outkeep.Grains;
 using Outkeep.Hosting;
 using Serilog;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Outkeep.Application.Azure
 {
+    [ExcludeFromCodeCoverage]
     internal sealed class Program
     {
         private Program()
