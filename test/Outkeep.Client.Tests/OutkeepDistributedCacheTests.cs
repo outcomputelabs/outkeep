@@ -52,6 +52,18 @@ namespace Outkeep.Client.Tests
         }
 
         [Fact]
+        public void RefreshCallsGrain()
+        {
+            var key = Guid.NewGuid().ToString();
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).RefreshAsync() == Task.CompletedTask);
+            var cache = new OutkeepDistributedCache(factory);
+
+            cache.Refresh(key);
+
+            Mock.Get(factory).VerifyAll();
+        }
+
+        [Fact]
         public async Task RemoveAsyncCallsGrain()
         {
             var key = Guid.NewGuid().ToString();
