@@ -47,6 +47,7 @@ namespace Outkeep.Core
             if (path[count - 1] != Path.DirectorySeparatorChar && path[count - 1] != Path.AltDirectorySeparatorChar)
             {
                 path[count] = Path.DirectorySeparatorChar;
+                ++count;
             }
 
             // format the key into the title by replacing invalid characters

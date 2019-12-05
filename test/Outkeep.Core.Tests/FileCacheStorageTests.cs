@@ -117,12 +117,23 @@ namespace Outkeep.Core.Tests
             }
         }
 
-        [Fact]
-        public async Task ReadReturnsCorrectContent()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task ReadReturnsCorrectContent(bool trimDirectoryTrailingSeparator)
         {
             var key = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
             var title = KeyToFileTitle(key);
             var directory = Path.GetTempPath();
+
+            if (trimDirectoryTrailingSeparator)
+            {
+                while (Path.EndsInDirectorySeparator(directory))
+                {
+                    directory = Path.TrimEndingDirectorySeparator(directory);
+                }
+            }
+
             var path = Path.Combine(directory, title);
             var value = Guid.NewGuid().ToByteArray();
             var absoluteExpiration = DateTimeOffset.UtcNow;
