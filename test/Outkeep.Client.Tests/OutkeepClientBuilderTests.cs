@@ -8,7 +8,7 @@ namespace Outkeep.Client.Tests
 {
     public class OutkeepClientBuilderTests
     {
-        public class SomeOptions
+        private class SomeOptions
         {
             public string SomeProperty { get; set; }
         }
