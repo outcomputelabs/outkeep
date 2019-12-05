@@ -127,10 +127,15 @@ namespace Outkeep.Core
             Log.DeletedFile(logger, path, key);
         }
 
-        public async Task<CacheItem?> ReadAsync(string key, CancellationToken cancellationToken = default)
+        public Task<CacheItem?> ReadAsync(string key, CancellationToken cancellationToken = default)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
+            return InnerReadAsync(key, cancellationToken);
+        }
+
+        private async Task<CacheItem?> InnerReadAsync(string key, CancellationToken cancellationToken)
+        {
             var path = KeyToFileName(key);
             byte[] value = null;
             DateTimeOffset? absoluteExpiration = null;
