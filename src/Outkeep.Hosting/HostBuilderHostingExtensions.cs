@@ -4,7 +4,7 @@ using System;
 
 namespace Microsoft.Extensions.Hosting
 {
-    public static class HostBuilderExtensions
+    public static class HostBuilderHostingExtensions
     {
         private const string HostBuilderContextKey = nameof(OutkeepServerBuilder);
 
