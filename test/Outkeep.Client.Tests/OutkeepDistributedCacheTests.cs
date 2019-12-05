@@ -106,5 +106,25 @@ namespace Outkeep.Client.Tests
 
             Mock.VerifyAll();
         }
+
+        [Fact]
+        public void SetCallsGrain()
+        {
+            var key = Guid.NewGuid().ToString();
+            var value = Guid.NewGuid().ToByteArray();
+            var absoluteExpiration = DateTimeOffset.UtcNow.AddHours(1);
+            var slidingExpiration = TimeSpan.FromMinutes(1);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(value.AsImmutable(), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
+            var cache = new OutkeepDistributedCache(factory);
+
+            var options = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpiration = absoluteExpiration,
+                SlidingExpiration = slidingExpiration
+            };
+            cache.Set(key, value, options);
+
+            Mock.VerifyAll();
+        }
     }
 }
