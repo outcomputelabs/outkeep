@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
+using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Timers;
 using Outkeep.Core;
@@ -118,6 +119,50 @@ namespace Outkeep.Grains.Tests
 
             // assert
             Assert.Same(value, result.Value);
+        }
+
+        [Fact]
+        public async Task RemoveClearsValueFromMemoryAndStorage()
+        {
+            // arrange
+            var key = "SomeKey";
+            var options = Options.Create(new CacheGrainOptions { });
+            var logger = new NullLogger<CacheGrain>();
+            var timers = Mock.Of<ITimerRegistry>();
+            var storage = new MemoryCacheStorage();
+            var clock = Mock.Of<ISystemClock>();
+            var identity = Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key);
+            var grain = new CacheGrain(options, logger, timers, storage, clock, identity);
+            await grain.OnActivateAsync().ConfigureAwait(false);
+
+            // act - set the value
+            var value = Guid.NewGuid().ToByteArray();
+            var absolute = DateTimeOffset.UtcNow;
+            var sliding = TimeSpan.MaxValue;
+            await grain.SetAsync(value.AsImmutable(), absolute, sliding).ConfigureAwait(false);
+
+            // assert value is set in storage
+            var stored = await storage.ReadAsync(key).ConfigureAwait(false);
+            Assert.Same(value, stored.Value.Value);
+            Assert.Equal(absolute, stored.Value.AbsoluteExpiration);
+            Assert.Equal(sliding, stored.Value.SlidingExpiration);
+
+            // assert value is set in memory
+            var result = await grain.GetAsync().ConfigureAwait(false);
+            Assert.Same(value, result.Value);
+
+            // act - clear the value
+            await grain.RemoveAsync().ConfigureAwait(false);
+
+            // assert value is cleared from storage
+            Assert.False((await storage.ReadAsync(key).ConfigureAwait(false)).HasValue);
+
+            // arrange - add dummy value to storage
+            await storage.WriteAsync(key, new CacheItem(value, absolute, sliding)).ConfigureAwait(false);
+
+            // assert value is cleared from memory and not reloaded
+            result = await grain.GetAsync().ConfigureAwait(false);
+            Assert.Null(result.Value);
         }
     }
 }
