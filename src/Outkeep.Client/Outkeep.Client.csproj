@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Outkeep.Interfaces\Outkeep.Interfaces.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
 </Project>
