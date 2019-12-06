@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Outkeep.Interfaces.Tests
 {
-    public class GrainFactoryExtensionsTests
+    public class GrainFactoryInterfaceExtensionsTests
     {
         [Fact]
         public void GetCacheGrainReturnsGrain()
@@ -20,6 +20,21 @@ namespace Outkeep.Interfaces.Tests
 
             // assert
             Assert.Same(grain, result);
+        }
+
+        [Fact]
+        public void GetCacheGrainThrowsOnNullFactory()
+        {
+            // arrange
+            var key = "SomeKey";
+            var grain = Mock.Of<ICacheGrain>();
+            IGrainFactory factory = null;
+
+            // act
+            void action() => factory.GetCacheGrain(key);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(factory), action);
         }
 
         [Fact]
