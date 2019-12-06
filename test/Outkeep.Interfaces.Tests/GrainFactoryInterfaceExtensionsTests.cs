@@ -65,5 +65,19 @@ namespace Outkeep.Interfaces.Tests
             // assert
             Assert.Same(grain, result);
         }
+
+        [Fact]
+        public void GetEchoGrainThrowsOnNullFactory()
+        {
+            // arrange
+            var grain = Mock.Of<IEchoGrain>();
+            IGrainFactory factory = null;
+
+            // act
+            void action() => factory.GetEchoGrain();
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(factory), action);
+        }
     }
 }
