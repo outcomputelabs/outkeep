@@ -38,6 +38,21 @@ namespace Outkeep.Interfaces.Tests
         }
 
         [Fact]
+        public void GetCacheGrainThrowsOnNullKey()
+        {
+            // arrange
+            string key = null;
+            var grain = Mock.Of<ICacheGrain>();
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null) == grain);
+
+            // act
+            void action() => factory.GetCacheGrain(key);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(key), action);
+        }
+
+        [Fact]
         public void GetEchoGrain()
         {
             // arrange
