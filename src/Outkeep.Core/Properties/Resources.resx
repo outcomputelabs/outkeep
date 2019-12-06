@@ -120,6 +120,9 @@
   <data name="Exception_CacheFile_X_ContainsKey_X_YetWeExpected_X" xml:space="preserve">
     <value>Cache file {0} contains key {1} yet we expected {2}</value>
   </data>
+  <data name="Exception_CacheFile_X_ContainsNullKey_YetWeExpected_X" xml:space="preserve">
+    <value>Cache file {0} contains null key yet we expected {1}</value>
+  </data>
   <data name="Exception_CacheFile_X_DoesNotContainExpectedKey_X" xml:space="preserve">
     <value>Cache file {0} does not contain expected key {1}</value>
   </data>

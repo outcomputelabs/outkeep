@@ -268,5 +268,51 @@ namespace Outkeep.Core.Tests
                 File.Delete(path);
             }
         }
+
+        [Fact]
+        public async Task ReadThrowsOnNullKey()
+        {
+            var key = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
+            var title = KeyToFileTitle(key);
+            var directory = Path.GetTempPath();
+            var path = Path.Combine(directory, title);
+            var value = Guid.NewGuid().ToByteArray();
+            var absoluteExpiration = DateTimeOffset.UtcNow;
+            var slidingExpiration = TimeSpan.FromMinutes(1);
+
+            using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous))
+            using (var writer = new Utf8JsonWriter(stream))
+            {
+                writer.WriteStartObject();
+                writer.WriteNull(nameof(key));
+                writer.WriteString(nameof(absoluteExpiration), absoluteExpiration);
+                writer.WriteString(nameof(slidingExpiration), slidingExpiration.ToString());
+                writer.WriteBase64String(nameof(value), value);
+                writer.WriteEndObject();
+
+                await writer.DisposeAsync();
+                await stream.DisposeAsync();
+            }
+
+            try
+            {
+                var logger = new NullLogger<FileCacheStorage>();
+                var options = new FileCacheStorageOptions
+                {
+                    StorageDirectory = directory
+                };
+                var storage = new FileCacheStorage(logger, Options.Create(options));
+
+                var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
+
+                Assert.Equal(Resources.Exception_CacheFile_X_ContainsNullKey_YetWeExpected_X.Format(path, key), error.Message);
+                Assert.Equal(path, error.Path);
+                Assert.Equal(key, error.Key);
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
     }
 }

@@ -158,7 +158,11 @@ namespace Outkeep.Core
                         {
                             string readKey = keyValue.GetString();
 
-                            if (readKey != key)
+                            if (readKey == null)
+                            {
+                                throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ContainsNullKey_YetWeExpected_X.Format(path, key), path, key);
+                            }
+                            else if (readKey != key)
                             {
                                 throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ContainsKey_X_YetWeExpected_X.Format(path, readKey, key), path, key, readKey);
                             }

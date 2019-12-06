@@ -70,6 +70,15 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cache file {0} contains null key yet we expected {1}.
+        /// </summary>
+        internal static string Exception_CacheFile_X_ContainsNullKey_YetWeExpected_X {
+            get {
+                return ResourceManager.GetString("Exception_CacheFile_X_ContainsNullKey_YetWeExpected_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cache file {0} does not contain expected key {1}.
         /// </summary>
         internal static string Exception_CacheFile_X_DoesNotContainExpectedKey_X {
