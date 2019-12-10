@@ -25,6 +25,9 @@ namespace System.Threading.Tasks
             // quick path for infinite timeout
             if (timeout == TimeSpan.MaxValue) return task;
 
+            // quick path for zero timeout
+            if (timeout == TimeSpan.Zero) return Task.FromResult(defaultValue);
+
             // slow path for regular completion
             return Task.WhenAny(
                 task,

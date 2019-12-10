@@ -17,16 +17,29 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public async Task WithDefaultOnTimeoutReturnsCompletedTask()
+        public void WithDefaultOnTimeoutReturnsCompletedTask()
         {
             // arrange
             Task<int> task = Task.FromResult(1);
 
             // act
-            var result = await task.WithDefaultOnTimeout(0, TimeSpan.Zero).ConfigureAwait(false);
+            var result = task.WithDefaultOnTimeout(0, TimeSpan.Zero);
 
             // assert
-            Assert.Equal(1, result);
+            Assert.Same(task, result);
+        }
+
+        [Fact]
+        public void WithDefaultOnTimeoutReturnsTaskOnMaxTimeout()
+        {
+            // arrange
+            var completion = new TaskCompletionSource<int>();
+
+            // act
+            var result = completion.Task.WithDefaultOnTimeout(0, TimeSpan.MaxValue);
+
+            // assert
+            Assert.Same(completion.Task, result);
         }
     }
 }
