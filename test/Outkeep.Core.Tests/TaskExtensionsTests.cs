@@ -70,5 +70,19 @@ namespace Outkeep.Core.Tests
             result.Wait();
             Assert.Equal(1, result.Result);
         }
+
+        [Fact]
+        public void WithDefaultOnTimeoutReturnsDefaultOnTimeout()
+        {
+            // arrange
+            var completion = new TaskCompletionSource<int>();
+
+            // act
+            var result = completion.Task.WithDefaultOnTimeout(0, TimeSpan.FromMilliseconds(100));
+
+            // assert
+            result.Wait();
+            Assert.Equal(0, result.Result);
+        }
     }
 }
