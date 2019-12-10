@@ -55,5 +55,20 @@ namespace Outkeep.Core.Tests
             Assert.True(result.IsCompletedSuccessfully);
             Assert.Equal(0, result.Result);
         }
+
+        [Fact]
+        public void WithDefaultOnTimeoutCompletesWithinTimeout()
+        {
+            // arrange
+            var completion = new TaskCompletionSource<int>();
+
+            // act
+            var result = completion.Task.WithDefaultOnTimeout(0, TimeSpan.FromMilliseconds(100));
+            completion.SetResult(1);
+
+            // assert
+            result.Wait();
+            Assert.Equal(1, result.Result);
+        }
     }
 }
