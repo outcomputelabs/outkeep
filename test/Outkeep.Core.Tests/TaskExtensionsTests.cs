@@ -41,5 +41,19 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Same(completion.Task, result);
         }
+
+        [Fact]
+        public void WithDefaultOnTimeoutReturnsDefaultOnZeroTimeout()
+        {
+            // arrange
+            var completion = new TaskCompletionSource<int>();
+
+            // act
+            var result = completion.Task.WithDefaultOnTimeout(0, TimeSpan.Zero);
+
+            // assert
+            Assert.True(result.IsCompletedSuccessfully);
+            Assert.Equal(0, result.Result);
+        }
     }
 }
