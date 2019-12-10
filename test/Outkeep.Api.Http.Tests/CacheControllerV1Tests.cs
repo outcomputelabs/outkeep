@@ -20,7 +20,7 @@ namespace Outkeep.Api.Http.Tests
         {
             var key = Guid.NewGuid().ToString();
             byte[] value = null;
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == Task.FromResult(value.AsImmutable()));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]>>(value.AsImmutable()));
             var controller = new CacheController(factory);
 
             var result = await controller.GetAsync(key).ConfigureAwait(false);
@@ -34,7 +34,7 @@ namespace Outkeep.Api.Http.Tests
         {
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == Task.FromResult(value.AsImmutable()));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]>>(value.AsImmutable()));
             var controller = new CacheController(factory);
 
             var result = await controller.GetAsync(key).ConfigureAwait(false);

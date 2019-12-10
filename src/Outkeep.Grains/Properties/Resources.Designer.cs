@@ -61,11 +61,48 @@ namespace Outkeep.Grains.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cache Grain for key {0} cannot clear state because a prior read has failed..
+        /// </summary>
+        internal static string Exception_CacheGrainForKey_X_CannotClearBecausePendingReadFailed {
+            get {
+                return ResourceManager.GetString("Exception_CacheGrainForKey_X_CannotClearBecausePendingReadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cache Grain for key {0} cannot execute a new storage operation because the prior operation has failed..
+        /// </summary>
+        internal static string Exception_CacheGrainForKey_X_CannotExecuteStorageOperationBecauseThePriorOperationFailed {
+            get {
+                return ResourceManager.GetString("Exception_CacheGrainForKey_X_CannotExecuteStorageOperationBecauseThePriorOperatio" +
+                        "nFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cache Grain for key {0} cannot write state because a prior read has failed..
+        /// </summary>
+        internal static string Exception_CacheGrainForKey_X_CannotWriteBecausePendingReadFailed {
+            get {
+                return ResourceManager.GetString("Exception_CacheGrainForKey_X_CannotWriteBecausePendingReadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be a positive {1}.
         /// </summary>
-        internal static string ExceptionXMustBeAPositiveX {
+        internal static string Exception_XMustBeAPositiveX {
             get {
-                return ResourceManager.GetString("ExceptionXMustBeAPositiveX", resourceCulture);
+                return ResourceManager.GetString("Exception_XMustBeAPositiveX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cache Grain for key {Key} failed and will be deactivated now..
+        /// </summary>
+        internal static string Log_CacheGrainForKey_X_FailedAndWillBeDeactivatedNow {
+            get {
+                return ResourceManager.GetString("Log_CacheGrainForKey_X_FailedAndWillBeDeactivatedNow", resourceCulture);
             }
         }
     }

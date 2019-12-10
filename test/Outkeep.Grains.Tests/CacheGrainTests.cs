@@ -109,10 +109,12 @@ namespace Outkeep.Grains.Tests
                 Mock.Of<ISystemClock>(),
                 Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key));
 
+            // act - this will load the value from storage
             await grain.OnActivateAsync().ConfigureAwait(false);
-
-            // act - this will load from storage
             var result = await grain.GetAsync().ConfigureAwait(false);
+
+            // assert
+            Assert.Same(value, result.Value);
 
             // arrange - clear storage
             Mock.Get(storage).Setup(x => x.ReadAsync(key, default)).Returns(Task.FromResult<CacheItem?>(null));
@@ -136,12 +138,12 @@ namespace Outkeep.Grains.Tests
             var clock = Mock.Of<ISystemClock>();
             var identity = Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key);
             var grain = new CacheGrain(options, logger, timers, storage, clock, identity);
-            await grain.OnActivateAsync().ConfigureAwait(false);
 
             // act - set the value
             var value = Guid.NewGuid().ToByteArray();
             var absolute = DateTimeOffset.UtcNow;
             var sliding = TimeSpan.MaxValue;
+            await grain.OnActivateAsync().ConfigureAwait(false);
             await grain.SetAsync(value.AsImmutable(), absolute, sliding).ConfigureAwait(false);
 
             // assert value is set in storage

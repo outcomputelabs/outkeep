@@ -9,7 +9,10 @@ namespace Outkeep.Grains
         public ValidateOptionsResult Validate(string name, CacheGrainOptions options)
         {
             if (options.ExpirationPolicyEvaluationPeriod <= TimeSpan.Zero)
-                return ValidateOptionsResult.Fail(Resources.ExceptionXMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)));
+                return ValidateOptionsResult.Fail(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)));
+
+            if (options.ReactivePollGracefulTimeout <= TimeSpan.Zero)
+                return ValidateOptionsResult.Fail(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ReactivePollGracefulTimeout), nameof(TimeSpan)));
 
             return ValidateOptionsResult.Success;
         }

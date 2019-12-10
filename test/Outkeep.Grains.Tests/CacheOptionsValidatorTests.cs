@@ -18,7 +18,7 @@ namespace Outkeep.Grains.Tests
             var result = validator.Validate(null, options);
 
             Assert.True(result.Failed);
-            Assert.Equal(Resources.ExceptionXMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)), result.FailureMessage);
+            Assert.Equal(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)), result.FailureMessage);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace Outkeep.Grains.Tests
             var result = validator.Validate(null, options);
 
             Assert.True(result.Failed);
-            Assert.Equal(Resources.ExceptionXMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)), result.FailureMessage);
+            Assert.Equal(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)), result.FailureMessage);
         }
 
         [Fact]

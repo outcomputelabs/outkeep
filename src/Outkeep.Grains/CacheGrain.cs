@@ -5,102 +5,99 @@ using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Timers;
 using Outkeep.Core;
+using Outkeep.Grains.Properties;
 using Outkeep.Interfaces;
 using System;
 using System.Threading.Tasks;
 
 namespace Outkeep.Grains
 {
+    [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
-        private readonly CacheGrainOptions options;
-        private readonly ILogger<CacheGrain> logger;
-        private readonly ITimerRegistry timerRegistry;
-        private readonly ICacheStorage storage;
-        private readonly ISystemClock clock;
-        private readonly IGrainIdentity identity;
+        private readonly CacheGrainOptions _options;
+        private readonly ILogger<CacheGrain> _logger;
+        private readonly ITimerRegistry _timerRegistry;
+        private readonly ICacheStorage _storage;
+        private readonly ISystemClock _clock;
+        private readonly IGrainIdentity _identity;
 
         public CacheGrain(IOptions<CacheGrainOptions> options, ILogger<CacheGrain> logger, ITimerRegistry timerRegistry, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity)
         {
-            this.options = options?.Value;
-            this.logger = logger;
-            this.timerRegistry = timerRegistry;
-            this.storage = storage;
-            this.clock = clock;
-            this.identity = identity;
+            _options = options?.Value;
+            _logger = logger;
+            _timerRegistry = timerRegistry;
+            _storage = storage;
+            _clock = clock;
+            _identity = identity;
         }
 
-        private Task<Immutable<byte[]>> valueAsTask;
-        private DateTimeOffset? accessed;
-        private DateTimeOffset? absoluteExpiration;
-        private TimeSpan? slidingExpiration;
+        private ReactiveResult<byte[]> _result = new ReactiveResult<byte[]>(null, Guid.NewGuid());
+        private DateTimeOffset? _absoluteExpiration;
+        private TimeSpan? _slidingExpiration;
+        private DateTimeOffset _accessed;
 
-        public override Task OnActivateAsync()
+        private Task _outstandingStorageOperation;
+
+        private TaskCompletionSource<ReactiveResult<byte[]>> _reactiveTask = new TaskCompletionSource<ReactiveResult<byte[]>>();
+
+        public override async Task OnActivateAsync()
         {
             // start an expiry policy evaluation timer
-            timerRegistry.RegisterTimer(this, TickExpirationPolicy, null, options.ExpirationPolicyEvaluationPeriod, options.ExpirationPolicyEvaluationPeriod);
+            _timerRegistry.RegisterTimer(this, TickExpirationPolicy, null, _options.ExpirationPolicyEvaluationPeriod, _options.ExpirationPolicyEvaluationPeriod);
 
-            return Task.CompletedTask;
+            // attempt to load from storage
+            var item = await _storage.ReadAsync(_identity.PrimaryKeyString).ConfigureAwait(true);
+            if (item.HasValue)
+            {
+                _result = new ReactiveResult<byte[]>(item.Value.Value, Guid.NewGuid());
+                _absoluteExpiration = item.Value.AbsoluteExpiration;
+                _slidingExpiration = item.Value.SlidingExpiration;
+            }
+            _accessed = _clock.UtcNow;
         }
 
-        private async Task TickExpirationPolicy(object state)
+        private Task TickExpirationPolicy(object state)
         {
-            var now = clock.UtcNow;
+            // quick path for nothing to remove
+            if (_result.Value == null) return Task.CompletedTask;
 
-            if ((absoluteExpiration.HasValue && absoluteExpiration.Value <= now) ||
-                (slidingExpiration.HasValue && accessed.GetValueOrDefault(DateTimeOffset.MinValue).Add(slidingExpiration.Value) <= now))
-            {
-                await storage.ClearAsync(identity.PrimaryKeyString).ConfigureAwait(true);
+            // quick-ish path for item not yet expired
+            if (!IsExpired()) return Task.CompletedTask;
 
-                DeactivateOnIdle();
-            }
+            // slow path for removing the item
+            return RemoveAsync();
+        }
+
+        private void SetReactivePromise()
+        {
+            // fulfill the pending reactive promise
+            _reactiveTask.SetResult(_result);
+
+            // create a new pending reactive promise
+            _reactiveTask = new TaskCompletionSource<ReactiveResult<byte[]>>();
+        }
+
+        /// <summary>
+        /// Returns <see cref="true"/> if the item has expired, otherwise <see cref="false"/>.
+        /// </summary>
+        private bool IsExpired()
+        {
+            var now = _clock.UtcNow;
+
+            return
+                (_absoluteExpiration.HasValue && _absoluteExpiration.Value <= now) ||
+                (_slidingExpiration.HasValue && _accessed.Add(_slidingExpiration.Value) <= now);
         }
 
         /// <summary>
         /// Gets the cached value.
-        /// Only loads from storage if the value is not yet in memory.
-        /// E.g. a SET operation on an empty grain will not trigger a load attempt from storage as the built-in persistent interface would.
         /// </summary>
-        /// <returns></returns>
-        public Task<Immutable<byte[]>> GetAsync()
+        public ValueTask<Immutable<byte[]>> GetAsync()
         {
-            // quick path when value is already in memory
-            // we assume this method will be called far more often than the set method
-            // therefore we have pre-built the task object to reduce allocations over time
-            if (accessed.HasValue)
-            {
-                accessed = clock.UtcNow;
-                return valueAsTask;
-            }
+            _accessed = _clock.UtcNow;
 
-            // load value from storage only if not in memory yet
-            // we assume this method will rarely be called
-            return LoadAsync();
-        }
-
-        /// <summary>
-        /// Deferred load from storage for when the value is not yet in memory.
-        /// </summary>
-        private async Task<Immutable<byte[]>> LoadAsync()
-        {
-            // attempt to read the value from storage as a best effort
-            var saved = await storage.ReadAsync(identity.PrimaryKeyString).ConfigureAwait(true);
-            if (saved.HasValue)
-            {
-                valueAsTask = Task.FromResult(saved.Value.Value.AsImmutable());
-                absoluteExpiration = saved.Value.AbsoluteExpiration;
-                slidingExpiration = saved.Value.SlidingExpiration;
-            }
-            else
-            {
-                valueAsTask = NullValueTask;
-                absoluteExpiration = null;
-                slidingExpiration = null;
-            }
-
-            // set the accessed time regardless so we make no further deferred attempts to read from storage
-            accessed = clock.UtcNow;
-            return valueAsTask.Result;
+            return new ValueTask<Immutable<byte[]>>(_result.Value.AsImmutable());
         }
 
         /// <summary>
@@ -108,11 +105,12 @@ namespace Outkeep.Grains
         /// </summary>
         public Task RemoveAsync()
         {
-            // reset the in-memory value
-            valueAsTask = NullValueTask;
+            _result = ReactiveResult<byte[]>.Default;
+            _absoluteExpiration = null;
+            _slidingExpiration = null;
+            _accessed = _clock.UtcNow;
 
-            // also attempt to clear storage
-            return storage.ClearAsync(identity.PrimaryKeyString);
+            return StorageOperationAsync(StorageOperationType.Clear);
         }
 
         /// <summary>
@@ -120,14 +118,80 @@ namespace Outkeep.Grains
         /// </summary>
         public Task SetAsync(Immutable<byte[]> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
-            // we cache the task itself to reduce allocations over time on the GET method
-            valueAsTask = Task.FromResult(value);
-            this.absoluteExpiration = absoluteExpiration;
-            this.slidingExpiration = slidingExpiration;
-            accessed = clock.UtcNow;
+            _result = new ReactiveResult<byte[]>(value.Value, Guid.NewGuid());
+            _absoluteExpiration = absoluteExpiration;
+            _slidingExpiration = slidingExpiration;
 
-            // also attempt to save to storage
-            return storage.WriteAsync(identity.PrimaryKeyString, new CacheItem(value.Value, absoluteExpiration, slidingExpiration));
+            SetReactivePromise();
+
+            return StorageOperationAsync(StorageOperationType.Write);
+        }
+
+        /// <summary>
+        /// Executes storage operations in a reentrancy-safe way.
+        /// </summary>
+        private async Task StorageOperationAsync(StorageOperationType type)
+        {
+            // check if there is an outstanding storage operation
+            // if there is one it will not include the values we have just staged
+            var thisTask = _outstandingStorageOperation;
+            if (thisTask != null)
+            {
+                try
+                {
+                    await thisTask.ConfigureAwait(true);
+                }
+                catch (Exception ex)
+                {
+                    // while we do not want to observe past exceptions
+                    // we do want to stop execution early if the outstanding operation failed
+                    throw new InvalidOperationException(Resources.Exception_CacheGrainForKey_X_CannotExecuteStorageOperationBecauseThePriorOperationFailed.Format(_identity.PrimaryKeyString), ex);
+                }
+                finally
+                {
+                    // if this continuation beat other write attempts then we null out the task to allow further attempts
+                    // if the tasks are different then other attempts have already started
+                    if (thisTask == _outstandingStorageOperation)
+                    {
+                        _outstandingStorageOperation = null;
+                    }
+                }
+            }
+
+            // at this point this continuation is either the first to get here or other continuations may have gotten here already
+            if (_outstandingStorageOperation == null)
+            {
+                // this means this is (probably) the first continuation to get to this point
+                // therefore this continuation gets to start the next storage operation
+                _outstandingStorageOperation = type switch
+                {
+                    StorageOperationType.Write => _storage.WriteAsync(_identity.PrimaryKeyString, new CacheItem(_result.Value, _absoluteExpiration, _slidingExpiration)),
+                    StorageOperationType.Clear => _storage.ClearAsync(_identity.PrimaryKeyString),
+                    _ => throw new NotSupportedException(),
+                };
+                thisTask = _outstandingStorageOperation;
+            }
+            else
+            {
+                // getting here means another continuation has already started a write operation
+                // that write operation already covers the value of the current task so we can await on it
+                thisTask = _outstandingStorageOperation;
+            }
+
+            // either way we can now wait for the outstanding operation
+            try
+            {
+                await thisTask.ConfigureAwait(true);
+            }
+            finally
+            {
+                // if this continuation beat other write attempts here then we null out the task to allow further attempts
+                // otherwise some other write attempt has already started
+                if (thisTask == _outstandingStorageOperation)
+                {
+                    _outstandingStorageOperation = null;
+                }
+            }
         }
 
         /// <summary>
@@ -135,17 +199,20 @@ namespace Outkeep.Grains
         /// </summary>
         public Task RefreshAsync()
         {
-            // if the accessed time is set then we have already loaded this content
-            // we can therefore shortcut this call to only set the accessed time again
-            if (accessed.HasValue)
+            _accessed = _clock.UtcNow;
+            return Task.CompletedTask;
+        }
+
+        public Task<ReactiveResult<byte[]>> PollAsync(Guid etag)
+        {
+            // if the tags are the same then return the reactive promise
+            if (etag == _result.ETag)
             {
-                accessed = clock.UtcNow;
-                return Task.CompletedTask;
+                return _reactiveTask.Task.WithDefaultOnTimeout(ReactiveResult<byte[]>.Default, _options.ReactivePollGracefulTimeout);
             }
 
-            // otherwise we need to load from storage to keep the state consistent
-            // this operation will set the accessed time in the process
-            return LoadAsync();
+            // if the tags are different then return the current value
+            return Task.FromResult(_result);
         }
 
         public async Task Invoke(IIncomingGrainCallContext context)
@@ -159,11 +226,24 @@ namespace Outkeep.Grains
             catch (Exception ex)
             {
                 DeactivateOnIdle();
-                logger.LogError(ex, ex.Message);
+                Log.Failed(_logger, _identity.PrimaryKeyString, ex);
                 throw;
             }
         }
 
-        private static readonly Task<Immutable<byte[]>> NullValueTask = Task.FromResult(new Immutable<byte[]>());
+        private static class Log
+        {
+            private static readonly Action<ILogger, string, Exception> _failed =
+                LoggerMessage.Define<string>(LogLevel.Error, new EventId(1, nameof(Failed)), Resources.Log_CacheGrainForKey_X_FailedAndWillBeDeactivatedNow);
+
+            public static void Failed(ILogger logger, string key, Exception exception) =>
+                _failed(logger, key, exception);
+        }
+
+        private enum StorageOperationType
+        {
+            Write,
+            Clear
+        }
     }
 }
