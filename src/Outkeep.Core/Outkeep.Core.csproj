@@ -10,6 +10,7 @@
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

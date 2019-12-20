@@ -61,6 +61,51 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cache entry for key {0} already has a registered callback.
+        /// </summary>
+        internal static string Exception_CacheEntryFor_X_AlreadyHasARegisteredCallback {
+            get {
+                return ResourceManager.GetString("Exception_CacheEntryFor_X_AlreadyHasARegisteredCallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cache entry for key {0} is comitted and does not allow this operation.
+        /// </summary>
+        internal static string Exception_CacheEntryFor_X_IsCommittedAndDoesNotAllowThisOperation {
+            get {
+                return ResourceManager.GetString("Exception_CacheEntryFor_X_IsCommittedAndDoesNotAllowThisOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cache entry for key {0} is uncomitted and does not allow this operation.
+        /// </summary>
+        internal static string Exception_CacheEntryFor_X_IsUncommittedAndDoesNotAllowThisOperation {
+            get {
+                return ResourceManager.GetString("Exception_CacheEntryFor_X_IsUncommittedAndDoesNotAllowThisOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The cache entry for key {0} must have a size greater than zero.
+        /// </summary>
+        internal static string Exception_CacheEntryFor_X_MustHaveSizeGreaterThanZero {
+            get {
+                return ResourceManager.GetString("Exception_CacheEntryFor_X_MustHaveSizeGreaterThanZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The cache entry for key {0} must have a size lesser than or equal capacity of {1}.
+        /// </summary>
+        internal static string Exception_CacheEntryFor_X_MustHaveSizeLesserThanOrEqualCapacityOf_X {
+            get {
+                return ResourceManager.GetString("Exception_CacheEntryFor_X_MustHaveSizeLesserThanOrEqualCapacityOf_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cache file {0} contains key {1} yet we expected {2}.
         /// </summary>
         internal static string Exception_CacheFile_X_ContainsKey_X_YetWeExpected_X {
@@ -93,6 +138,15 @@ namespace Outkeep.Core.Properties {
         internal static string Exception_CacheFile_X_ForKey_X_DoesNotContainValue {
             get {
                 return ResourceManager.GetString("Exception_CacheFile_X_ForKey_X_DoesNotContainValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition for type {0} with value {1} is not supported.
+        /// </summary>
+        internal static string Exception_ConditionForType_X_WithValue_X_IsNotSupported {
+            get {
+                return ResourceManager.GetString("Exception_ConditionForType_X_WithValue_X_IsNotSupported", resourceCulture);
             }
         }
         
@@ -133,11 +187,29 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Completed overcapacity compaction with final size of {Size}.
+        /// </summary>
+        internal static string Log_CompletedOvercapacityCompactionWithSizeOf_X {
+            get {
+                return ResourceManager.GetString("Log_CompletedOvercapacityCompactionWithSizeOf_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deleted cache file {Path} for key {Key}.
         /// </summary>
         internal static string Log_DeletedCacheFile_X_ForKey_X {
             get {
                 return ResourceManager.GetString("Log_DeletedCacheFile_X_ForKey_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The eviction callback for key {Key} and cause {Cause} failed.
+        /// </summary>
+        internal static string Log_EvictionCallbackForKey_X_WithCause_X_Failed {
+            get {
+                return ResourceManager.GetString("Log_EvictionCallbackForKey_X_WithCause_X_Failed", resourceCulture);
             }
         }
         
@@ -156,6 +228,24 @@ namespace Outkeep.Core.Properties {
         internal static string Log_ReadCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes {
             get {
                 return ResourceManager.GetString("Log_ReadCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scheduling overcapacity compaction.
+        /// </summary>
+        internal static string Log_SchedulingOvercapacityCompaction {
+            get {
+                return ResourceManager.GetString("Log_SchedulingOvercapacityCompaction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting overcapacity compaction with current size of {Size}.
+        /// </summary>
+        internal static string Log_StartingOvercapacityCompactionWithSizeOf_X {
+            get {
+                return ResourceManager.GetString("Log_StartingOvercapacityCompactionWithSizeOf_X", resourceCulture);
             }
         }
         

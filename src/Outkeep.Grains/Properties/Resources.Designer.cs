@@ -61,7 +61,7 @@ namespace Outkeep.Grains.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cache Grain for key {0} cannot clear state because a prior read has failed..
+        ///   Looks up a localized string similar to Cache Grain for key {0} cannot clear state because a prior read has failed.
         /// </summary>
         internal static string Exception_CacheGrainForKey_X_CannotClearBecausePendingReadFailed {
             get {
@@ -70,7 +70,7 @@ namespace Outkeep.Grains.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cache Grain for key {0} cannot execute a new storage operation because the prior operation has failed..
+        ///   Looks up a localized string similar to Cache Grain for key {0} cannot execute a new storage operation because the prior operation has failed.
         /// </summary>
         internal static string Exception_CacheGrainForKey_X_CannotExecuteStorageOperationBecauseThePriorOperationFailed {
             get {
@@ -80,7 +80,7 @@ namespace Outkeep.Grains.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cache Grain for key {0} cannot write state because a prior read has failed..
+        ///   Looks up a localized string similar to Cache Grain for key {0} cannot write state because a prior read has failed.
         /// </summary>
         internal static string Exception_CacheGrainForKey_X_CannotWriteBecausePendingReadFailed {
             get {
@@ -98,7 +98,34 @@ namespace Outkeep.Grains.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cache Grain for key {Key} failed and will be deactivated now..
+        ///   Looks up a localized string similar to The Cache Director Grain Service has encountered an error.
+        /// </summary>
+        internal static string Log_CachedDirectorGrainServiceError {
+            get {
+                return ResourceManager.GetString("Log_CachedDirectorGrainServiceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cache Director Grain Service has started.
+        /// </summary>
+        internal static string Log_CacheDirectorGrainServiceStarted {
+            get {
+                return ResourceManager.GetString("Log_CacheDirectorGrainServiceStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cache Director Grain Service has stopped.
+        /// </summary>
+        internal static string Log_CacheDirectorGrainServiceStopped {
+            get {
+                return ResourceManager.GetString("Log_CacheDirectorGrainServiceStopped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cache Grain for key {Key} failed and will be deactivated now.
         /// </summary>
         internal static string Log_CacheGrainForKey_X_FailedAndWillBeDeactivatedNow {
             get {

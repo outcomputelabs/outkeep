@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,5 +31,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Outkeep.Api.Http\Outkeep.Api.Http.csproj" />
   </ItemGroup>
-
 </Project>

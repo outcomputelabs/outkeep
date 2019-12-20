@@ -118,18 +118,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Exception_CacheGrainForKey_X_CannotClearBecausePendingReadFailed" xml:space="preserve">
-    <value>Cache Grain for key {0} cannot clear state because a prior read has failed.</value>
+    <value>Cache Grain for key {0} cannot clear state because a prior read has failed</value>
   </data>
   <data name="Exception_CacheGrainForKey_X_CannotExecuteStorageOperationBecauseThePriorOperationFailed" xml:space="preserve">
-    <value>Cache Grain for key {0} cannot execute a new storage operation because the prior operation has failed.</value>
+    <value>Cache Grain for key {0} cannot execute a new storage operation because the prior operation has failed</value>
   </data>
   <data name="Exception_CacheGrainForKey_X_CannotWriteBecausePendingReadFailed" xml:space="preserve">
-    <value>Cache Grain for key {0} cannot write state because a prior read has failed.</value>
+    <value>Cache Grain for key {0} cannot write state because a prior read has failed</value>
   </data>
   <data name="Exception_XMustBeAPositiveX" xml:space="preserve">
     <value>{0} must be a positive {1}</value>
   </data>
+  <data name="Log_CachedDirectorGrainServiceError" xml:space="preserve">
+    <value>The Cache Director Grain Service has encountered an error</value>
+  </data>
+  <data name="Log_CacheDirectorGrainServiceStarted" xml:space="preserve">
+    <value>The Cache Director Grain Service has started</value>
+  </data>
+  <data name="Log_CacheDirectorGrainServiceStopped" xml:space="preserve">
+    <value>The Cache Director Grain Service has stopped</value>
+  </data>
   <data name="Log_CacheGrainForKey_X_FailedAndWillBeDeactivatedNow" xml:space="preserve">
-    <value>Cache Grain for key {Key} failed and will be deactivated now.</value>
+    <value>Cache Grain for key {Key} failed and will be deactivated now</value>
   </data>
 </root>

@@ -14,6 +14,7 @@
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <UserSecretsId>e9e9ef0c-531b-4b37-93cf-4525e559687a</UserSecretsId>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

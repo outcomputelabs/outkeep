@@ -10,6 +10,7 @@
     <Product>Outkeep</Product>
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Orleans.Core" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="3.0.1" />
   </ItemGroup>
 
   <ItemGroup>

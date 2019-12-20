@@ -14,6 +14,7 @@
     <UserSecretsId>f3c6c147-f138-43ab-b8bc-2132ea361241</UserSecretsId>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
