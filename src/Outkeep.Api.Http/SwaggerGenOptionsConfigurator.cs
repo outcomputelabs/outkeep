@@ -16,8 +16,8 @@ namespace Outkeep.Api.Http
 
         public SwaggerGenOptionsConfigurator(IApiVersionDescriptionProvider provider, IOptions<OutkeepHttpApiServerOptions> options)
         {
-            this.provider = provider;
-            this.options = options?.Value;
+            this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
         public void Configure(SwaggerGenOptions options)
