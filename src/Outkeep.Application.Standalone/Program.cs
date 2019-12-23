@@ -8,6 +8,7 @@ using Outkeep.Hosting;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Outkeep.Application.Standalone
@@ -64,7 +65,7 @@ namespace Outkeep.Application.Standalone
             {
                 var apiOptions = host.Services.GetRequiredService<IOptions<OutkeepHttpApiServerOptions>>().Value;
 
-                Console.Title = $"HttpApi: {apiOptions.ApiUri.Port}";
+                Console.Title = $"HttpApi: {apiOptions.ApiUri?.Port.ToString(CultureInfo.InvariantCulture) ?? "(none)"}";
             }
 
             await host.RunAsync().ConfigureAwait(false);
