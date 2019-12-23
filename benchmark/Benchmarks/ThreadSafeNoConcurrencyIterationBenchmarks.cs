@@ -17,7 +17,6 @@ namespace Benchmarks
         private List<object> _list;
         private ImmutableList<object> _ilist;
         private ImmutableArray<object> _iarray;
-        private CopyingCollection<object> _larray;
         private object[] _array;
 
         private readonly object _lock = new object();
@@ -33,7 +32,6 @@ namespace Benchmarks
             _dictionary = new Dictionary<object, byte>(N);
             _list = new List<object>(N);
             _array = new object[N];
-            _larray = new CopyingCollection<object>();
 
             var immutableListBuilder = ImmutableList.CreateBuilder<object>();
             var immutableArrayBuilder = ImmutableArray.CreateBuilder<object>(N);
@@ -45,7 +43,6 @@ namespace Benchmarks
                 _dictionary[obj] = 0x00;
                 _list.Add(obj);
                 _array[i] = obj;
-                _larray.Add(obj);
                 immutableListBuilder.Add(obj);
                 immutableArrayBuilder.Add(obj);
             }
