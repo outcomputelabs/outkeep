@@ -398,7 +398,7 @@ namespace Outkeep.Core.Caching
         /// ?. Items with the soonest sliding expiration.
         /// ?. Larger objects - estimated by object graph size, inaccurate.
         [Obsolete("TODO: Move this to the cache director grain")]
-        private void ExpirePriorityBucket(ref long removedSize, long removalSizeTarget, Func<CacheEntry, long> computeEntrySize, List<CacheEntry> entriesToRemove, List<CacheEntry> priorityEntries)
+        private static void ExpirePriorityBucket(ref long removedSize, long removalSizeTarget, Func<CacheEntry, long> computeEntrySize, List<CacheEntry> entriesToRemove, List<CacheEntry> priorityEntries)
         {
             // Do we meet our quota by just removing expired entries?
             if (removalSizeTarget <= removedSize)
