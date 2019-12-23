@@ -465,15 +465,15 @@ namespace Outkeep.Core.Caching
         {
             public static void SchedulingOverCapacityCompaction(ILogger logger) => _schedulingOvercapacityCompaction(logger, null);
 
-            private static readonly Action<ILogger, Exception> _schedulingOvercapacityCompaction = LoggerMessage.Define(LogLevel.Debug, new EventId(1, nameof(SchedulingOverCapacityCompaction)), Resources.Log_SchedulingOvercapacityCompaction);
+            private static readonly Action<ILogger, Exception?> _schedulingOvercapacityCompaction = LoggerMessage.Define(LogLevel.Debug, new EventId(1, nameof(SchedulingOverCapacityCompaction)), Resources.Log_SchedulingOvercapacityCompaction);
 
             public static void StartingOvercapacityCompaction(ILogger logger, long size) => _startingOvercapacityCompaction(logger, size, null);
 
-            private static readonly Action<ILogger, long, Exception> _startingOvercapacityCompaction = LoggerMessage.Define<long>(LogLevel.Debug, new EventId(2, nameof(StartingOvercapacityCompaction)), Resources.Log_StartingOvercapacityCompactionWithSizeOf_X);
+            private static readonly Action<ILogger, long, Exception?> _startingOvercapacityCompaction = LoggerMessage.Define<long>(LogLevel.Debug, new EventId(2, nameof(StartingOvercapacityCompaction)), Resources.Log_StartingOvercapacityCompactionWithSizeOf_X);
 
             public static void CompletedOvercapacityCompaction(ILogger logger, long size) => _completedOvercapacityCompaction(logger, size, null);
 
-            private static readonly Action<ILogger, long, Exception> _completedOvercapacityCompaction = LoggerMessage.Define<long>(LogLevel.Debug, new EventId(3, nameof(CompletedOvercapacityCompaction)), Resources.Log_CompletedOvercapacityCompactionWithSizeOf_X);
+            private static readonly Action<ILogger, long, Exception?> _completedOvercapacityCompaction = LoggerMessage.Define<long>(LogLevel.Debug, new EventId(3, nameof(CompletedOvercapacityCompaction)), Resources.Log_CompletedOvercapacityCompactionWithSizeOf_X);
         }
     }
 }
