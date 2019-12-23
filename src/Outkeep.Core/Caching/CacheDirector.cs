@@ -328,57 +328,67 @@ namespace Outkeep.Core.Caching
             Compact(removalCountTarget, _ => 1);
         }
 
+        private readonly List<CacheEntry> _compactElectedEntries = new List<CacheEntry>();
+        private readonly List<CacheEntry> _compactLowPriorityEntries = new List<CacheEntry>();
+        private readonly List<CacheEntry> _compactNormalPriorityEntries = new List<CacheEntry>();
+        private readonly List<CacheEntry> _compactHighPriorityEntries = new List<CacheEntry>();
+
         [Obsolete("TODO: Move this to the cache director grain")]
         private void Compact(long removalSizeTarget, Func<CacheEntry, long> computeEntrySize)
         {
-            // todo: can we re-use buffers here to avoid collection allocations?
-            var entriesToRemove = new List<CacheEntry>();
-            var lowPriEntries = new List<CacheEntry>();
-            var normalPriEntries = new List<CacheEntry>();
-            var highPriEntries = new List<CacheEntry>();
             long removedSize = 0;
 
-            // bucket items by expiration and priority
-            var now = _clock.UtcNow;
-            foreach (var entry in _entries.Values)
+            try
             {
-                if (entry.TrySetExpiredOnTimeout(now))
+                // bucket items by expiration and priority
+                var now = _clock.UtcNow;
+                foreach (var entry in _entries.Values)
                 {
-                    entriesToRemove.Add(entry);
-                    removedSize += computeEntrySize(entry);
-                }
-                else
-                {
-                    switch (entry.Priority)
+                    if (entry.TrySetExpiredOnTimeout(now))
                     {
-                        case CachePriority.Low:
-                            lowPriEntries.Add(entry);
-                            break;
+                        _compactElectedEntries.Add(entry);
+                        removedSize += computeEntrySize(entry);
+                    }
+                    else
+                    {
+                        switch (entry.Priority)
+                        {
+                            case CachePriority.Low:
+                                _compactLowPriorityEntries.Add(entry);
+                                break;
 
-                        case CachePriority.Normal:
-                            normalPriEntries.Add(entry);
-                            break;
+                            case CachePriority.Normal:
+                                _compactNormalPriorityEntries.Add(entry);
+                                break;
 
-                        case CachePriority.High:
-                            highPriEntries.Add(entry);
-                            break;
+                            case CachePriority.High:
+                                _compactHighPriorityEntries.Add(entry);
+                                break;
 
-                        case CachePriority.NeverRemove:
-                            break;
+                            case CachePriority.NeverRemove:
+                                break;
 
-                        default:
-                            throw new NotSupportedException(Resources.Exception_ConditionForType_X_WithValue_X_IsNotSupported.Format(nameof(CachePriority), entry.Priority));
+                            default:
+                                throw new NotSupportedException(Resources.Exception_ConditionForType_X_WithValue_X_IsNotSupported.Format(nameof(CachePriority), entry.Priority));
+                        }
                     }
                 }
+
+                ExpirePriorityBucket(ref removedSize, removalSizeTarget, computeEntrySize, _compactElectedEntries, _compactLowPriorityEntries);
+                ExpirePriorityBucket(ref removedSize, removalSizeTarget, computeEntrySize, _compactElectedEntries, _compactNormalPriorityEntries);
+                ExpirePriorityBucket(ref removedSize, removalSizeTarget, computeEntrySize, _compactElectedEntries, _compactHighPriorityEntries);
+
+                foreach (var entry in _compactElectedEntries)
+                {
+                    RemoveEntry(entry);
+                }
             }
-
-            ExpirePriorityBucket(ref removedSize, removalSizeTarget, computeEntrySize, entriesToRemove, lowPriEntries);
-            ExpirePriorityBucket(ref removedSize, removalSizeTarget, computeEntrySize, entriesToRemove, normalPriEntries);
-            ExpirePriorityBucket(ref removedSize, removalSizeTarget, computeEntrySize, entriesToRemove, highPriEntries);
-
-            foreach (var entry in entriesToRemove)
+            finally
             {
-                RemoveEntry(entry);
+                _compactElectedEntries.Clear();
+                _compactLowPriorityEntries.Clear();
+                _compactNormalPriorityEntries.Clear();
+                _compactHighPriorityEntries.Clear();
             }
         }
 
