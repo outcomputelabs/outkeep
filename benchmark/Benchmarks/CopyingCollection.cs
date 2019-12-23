@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace Benchmarks
 {
-    public class LockingImmutableArray<T> : ICollection<T>
+    public class CopyingCollection<T> : ICollection<T>
     {
         private readonly object _lock = new object();
         private ImmutableArray<T> _array = ImmutableArray<T>.Empty;
