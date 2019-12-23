@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace System.Threading.Tasks
+﻿namespace System.Threading.Tasks
 {
     public static class TaskExtensions
     {
@@ -8,16 +6,9 @@ namespace System.Threading.Tasks
         /// Creates a task that completes when the given task completes or a timeout is reached.
         /// If the timeout is reached, the created task return the given default value, otherwise it returns the
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="task"></param>
-        /// <param name="value"></param>
-        /// <param name="timeout"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Inlining")]
         public static Task<T> WithDefaultOnTimeout<T>(this Task<T> task, T defaultValue, TimeSpan timeout, CancellationToken cancellationToken = default)
         {
-            if (task == null) ThrowTaskNull();
+            if (task == null) throw new ArgumentNullException(nameof(task));
 
             // quick path for completed task
             if (task.IsCompleted) return task;
@@ -33,8 +24,6 @@ namespace System.Threading.Tasks
                 task,
                 Task.Delay(timeout).ContinueWith((x, dv) => (T)dv, defaultValue, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default))
                 .Unwrap();
-
-            void ThrowTaskNull() => throw new ArgumentNullException(nameof(task));
         }
     }
 }
