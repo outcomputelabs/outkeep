@@ -93,7 +93,6 @@ namespace Outkeep.Core
         private async Task InnerClearAsync(string key)
         {
             // attempt to delete the file in an async fashion as not to block the caller thread
-            // todo: benchmark this to make sure it works across different platforms
             var path = KeyToFileName(key);
             try
             {
