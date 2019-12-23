@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Outkeep.Core.Properties;
+﻿using Outkeep.Core.Properties;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -207,18 +206,6 @@ namespace Outkeep.Core.Caching
 
             // notify the owning context tnhat this entry has expired
             _context.OnEntryExpired(this);
-        }
-
-        /// <summary>
-        /// High-performance logging extensions.
-        /// </summary>
-        private static class Log
-        {
-            private static readonly Action<ILogger, string, EvictionCause, Exception> _evictionCallbackFailed =
-                LoggerMessage.Define<string, EvictionCause>(LogLevel.Error, new EventId(1, nameof(EvictionCallbackFailed)), Resources.Log_EvictionCallbackForKey_X_WithCause_X_Failed);
-
-            public static void EvictionCallbackFailed(ILogger<CacheEntry> logger, string key, EvictionCause cause, Exception exception) =>
-                _evictionCallbackFailed(logger, key, cause, exception);
         }
     }
 }
