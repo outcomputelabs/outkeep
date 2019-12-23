@@ -136,7 +136,7 @@ namespace Outkeep.Core
         private async Task<CacheItem?> InnerReadAsync(string key, CancellationToken cancellationToken)
         {
             var path = KeyToFileName(key);
-            byte[] value = null;
+            byte[]? value = null;
             DateTimeOffset? absoluteExpiration = null;
             TimeSpan? slidingExpiration = null;
 
@@ -304,7 +304,7 @@ namespace Outkeep.Core
 
             #region DeletedFile
 
-            private static readonly Action<ILogger, string, string, Exception> _deletedFileForKey =
+            private static readonly Action<ILogger, string, string, Exception?> _deletedFileForKey =
                 LoggerMessage.Define<string, string>(
                     LogLevel.Debug,
                     new EventId(2, nameof(DeletedFile)),
@@ -317,7 +317,7 @@ namespace Outkeep.Core
 
             #region ReadFile
 
-            private static readonly Action<ILogger, string, string, int, Exception> _readFile =
+            private static readonly Action<ILogger, string, string, int, Exception?> _readFile =
                 LoggerMessage.Define<string, string, int>(
                     LogLevel.Debug,
                     new EventId(3, nameof(ReadFile)),
@@ -330,7 +330,7 @@ namespace Outkeep.Core
 
             #region WroteFile
 
-            private static readonly Action<ILogger, string, string, long, Exception> _wroteFile =
+            private static readonly Action<ILogger, string, string, long, Exception?> _wroteFile =
                 LoggerMessage.Define<string, string, long>(
                     LogLevel.Debug,
                     new EventId(4, nameof(WroteFile)),
@@ -343,7 +343,7 @@ namespace Outkeep.Core
 
             #region FileNotFound
 
-            private static readonly Action<ILogger, string, string, Exception> _fileNotFound =
+            private static readonly Action<ILogger, string, string, Exception?> _fileNotFound =
                 LoggerMessage.Define<string, string>(
                     LogLevel.Debug,
                     new EventId(5, nameof(FileNotFound)),
