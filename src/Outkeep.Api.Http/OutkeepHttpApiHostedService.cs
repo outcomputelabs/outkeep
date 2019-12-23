@@ -103,7 +103,10 @@ namespace Outkeep.Api.Http
                         });
                     });
 
-                    web.UseUrls(_options.ApiUri.ToString());
+                    if (_options.ApiUri != null)
+                    {
+                        web.UseUrls(_options.ApiUri.ToString());
+                    }
                 })
                 .Build();
         }
