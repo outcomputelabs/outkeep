@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Outkeep.Core.Caching
 {
@@ -15,14 +14,13 @@ namespace Outkeep.Core.Caching
         /// <param name="entry">The cache entry instance upon which to set the absolute expiration.</param>
         /// <param name="absoluteExpiration">The absolute expiration to set upon the cache entry.</param>
         /// <returns>The same cache entry instance to allow chaining.</returns>
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public static ICacheEntry SetAbsoluteExpiration(this ICacheEntry entry, DateTime absoluteExpiration)
         {
-            if (entry == null) ThrowEntryNull();
-            entry.AbsoluteExpiration = absoluteExpiration;
-            return entry;
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
 
-            static void ThrowEntryNull() => throw new ArgumentNullException(nameof(entry));
+            entry.AbsoluteExpiration = absoluteExpiration;
+
+            return entry;
         }
 
         /// <summary>
@@ -32,14 +30,13 @@ namespace Outkeep.Core.Caching
         /// <param name="entry">The cache entry instance upon which to set the sliding expiration.</param>
         /// <param name="slidingExpiration">The sliding expiration to set upon the cache entry.</param>
         /// <returns>The same cache entry instance to allow chaining.</returns>
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public static ICacheEntry SetSlidingExpiration<TKey>(this ICacheEntry entry, TimeSpan slidingExpiration)
         {
-            if (entry == null) ThrowEntryNull();
-            entry.SlidingExpiration = slidingExpiration;
-            return entry;
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
 
-            static void ThrowEntryNull() => throw new ArgumentNullException(nameof(entry));
+            entry.SlidingExpiration = slidingExpiration;
+
+            return entry;
         }
 
         /// <summary>
@@ -49,14 +46,13 @@ namespace Outkeep.Core.Caching
         /// <param name="entry">The cache entry instance upon which to set the priority.</param>
         /// <param name="priority">The priority to set upon the cache entry.</param>
         /// <returns>The same cache entry instance to allow chaining.</returns>
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
         public static ICacheEntry SetPriority<TKey>(this ICacheEntry entry, CachePriority priority)
         {
-            if (entry == null) ThrowEntryNull();
-            entry.Priority = priority;
-            return entry;
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
 
-            static void ThrowEntryNull() => throw new ArgumentNullException(nameof(entry));
+            entry.Priority = priority;
+
+            return entry;
         }
     }
 }
