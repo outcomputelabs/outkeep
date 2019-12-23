@@ -27,8 +27,8 @@ namespace Outkeep.Grains
             _timerArgs = new TimerArgs(_director, _logger);
         }
 
-        private IDisposable _removeExpiredTimer;
-        private IDisposable _overcapacityRegistration;
+        private IDisposable? _removeExpiredTimer;
+        private IDisposable? _overcapacityRegistration;
 
         public override Task Start()
         {
@@ -54,6 +54,9 @@ namespace Outkeep.Grains
 
         public override Task Stop()
         {
+            _removeExpiredTimer?.Dispose();
+            _overcapacityRegistration?.Dispose();
+
             Log.CacheDirectorGrainServiceStopped(_logger);
 
             return base.Stop();
