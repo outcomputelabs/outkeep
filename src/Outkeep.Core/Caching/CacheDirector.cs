@@ -77,6 +77,18 @@ namespace Outkeep.Core.Caching
         }
 
         /// <summary>
+        /// Attempts to find and expire the item with the given key.
+        /// </summary>
+        private CacheEntry TryExpire(string key)
+        {
+            if (_entries.TryGetValue(key, out var previous))
+            {
+                previous.SetExpired(EvictionCause.Replaced);
+            }
+            return previous;
+        }
+
+        /// <summary>
         /// Accepts an entry into this cache director.
         /// This method is to be called from <see cref="CacheEntry.Commit"/> after entry configuration.
         /// This is the critical performance path in the director.
@@ -92,10 +104,7 @@ namespace Outkeep.Core.Caching
 
             // mark any previous entry as expired but do not remove it yet
             // we must keep the entry in place to detect race conditions without locking
-            if (_entries.TryGetValue(entry.Key, out var previous))
-            {
-                previous.SetExpired(EvictionCause.Replaced);
-            }
+            var previous = TryExpire(entry.Key);
 
             // try to allocate space for the new entry
             var allocated = TryClaimSpace(entry);
