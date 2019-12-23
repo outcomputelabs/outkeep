@@ -164,7 +164,6 @@ namespace Outkeep.Core.Caching
 
                 // regardless of how we got here any previous entry was replaced and expired
                 // therefore invoke any user registered callbacks on it
-                // todo: refactor as to only attempt execution of this method once
                 if (previous != null)
                 {
                     previous.ScheduleEvictionCallback();
