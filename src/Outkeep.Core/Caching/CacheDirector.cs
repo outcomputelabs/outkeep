@@ -16,7 +16,6 @@ namespace Outkeep.Core.Caching
     internal sealed class CacheDirector : ICacheDirector, ICacheContext
     {
         private readonly ILogger<CacheDirector> _logger;
-        private readonly ILogger<CacheEntry> _entryLogger;
         private readonly CacheDirectorOptions _options;
         private readonly ISystemClock _clock;
 
@@ -24,7 +23,6 @@ namespace Outkeep.Core.Caching
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _entryLogger = entryLogger ?? throw new ArgumentNullException(nameof(entryLogger));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         }
 
