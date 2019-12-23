@@ -13,7 +13,7 @@ namespace Outkeep.Core.Caching
             return services.AddCacheDirector(null, configure);
         }
 
-        public static IServiceCollection AddCacheDirector(this IServiceCollection services, string name, Action<CacheDirectorOptions> configure)
+        public static IServiceCollection AddCacheDirector(this IServiceCollection services, string? name, Action<CacheDirectorOptions> configure)
         {
             return services
                 .AddSingleton<CacheDirector>()
