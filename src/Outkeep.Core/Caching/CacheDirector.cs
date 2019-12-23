@@ -73,7 +73,7 @@ namespace Outkeep.Core.Caching
             if (size < 1) throw new ArgumentOutOfRangeException(nameof(size), Resources.Exception_CacheEntryFor_X_MustHaveSizeGreaterThanZero.Format(key));
             if (size > _options.Capacity) throw new ArgumentOutOfRangeException(nameof(size), Resources.Exception_CacheEntryFor_X_MustHaveSizeLesserThanOrEqualCapacityOf_X.Format(key, _options.Capacity));
 
-            return new CacheEntry(key, size, _entryLogger, this);
+            return new CacheEntry(key, size, this);
         }
 
         /// <summary>

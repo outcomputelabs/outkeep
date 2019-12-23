@@ -13,11 +13,6 @@ namespace Outkeep.Core.Caching
     internal sealed class CacheEntry : ICacheEntry, ICacheEntryContext, IDisposable
     {
         /// <summary>
-        /// The logger for this cache entry.
-        /// </summary>
-        private readonly ILogger<CacheEntry> _logger;
-
-        /// <summary>
         /// The cache context to use for raising notifications.
         /// </summary>
         private readonly ICacheContext _context;
@@ -27,12 +22,11 @@ namespace Outkeep.Core.Caching
         /// </summary>
         private PostEvictionCallbackRegistration? _postEvictionCallbackRegistration;
 
-        public CacheEntry(string key, long size, ILogger<CacheEntry> logger, ICacheContext context)
+        public CacheEntry(string key, long size, ICacheContext context)
         {
             Key = key ?? throw new ArgumentNullException(nameof(key));
             Size = size < 1 ? throw new ArgumentOutOfRangeException(nameof(size)) : size;
 
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
