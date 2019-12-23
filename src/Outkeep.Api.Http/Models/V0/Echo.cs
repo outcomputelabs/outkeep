@@ -15,11 +15,11 @@ namespace Outkeep.Api.Http.Models.V0
         /// <summary>
         /// The message present in the request.
         /// </summary>
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         /// <summary>
         /// The API version that fulfilled the request.
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
     }
 }
