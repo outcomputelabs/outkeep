@@ -186,7 +186,7 @@ namespace Outkeep.Core
 
                         if (document.RootElement.TryGetProperty(SlidingExpirationPropertyName, out var slidingExpirationValue))
                         {
-                            // todo: refactor this into non-allocating code if/when the json reader supports timespan or at least writing to a span
+                            // this alocates a string for no good reason - refactor this once the json reader supports timespans
                             slidingExpiration = TimeSpan.Parse(slidingExpirationValue.GetString(), CultureInfo.InvariantCulture);
                         }
                     }
