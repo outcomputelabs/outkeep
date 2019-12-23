@@ -247,11 +247,6 @@ namespace Outkeep.Core.Caching
             return false;
         }
 
-        private static void ValidateKey(object key)
-        {
-            if (key == null) throw new ArgumentNullException(nameof(key));
-        }
-
         /// <summary>
         /// Removes the given entry from the dictionary and updates the used spaced as appropriate.
         /// Takes no action if the given entry no longer exists in the dictionary.
