@@ -188,18 +188,14 @@ namespace Outkeep.Core.Caching
 
                 // if we found a previous entry then remove it as well
                 // an attempt to add an entry must remove any old entry even if unsuccessful
-                if (previous != null)
+                // only remove the previous entry if it was the same we found otherwise a concurrent thread already took care of it
+                if (previous != null && _entries.TryRemove(new KeyValuePair<string, CacheEntry>(previous.Key, previous)))
                 {
-                    // only remove the previous entry if it was the same we found
-                    // otherwise a concurrent thread already took care of it
-                    if (_entries.TryRemove(new KeyValuePair<string, CacheEntry>(previous.Key, previous)))
-                    {
-                        // free up the space taken by the previous entry
-                        Interlocked.Add(ref _size, -previous.Size);
+                    // free up the space taken by the previous entry
+                    Interlocked.Add(ref _size, -previous.Size);
 
-                        // we evicted the previous entry so call the user callback
-                        previous.ScheduleEvictionCallback();
-                    }
+                    // we evicted the previous entry so call the user callback
+                    previous.ScheduleEvictionCallback();
                 }
             }
         }
