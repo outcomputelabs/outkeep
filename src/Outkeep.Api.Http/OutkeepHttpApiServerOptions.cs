@@ -12,7 +12,7 @@ namespace Outkeep.Api.Http
         /// The URI for the Outkeep HTTP API to listen on.
         /// </summary>
         [Required]
-        public Uri ApiUri { get; set; }
+        public Uri? ApiUri { get; set; }
 
         /// <summary>
         /// The user interface title for the Outkeep HTTP API instance.
