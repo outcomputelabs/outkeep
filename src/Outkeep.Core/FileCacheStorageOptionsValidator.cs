@@ -11,7 +11,7 @@ namespace Outkeep.Core
             if (options == null) throw new ArgumentNullException(nameof(options));
 
             // storage directory is required
-            if (options.StorageDirectory == null)
+            if (string.IsNullOrWhiteSpace(options.StorageDirectory))
             {
                 return ValidateOptionsResult.Fail(Resources.Exception_CacheStorageOptions_StorageDirectory_MustBeConfigured);
             }
