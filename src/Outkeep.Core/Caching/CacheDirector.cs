@@ -277,7 +277,6 @@ namespace Outkeep.Core.Caching
             }
         }
 
-        private readonly List<CacheEntry> _compactElectedEntries = new List<CacheEntry>();
         private readonly List<CacheEntry> _compactLowPriorityEntries = new List<CacheEntry>();
         private readonly List<CacheEntry> _compactNormalPriorityEntries = new List<CacheEntry>();
         private readonly List<CacheEntry> _compactHighPriorityEntries = new List<CacheEntry>();
