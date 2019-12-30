@@ -22,7 +22,7 @@ namespace Outkeep.Api.Http.Tests
             var builder = Mock.Of<IOutkeepServerBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.ConfigureServices(It.IsAny<Action<HostBuilderContext, IServiceCollection>>()))
-                .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null, services))
+                .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null!, services))
                 .Returns(builder);
 
             builder.UseHttpApi(options =>
@@ -33,7 +33,7 @@ namespace Outkeep.Api.Http.Tests
 
             var provider = services.BuildServiceProvider();
 
-            var options = provider.GetService<IOptions<OutkeepHttpApiServerOptions>>()?.Value;
+            var options = provider.GetService<IOptions<OutkeepHttpApiServerOptions>>().Value;
             Assert.NotNull(options);
             Assert.Equal(new Uri("http://localhost:12345"), options.ApiUri);
             Assert.Equal("Test", options.Title);

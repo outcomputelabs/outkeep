@@ -23,7 +23,7 @@ namespace Outkeep.Api.Http.Tests
                 }
             };
 
-            filter.Apply(document, null);
+            filter.Apply(document, null!);
 
             Assert.Collection(document.Paths,
                 x =>

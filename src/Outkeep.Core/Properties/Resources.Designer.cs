@@ -142,6 +142,15 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to StorageDirectory must be configured.
+        /// </summary>
+        internal static string Exception_CacheStorageOptions_StorageDirectory_MustBeConfigured {
+            get {
+                return ResourceManager.GetString("Exception_CacheStorageOptions_StorageDirectory_MustBeConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to StorageDirectory {0} is not a well formed absolute URI.
         /// </summary>
         internal static string Exception_CacheStorageOptions_StorageDirectory_X_IsNotWellAbsoluteFormed {

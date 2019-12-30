@@ -19,7 +19,7 @@ namespace Outkeep.Api.Http.Tests
         public async Task GettingNonExistingKeyReturnsNoContent()
         {
             var key = Guid.NewGuid().ToString();
-            byte[] value = null;
+            byte[] value = null!;
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]>>(value.AsImmutable()));
             var controller = new CacheController(factory);
 

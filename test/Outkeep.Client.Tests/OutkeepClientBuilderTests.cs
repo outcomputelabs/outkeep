@@ -10,7 +10,7 @@ namespace Outkeep.Client.Tests
     {
         private class SomeOptions
         {
-            public string SomeProperty { get; set; }
+            public string? SomeProperty { get; set; }
         }
 
         [Fact]

@@ -25,7 +25,7 @@ namespace Outkeep.Grains.Tests
 
             var options = provider.GetService<IOptions<CacheGrainOptions>>()?.Value;
             Assert.NotNull(options);
-            Assert.Equal(value, options.ExpirationPolicyEvaluationPeriod);
+            Assert.Equal(value, options!.ExpirationPolicyEvaluationPeriod);
 
             var validator = provider.GetService<IValidateOptions<CacheGrainOptions>>();
             Assert.NotNull(validator);

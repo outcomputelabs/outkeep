@@ -14,7 +14,5 @@ namespace Outkeep.Interfaces
 
         public T Value { get; }
         public Guid ETag { get; }
-
-        public static readonly ReactiveResult<T> Default = new ReactiveResult<T>(default, default);
     }
 }

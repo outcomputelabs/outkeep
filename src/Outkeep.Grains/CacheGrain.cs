@@ -15,6 +15,8 @@ namespace Outkeep.Grains
     [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
+        private static readonly ReactiveResult<byte[]> EmptyResult = new ReactiveResult<byte[]>(null!, Guid.Empty);
+
         private readonly CacheGrainOptions _options;
         private readonly ILogger<CacheGrain> _logger;
         private readonly ITimerRegistry _timerRegistry;
@@ -24,20 +26,20 @@ namespace Outkeep.Grains
 
         public CacheGrain(IOptions<CacheGrainOptions> options, ILogger<CacheGrain> logger, ITimerRegistry timerRegistry, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity)
         {
-            _options = options?.Value;
-            _logger = logger;
-            _timerRegistry = timerRegistry;
-            _storage = storage;
-            _clock = clock;
-            _identity = identity;
+            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _timerRegistry = timerRegistry ?? throw new ArgumentNullException(nameof(timerRegistry));
+            _storage = storage ?? throw new ArgumentNullException(nameof(storage));
+            _clock = clock ?? throw new ArgumentNullException(nameof(clock));
+            _identity = identity ?? throw new ArgumentNullException(nameof(identity));
         }
 
-        private ReactiveResult<byte[]> _result = new ReactiveResult<byte[]>(null, Guid.NewGuid());
+        private ReactiveResult<byte[]> _result = new ReactiveResult<byte[]>(null!, Guid.NewGuid());
         private DateTimeOffset? _absoluteExpiration;
         private TimeSpan? _slidingExpiration;
         private DateTimeOffset _accessed;
 
-        private Task _outstandingStorageOperation;
+        private Task? _outstandingStorageOperation = null;
 
         private TaskCompletionSource<ReactiveResult<byte[]>> _reactiveTask = new TaskCompletionSource<ReactiveResult<byte[]>>();
 
@@ -105,10 +107,12 @@ namespace Outkeep.Grains
         /// </summary>
         public Task RemoveAsync()
         {
-            _result = ReactiveResult<byte[]>.Default;
+            _result = new ReactiveResult<byte[]>(null!, Guid.NewGuid());
             _absoluteExpiration = null;
             _slidingExpiration = null;
             _accessed = _clock.UtcNow;
+
+            SetReactivePromise();
 
             return StorageOperationAsync(StorageOperationType.Clear);
         }
@@ -121,6 +125,7 @@ namespace Outkeep.Grains
             _result = new ReactiveResult<byte[]>(value.Value, Guid.NewGuid());
             _absoluteExpiration = absoluteExpiration;
             _slidingExpiration = slidingExpiration;
+            _accessed = _clock.UtcNow;
 
             SetReactivePromise();
 
@@ -208,7 +213,7 @@ namespace Outkeep.Grains
             // if the tags are the same then return the reactive promise
             if (etag == _result.ETag)
             {
-                return _reactiveTask.Task.WithDefaultOnTimeout(ReactiveResult<byte[]>.Default, _options.ReactivePollGracefulTimeout);
+                return _reactiveTask.Task.WithDefaultOnTimeout(EmptyResult, _options.ReactivePollGracefulTimeout);
             }
 
             // if the tags are different then return the current value

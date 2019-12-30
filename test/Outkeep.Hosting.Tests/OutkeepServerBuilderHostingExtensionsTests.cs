@@ -22,7 +22,7 @@ namespace Outkeep.Hosting.Tests
             var builder = Mock.Of<IOutkeepServerBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.ConfigureServices(It.IsAny<Action<HostBuilderContext, IServiceCollection>>()))
-                .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null, services))
+                .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null!, services))
                 .Returns(builder);
 
             builder.Configure<MyOptions>(options =>

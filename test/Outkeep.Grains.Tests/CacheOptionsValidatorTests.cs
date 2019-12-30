@@ -15,7 +15,7 @@ namespace Outkeep.Grains.Tests
             };
             var validator = new CacheOptionsValidator();
 
-            var result = validator.Validate(null, options);
+            var result = validator.Validate(null!, options);
 
             Assert.True(result.Failed);
             Assert.Equal(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)), result.FailureMessage);
@@ -30,7 +30,7 @@ namespace Outkeep.Grains.Tests
             };
             var validator = new CacheOptionsValidator();
 
-            var result = validator.Validate(null, options);
+            var result = validator.Validate(null!, options);
 
             Assert.True(result.Failed);
             Assert.Equal(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)), result.FailureMessage);
@@ -45,7 +45,7 @@ namespace Outkeep.Grains.Tests
             };
             var validator = new CacheOptionsValidator();
 
-            var result = validator.Validate(null, options);
+            var result = validator.Validate(null!, options);
 
             Assert.True(result.Succeeded);
         }

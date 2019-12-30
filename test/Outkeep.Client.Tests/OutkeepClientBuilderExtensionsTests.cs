@@ -16,7 +16,7 @@ namespace Outkeep.Client.Tests
             var builder = Mock.Of<IOutkeepClientBuilder>();
             Mock.Get(builder)
                 .Setup(x => x.ConfigureServices(It.IsAny<Action<HostBuilderContext, IServiceCollection>>()))
-                .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null, null))
+                .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null!, null!))
                 .Returns(builder);
 
             // act

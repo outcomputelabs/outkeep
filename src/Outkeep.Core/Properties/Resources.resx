@@ -144,6 +144,9 @@
   <data name="Exception_CacheFile_X_ForKey_X_DoesNotContainValue" xml:space="preserve">
     <value>Cache file {0} does not contain a value</value>
   </data>
+  <data name="Exception_CacheStorageOptions_StorageDirectory_MustBeConfigured" xml:space="preserve">
+    <value>StorageDirectory must be configured</value>
+  </data>
   <data name="Exception_CacheStorageOptions_StorageDirectory_X_IsNotWellAbsoluteFormed" xml:space="preserve">
     <value>StorageDirectory {0} is not a well formed absolute URI</value>
   </data>

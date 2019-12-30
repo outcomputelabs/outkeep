@@ -28,7 +28,7 @@ namespace Outkeep.Interfaces.Tests
             // arrange
             var key = "SomeKey";
             var grain = Mock.Of<ICacheGrain>();
-            IGrainFactory factory = null;
+            IGrainFactory factory = null!;
 
             // act
             void action() => factory.GetCacheGrain(key);
@@ -41,7 +41,7 @@ namespace Outkeep.Interfaces.Tests
         public void GetCacheGrainThrowsOnNullKey()
         {
             // arrange
-            string key = null;
+            string key = null!;
             var grain = Mock.Of<ICacheGrain>();
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null) == grain);
 
@@ -71,7 +71,7 @@ namespace Outkeep.Interfaces.Tests
         {
             // arrange
             var grain = Mock.Of<IEchoGrain>();
-            IGrainFactory factory = null;
+            IGrainFactory factory = null!;
 
             // act
             void action() => factory.GetEchoGrain();

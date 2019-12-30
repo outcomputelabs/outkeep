@@ -19,13 +19,13 @@ namespace Outkeep.Hosting.Standalone.Tests
             var silo = Mock.Of<ISiloBuilder>();
             Mock.Get(silo)
                 .Setup(x => x.ConfigureServices(It.IsAny<Action<HostBuilderContext, IServiceCollection>>()))
-                .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null, services))
+                .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null!, services))
                 .Returns(silo);
 
             var outkeep = Mock.Of<IOutkeepServerBuilder>();
             Mock.Get(outkeep)
                 .Setup(x => x.ConfigureSilo(It.IsAny<Action<HostBuilderContext, ISiloBuilder>>()))
-                .Callback((Action<HostBuilderContext, ISiloBuilder> action) => action(null, silo))
+                .Callback((Action<HostBuilderContext, ISiloBuilder> action) => action(null!, silo))
                 .Returns(outkeep);
 
             var siloStartPort = 11110;

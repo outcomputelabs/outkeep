@@ -23,7 +23,7 @@ namespace Outkeep.Api.Http.Tests
             };
 
             // act
-            filter.Apply(operation, null);
+            filter.Apply(operation, null!);
 
             // assert
             Assert.Collection(

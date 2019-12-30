@@ -10,12 +10,16 @@ namespace Outkeep.Core
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            if (options.StorageDirectory != null)
+            // storage directory is required
+            if (options.StorageDirectory == null)
             {
-                if (!Uri.IsWellFormedUriString(options.StorageDirectory, UriKind.Absolute))
-                {
-                    return ValidateOptionsResult.Fail(Resources.Exception_CacheStorageOptions_StorageDirectory_X_IsNotWellAbsoluteFormed.Format(options.StorageDirectory));
-                }
+                return ValidateOptionsResult.Fail(Resources.Exception_CacheStorageOptions_StorageDirectory_MustBeConfigured);
+            }
+
+            // storage directory must be well formed
+            if (!Uri.IsWellFormedUriString(options.StorageDirectory, UriKind.Absolute))
+            {
+                return ValidateOptionsResult.Fail(Resources.Exception_CacheStorageOptions_StorageDirectory_X_IsNotWellAbsoluteFormed.Format(options.StorageDirectory));
             }
 
             return ValidateOptionsResult.Success;

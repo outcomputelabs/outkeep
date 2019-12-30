@@ -30,7 +30,7 @@ namespace Outkeep.Core.Tests
             var item = new CacheItem();
 
             // act
-            var result = item.Equals(null);
+            var result = item.Equals(null!);
 
             // assert
             Assert.False(result);
