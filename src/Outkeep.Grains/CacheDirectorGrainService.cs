@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Runtime;
 using Outkeep.Core.Caching;
@@ -10,9 +11,10 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Grains
 {
+    [Reentrant]
     public class CacheDirectorGrainService : GrainService, ICacheDirectorGrainService
     {
-        private readonly ILogger<CacheDirectorGrainService> _logger;
+        private readonly ILogger _logger;
         private readonly CacheDirectorOptions _options;
         private readonly ICacheDirector _director;
         private readonly TimerArgs _timerArgs;
@@ -24,28 +26,31 @@ namespace Outkeep.Grains
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _director = director ?? throw new ArgumentNullException(nameof(director));
 
-            _timerArgs = new TimerArgs(_director, _logger);
+            _timerArgs = new TimerArgs(this, _director, _logger);
         }
 
         private IDisposable? _removeExpiredTimer;
-        private IDisposable? _overcapacityRegistration;
+        private IDisposable? _overcapacityCompactionTimer;
 
         public override Task Start()
         {
+            // schedule removal of expired items
             _removeExpiredTimer = RegisterTimer(
                 TickRemoveExpired,
-                new TimerArgs(_director, _logger),
+                _timerArgs,
                 _options.ExpirationScanFrequency,
                 _options.ExpirationScanFrequency);
 
-            _overcapacityRegistration = _director.RegisterOvercapacityCallback(
-                state =>
-                {
-                    // todo: issue compaction here after
-                    // the objective is to run compaction on an orleans worker thread and avoid unnecessary noise on the thread pool
-                },
-                this,
-                TaskScheduler.Current);
+            // schedule automatic compaction on overcapacity
+            if (_options.AutomaticOvercapacityCompaction)
+            {
+                // schedule the automatic compaction task itself
+                _overcapacityCompactionTimer = RegisterTimer(
+                    TickOvercapacityCompaction,
+                    _timerArgs,
+                    _options.OvercapacityCompactionFrequency,
+                    _options.OvercapacityCompactionFrequency);
+            }
 
             Log.CacheDirectorGrainServiceStarted(_logger);
 
@@ -55,7 +60,7 @@ namespace Outkeep.Grains
         public override Task Stop()
         {
             _removeExpiredTimer?.Dispose();
-            _overcapacityRegistration?.Dispose();
+            _overcapacityCompactionTimer?.Dispose();
 
             Log.CacheDirectorGrainServiceStopped(_logger);
 
@@ -79,18 +84,44 @@ namespace Outkeep.Grains
             return Task.CompletedTask;
         }
 
+        private static Task TickOvercapacityCompaction(object state)
+        {
+            var args = (TimerArgs)state;
+
+            // no-op if not at overcapacity
+            if (args.Director.Size <= args.Director.TargetCapacity) return Task.CompletedTask;
+
+            // the cache director is at overcapacity
+            try
+            {
+                // todo: execute compaction here
+            }
+            catch (Exception ex)
+            {
+                Log.CacheDirectorGrainServiceError(args.Logger, ex);
+                throw;
+            }
+
+            return Task.CompletedTask;
+        }
+
         public Task PingAsync() => Task.CompletedTask;
 
+        /// <summary>
+        /// Groups state information for timer callbacks.
+        /// </summary>
         private class TimerArgs
         {
-            public TimerArgs(ICacheDirector director, ILogger<CacheDirectorGrainService> logger)
+            public TimerArgs(CacheDirectorGrainService service, ICacheDirector director, ILogger logger)
             {
+                Service = service;
                 Director = director;
                 Logger = logger;
             }
 
+            public CacheDirectorGrainService Service { get; }
             public ICacheDirector Director { get; }
-            public ILogger<CacheDirectorGrainService> Logger { get; }
+            public ILogger Logger { get; }
         }
 
         private static class Log

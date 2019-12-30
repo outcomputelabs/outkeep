@@ -142,6 +142,15 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to StorageDirectory {0} is not a well formed absolute URI.
+        /// </summary>
+        internal static string Exception_CacheStorageOptions_StorageDirectory_X_IsNotWellAbsoluteFormed {
+            get {
+                return ResourceManager.GetString("Exception_CacheStorageOptions_StorageDirectory_X_IsNotWellAbsoluteFormed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Condition for type {0} with value {1} is not supported.
         /// </summary>
         internal static string Exception_ConditionForType_X_WithValue_X_IsNotSupported {
@@ -174,6 +183,15 @@ namespace Outkeep.Core.Properties {
         internal static string Exception_FailedToWriteCacheFile_X_For_Key_X {
             get {
                 return ResourceManager.GetString("Exception_FailedToWriteCacheFile_X_For_Key_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The cache director could not compact the cache to target capacity of {Size}.
+        /// </summary>
+        internal static string Log_CacheDirectorCannotCompactToTargetSizeOf_X {
+            get {
+                return ResourceManager.GetString("Log_CacheDirectorCannotCompactToTargetSizeOf_X", resourceCulture);
             }
         }
         

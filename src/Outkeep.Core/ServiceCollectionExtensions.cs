@@ -5,7 +5,7 @@ using System.Linq;
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Utility extensions for <see cref="IServiceCollection"/> instances.
+    /// Quality-of-life extensions for <see cref="IServiceCollection"/>.
     /// </summary>
     public static class ServiceCollectionExtensions
     {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace Outkeep.Core.Caching
+﻿namespace Outkeep.Core.Caching
 {
     /// <summary>
     /// Represents a cache manager that does not hold the data itself and instead coordinates opt-in participants.
@@ -28,9 +25,14 @@ namespace Outkeep.Core.Caching
         long Size { get; }
 
         /// <summary>
-        /// Gets the capacity managed by this cache directory.
+        /// Gets the target capacity managed by this cache director.
         /// </summary>
-        long Capacity { get; }
+        long TargetCapacity { get; }
+
+        /// <summary>
+        /// Get the maximum capacity managed by this cache director.
+        /// </summary>
+        long MaxCapacity { get; }
 
         /// <summary>
         /// Scans the cache for expired entries and removes them as appropriate, scheduling callback invocation.
@@ -39,8 +41,8 @@ namespace Outkeep.Core.Caching
         void RemoveExpired();
 
         /// <summary>
-        /// Registers a callback that will be called every time there is an overcapacity event.
+        /// Expires enough entries to keep the cache at or below <see cref="TargetCapacity"/>.
         /// </summary>
-        IDisposable RegisterOvercapacityCallback(Action<object?> callback, object? state, TaskScheduler taskScheduler);
+        void Compact();
     }
 }

@@ -27,21 +27,21 @@ namespace Outkeep.Core
 
         public FileCacheStorage(ILogger<FileCacheStorage> logger, IOptions<FileCacheStorageOptions> options)
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
-        private readonly ILogger<FileCacheStorage> logger;
-        private readonly FileCacheStorageOptions options;
+        private readonly ILogger<FileCacheStorage> _logger;
+        private readonly FileCacheStorageOptions _options;
 
-        [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "N/A")]
+        [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters")]
         private string KeyToFileName(string key)
         {
             Span<char> path = stackalloc char[1 << 10];
 
             // format the storage directory into the file path
-            options.StorageDirectory.AsSpan().CopyTo(path);
-            var count = options.StorageDirectory.Length;
+            _options.StorageDirectory.AsSpan().CopyTo(path);
+            var count = _options.StorageDirectory.Length;
 
             // add in the path separator if not there yet
             if (path[count - 1] != Path.DirectorySeparatorChar && path[count - 1] != Path.AltDirectorySeparatorChar)
@@ -103,7 +103,7 @@ namespace Outkeep.Core
                     FileMode.Open,
                     FileAccess.Read,
                     FileShare.None,
-                    options.BufferSize,
+                    _options.BufferSize,
                     FileOptions.DeleteOnClose | FileOptions.Asynchronous))
                 {
                     await stream.DisposeAsync();
@@ -112,18 +112,18 @@ namespace Outkeep.Core
             catch (FileNotFoundException)
             {
                 // this is okay
-                Log.FileNotFound(logger, path, key);
+                _logger.FileCacheStorageFileNotFound(path, key);
                 return;
             }
             catch (Exception ex)
             {
                 // this is not okay
                 var error = new FileCacheStorageException(Resources.Exception_FailedToClearCacheFile_X_ForKey_X.Format(path, key), path, key, ex);
-                Log.Failed(logger, path, key, error);
+                _logger.FileCacheStorageFailed(path, key, error);
                 throw error;
             }
 
-            Log.DeletedFile(logger, path, key);
+            _logger.FileCacheStorageDeletedFile(path, key);
         }
 
         public Task<CacheItem?> ReadAsync(string key, CancellationToken cancellationToken = default)
@@ -147,7 +147,7 @@ namespace Outkeep.Core
                     FileMode.Open,
                     FileAccess.Read,
                     FileShare.Read,
-                    options.BufferSize,
+                    _options.BufferSize,
                     FileOptions.Asynchronous))
                 {
                     using (var document = await JsonDocument.ParseAsync(stream, default, cancellationToken).ConfigureAwait(false))
@@ -197,24 +197,24 @@ namespace Outkeep.Core
             catch (FileNotFoundException)
             {
                 // this is okay
-                Log.FileNotFound(logger, path, key);
+                _logger.FileCacheStorageFileNotFound(path, key);
                 return null;
             }
             catch (FileCacheStorageException ex)
             {
                 // bubble these up
-                Log.Failed(logger, path, key, ex);
+                _logger.FileCacheStorageFailed(path, key, ex);
                 throw;
             }
             catch (Exception ex)
             {
                 // wrap everything else
                 var error = new FileCacheStorageException(Resources.Exception_FailedToReadCacheFile, path, key, ex);
-                Log.Failed(logger, path, key, error);
+                _logger.FileCacheStorageFailed(path, key, error);
                 throw error;
             }
 
-            Log.ReadFile(logger, path, key, value.Length);
+            _logger.FileCacheStorageReadFile(path, key, value.Length);
             return new CacheItem(value, absoluteExpiration, slidingExpiration);
         }
 
@@ -280,79 +280,11 @@ namespace Outkeep.Core
             catch (Exception ex)
             {
                 var error = new FileCacheStorageException(Resources.Exception_FailedToWriteCacheFile_X_For_Key_X.Format(path, key), path, key, ex);
-                Log.Failed(logger, path, key, error);
+                _logger.FileCacheStorageFailed(path, key, error);
                 throw error;
             }
 
-            Log.WroteFile(logger, path, key, size);
-        }
-
-        private static class Log
-        {
-            #region Failed
-
-            private static readonly Action<ILogger, string, string, Exception> _failed =
-                LoggerMessage.Define<string, string>(
-                    LogLevel.Error,
-                    new EventId(1, nameof(Failed)),
-                    Resources.Log_FailedOperationOnCacheFile_X_ForKey_X);
-
-            public static void Failed(ILogger logger, string path, string key, Exception exception) =>
-                _failed(logger, path, key, exception);
-
-            #endregion Failed
-
-            #region DeletedFile
-
-            private static readonly Action<ILogger, string, string, Exception?> _deletedFileForKey =
-                LoggerMessage.Define<string, string>(
-                    LogLevel.Debug,
-                    new EventId(2, nameof(DeletedFile)),
-                    Resources.Log_DeletedCacheFile_X_ForKey_X);
-
-            public static void DeletedFile(ILogger logger, string path, string key) =>
-                _deletedFileForKey(logger, path, key, null);
-
-            #endregion DeletedFile
-
-            #region ReadFile
-
-            private static readonly Action<ILogger, string, string, int, Exception?> _readFile =
-                LoggerMessage.Define<string, string, int>(
-                    LogLevel.Debug,
-                    new EventId(3, nameof(ReadFile)),
-                    Resources.Log_ReadCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes);
-
-            public static void ReadFile(ILogger logger, string path, string key, int size) =>
-                _readFile(logger, path, key, size, null);
-
-            #endregion ReadFile
-
-            #region WroteFile
-
-            private static readonly Action<ILogger, string, string, long, Exception?> _wroteFile =
-                LoggerMessage.Define<string, string, long>(
-                    LogLevel.Debug,
-                    new EventId(4, nameof(WroteFile)),
-                    Resources.Log_WroteCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes);
-
-            public static void WroteFile(ILogger logger, string path, string key, long size) =>
-                _wroteFile(logger, path, key, size, null);
-
-            #endregion WroteFile
-
-            #region FileNotFound
-
-            private static readonly Action<ILogger, string, string, Exception?> _fileNotFound =
-                LoggerMessage.Define<string, string>(
-                    LogLevel.Debug,
-                    new EventId(5, nameof(FileNotFound)),
-                    Resources.Log_CacheFile_X_ForKey_X_NotFound);
-
-            public static void FileNotFound(ILogger logger, string path, string key) =>
-                _fileNotFound(logger, path, key, null);
-
-            #endregion FileNotFound
+            _logger.FileCacheStorageWroteFile(path, key, size);
         }
     }
 }

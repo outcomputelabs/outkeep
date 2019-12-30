@@ -4,12 +4,13 @@ using Xunit;
 
 namespace Outkeep.Interfaces.Tests
 {
-    public class DefaultSystemClockTests
+    public class SystemClockTests
     {
         [Fact]
         public void ReturnsUtcNow()
         {
-            var result = DefaultSystemClock.Instance.UtcNow;
+            var clock = new SystemClock();
+            var result = clock.UtcNow;
             var now = DateTimeOffset.UtcNow;
 
             Assert.InRange(result, now.AddMilliseconds(-100), now.AddMilliseconds(100));

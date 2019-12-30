@@ -13,11 +13,5 @@
         /// </summary>
         /// <param name="entry">The entry that has expired.</param>
         public void OnEntryExpired(CacheEntry entry);
-
-        /// <summary>
-        /// Invoked by each overcapacity registration after disposing.
-        /// </summary>
-        /// <param name="registration">The registration that was disposed.</param>
-        public void OnOvercapacityCallbackRegistrationDisposed(OvercapacityCallbackRegistration registration);
     }
 }

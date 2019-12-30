@@ -36,16 +36,16 @@ namespace Outkeep.Core
         {
         }
 
-        public FileCacheStorageException(string message, string path, string key, string otherKey, Exception innerException) : base(message, innerException)
+        public FileCacheStorageException(string? message, string? path, string? key, string? otherKey, Exception? innerException) : base(message!, innerException!)
         {
             Path = path;
             Key = key;
             OtherKey = otherKey;
         }
 
-        public string Path { get; }
-        public string Key { get; }
-        public string OtherKey { get; }
+        public string? Path { get; }
+        public string? Key { get; }
+        public string? OtherKey { get; }
 
         public override string ToString() => $"{nameof(FileCacheStorageException)}: Key='{Key}', OtherKey='{OtherKey}', Path='{Path}', Message='{Message}', InnerException='{InnerException}'";
 

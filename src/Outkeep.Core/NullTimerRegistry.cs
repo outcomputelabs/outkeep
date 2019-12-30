@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Outkeep.Core
 {
     /// <summary>
-    /// Implements an <see cref="ITimerRegistry"/> that does nothing and allows access to the registered timers for manual invocation.
+    /// Implements an <see cref="ITimerRegistry"/> that does nothing on its own and instead allows access to the registered timers for manual invocation.
     /// Use this for testing where you do not want a mock or to disable the timer registry in a deployment.
     /// This class is thread-safe.
     /// </summary>
