@@ -64,7 +64,7 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.NotNull(obj);
             var result = Assert.IsType<OutkeepException>(obj);
-            Assert.Equal(inner.Message, result.InnerException.Message);
+            Assert.Equal(inner.Message, result.InnerException?.Message);
             Assert.Equal(message, result.Message);
         }
     }

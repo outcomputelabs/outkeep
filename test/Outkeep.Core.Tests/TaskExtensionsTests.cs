@@ -10,10 +10,10 @@ namespace Outkeep.Core.Tests
         public async Task WithDefaultOnTimeoutThrowsOnNullTask()
         {
             // arrange
-            Task<int> task = null;
+            Task<int>? task = null;
 
             // act and assert
-            await Assert.ThrowsAsync<ArgumentNullException>(nameof(task), () => task.WithDefaultOnTimeout(0, TimeSpan.Zero)).ConfigureAwait(false);
+            await Assert.ThrowsAsync<ArgumentNullException>(nameof(task), () => task!.WithDefaultOnTimeout(0, TimeSpan.Zero)).ConfigureAwait(false);
         }
 
         [Fact]

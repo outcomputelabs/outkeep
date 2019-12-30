@@ -18,7 +18,7 @@ namespace Outkeep.Core
         private readonly ConcurrentDictionary<Grain, ImmutableList<NullTimerEntry>> _entries =
             new ConcurrentDictionary<Grain, ImmutableList<NullTimerEntry>>();
 
-        public IDisposable RegisterTimer(Grain grain, Func<object, Task> asyncCallback, object state, TimeSpan dueTime, TimeSpan period)
+        public IDisposable RegisterTimer(Grain grain, Func<object?, Task> asyncCallback, object? state, TimeSpan dueTime, TimeSpan period)
         {
             var timer = new NullTimerEntry(asyncCallback, state, dueTime, period);
 

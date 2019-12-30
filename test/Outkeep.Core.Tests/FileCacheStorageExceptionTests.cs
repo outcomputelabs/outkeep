@@ -147,7 +147,7 @@ namespace Outkeep.Core.Tests
             Assert.Equal(path, result.Path);
             Assert.Equal(key, result.Key);
             Assert.Equal(otherKey, result.OtherKey);
-            Assert.Equal(inner.Message, result.InnerException.Message);
+            Assert.Equal(inner.Message, result.InnerException?.Message);
             Assert.Equal(message, result.Message);
         }
 

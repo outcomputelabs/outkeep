@@ -8,7 +8,7 @@ namespace Outkeep.Core
     /// </summary>
     public sealed class NullTimerEntry : IDisposable
     {
-        public NullTimerEntry(Func<object, Task> asyncCallback, object state, TimeSpan dueTime, TimeSpan period)
+        public NullTimerEntry(Func<object?, Task> asyncCallback, object? state, TimeSpan dueTime, TimeSpan period)
         {
             AsyncCallback = asyncCallback ?? throw new ArgumentNullException(nameof(asyncCallback));
             State = state;
@@ -17,7 +17,7 @@ namespace Outkeep.Core
         }
 
         public Func<object, Task> AsyncCallback { get; }
-        public object State { get; }
+        public object? State { get; }
         public TimeSpan DueTime { get; }
         public TimeSpan Period { get; }
 
