@@ -9,14 +9,14 @@ using System.Threading;
 
 namespace Outkeep.Core.Caching
 {
-    [DebuggerDisplay("Count = {Count}, Size = {Size}, Capacity = {Capacity}")]
+    [DebuggerDisplay("Count = {Count}, Size = {Size}, TargetCapacity = {TargetCapacity}, MaxCapacity = {MaxCapacity}")]
     internal sealed class CacheDirector : ICacheDirector, ICacheContext
     {
         private readonly ILogger<CacheDirector> _logger;
         private readonly CacheDirectorOptions _options;
         private readonly ISystemClock _clock;
 
-        public CacheDirector(IOptions<CacheDirectorOptions> options, ILogger<CacheDirector> logger, ILogger<CacheEntry> entryLogger, ISystemClock clock)
+        public CacheDirector(IOptions<CacheDirectorOptions> options, ILogger<CacheDirector> logger, ISystemClock clock)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
