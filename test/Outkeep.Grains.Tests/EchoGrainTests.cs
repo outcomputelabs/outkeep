@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace Outkeep.Grains.Tests
         [Fact]
         public async Task Echoes()
         {
-            var grain = new EchoGrain();
+            var grain = new EchoGrain(NullLogger<EchoGrain>.Instance);
             var message = Guid.NewGuid().ToString();
 
             await grain.OnActivateAsync().ConfigureAwait(false);

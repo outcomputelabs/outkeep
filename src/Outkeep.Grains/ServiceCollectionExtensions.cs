@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Orleans.Hosting;
-using Outkeep.Grains;
 using Outkeep.Interfaces;
 using System;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Outkeep.Grains
 {
-    public static class ServiceCollectionGrainExtensions
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddCacheGrainOptions(this IServiceCollection services, Action<CacheGrainOptions> configure)
         {
