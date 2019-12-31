@@ -132,5 +132,14 @@ namespace Outkeep.Grains.Properties {
                 return ResourceManager.GetString("Log_CacheGrainForKey_X_FailedAndWillBeDeactivatedNow", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Echo {Message}.
+        /// </summary>
+        internal static string Log_Echo_X {
+            get {
+                return ResourceManager.GetString("Log_Echo_X", resourceCulture);
+            }
+        }
     }
 }

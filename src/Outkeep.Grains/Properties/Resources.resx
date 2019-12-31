@@ -141,4 +141,7 @@
   <data name="Log_CacheGrainForKey_X_FailedAndWillBeDeactivatedNow" xml:space="preserve">
     <value>Cache Grain for key {Key} failed and will be deactivated now</value>
   </data>
+  <data name="Log_Echo_X" xml:space="preserve">
+    <value>Echo {Message}</value>
+  </data>
 </root>
