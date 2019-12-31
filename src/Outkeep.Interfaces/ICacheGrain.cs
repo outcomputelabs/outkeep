@@ -13,7 +13,7 @@ namespace Outkeep.Interfaces
         /// <summary>
         /// Gets the cached value.
         /// </summary>
-        ValueTask<Immutable<byte[]>> GetAsync();
+        ValueTask<Immutable<byte[]?>> GetAsync();
 
         /// <summary>
         /// Clear the content from storage and release it from memory.
@@ -23,7 +23,7 @@ namespace Outkeep.Interfaces
         /// <summary>
         /// Sets content and expiration options for a cache key.
         /// </summary>
-        Task SetAsync(Immutable<byte[]> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration);
+        Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration);
 
         /// <summary>
         /// Touches the cached item without retrieving it as to delay the sliding expiration.
@@ -33,6 +33,6 @@ namespace Outkeep.Interfaces
         /// <summary>
         /// Long polls the grain for changes to the cache item.
         /// </summary>
-        Task<ReactiveResult<byte[]>> PollAsync(Guid etag);
+        Task<ReactiveResult<Guid, byte[]?>> PollAsync(Guid etag);
     }
 }

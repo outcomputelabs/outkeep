@@ -17,7 +17,7 @@ namespace Outkeep.Client.Tests
         {
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]>>(value.AsImmutable()));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]?>>(new Immutable<byte[]?>(value)));
             var clock = new SystemClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
@@ -32,7 +32,7 @@ namespace Outkeep.Client.Tests
         {
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]>>(value.AsImmutable()));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]?>>(new Immutable<byte[]?>(value)));
             var clock = new SystemClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
@@ -101,7 +101,7 @@ namespace Outkeep.Client.Tests
             var value = Guid.NewGuid().ToByteArray();
             var absoluteExpiration = DateTimeOffset.UtcNow.AddHours(1);
             var slidingExpiration = TimeSpan.FromMinutes(1);
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(value.AsImmutable(), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(new Immutable<byte[]?>(value), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
             var clock = new SystemClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
@@ -124,7 +124,7 @@ namespace Outkeep.Client.Tests
             var utcNow = DateTimeOffset.UtcNow;
             var absoluteExpiration = utcNow.Add(absoluteExpirationRelativeToNow);
             var slidingExpiration = TimeSpan.FromMinutes(1);
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(value.AsImmutable(), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(new Immutable<byte[]?>(value), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
             var clock = Mock.Of<ISystemClock>(x => x.UtcNow == utcNow);
             var cache = new OutkeepDistributedCache(factory, clock);
 
@@ -144,7 +144,7 @@ namespace Outkeep.Client.Tests
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
             var slidingExpiration = TimeSpan.FromMinutes(1);
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(value.AsImmutable(), null, slidingExpiration) == Task.CompletedTask);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(new Immutable<byte[]?>(value), null, slidingExpiration) == Task.CompletedTask);
             var clock = new SystemClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
@@ -164,7 +164,7 @@ namespace Outkeep.Client.Tests
             var value = Guid.NewGuid().ToByteArray();
             var absoluteExpiration = DateTimeOffset.UtcNow.AddHours(1);
             var slidingExpiration = TimeSpan.FromMinutes(1);
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(value.AsImmutable(), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(new Immutable<byte[]?>(value), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
             var clock = new SystemClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 

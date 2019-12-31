@@ -19,12 +19,12 @@ namespace Outkeep.Client
             this.clock = clock ?? throw new ArgumentNullException(nameof(clock));
         }
 
-        public byte[] Get(string key)
+        public byte[]? Get(string key)
         {
-            return GetAsync(key).Result;
+            return GetAsync(key).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        public async Task<byte[]> GetAsync(string key, CancellationToken token = default)
+        public async Task<byte[]?> GetAsync(string key, CancellationToken token = default)
         {
             var result = await factory.GetCacheGrain(key).GetAsync().ConfigureAwait(false);
             return result.Value;
@@ -32,7 +32,7 @@ namespace Outkeep.Client
 
         public void Refresh(string key)
         {
-            RefreshAsync(key).Wait();
+            RefreshAsync(key).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         public Task RefreshAsync(string key, CancellationToken token = default)
@@ -42,7 +42,7 @@ namespace Outkeep.Client
 
         public void Remove(string key)
         {
-            RemoveAsync(key).Wait();
+            RemoveAsync(key).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         public Task RemoveAsync(string key, CancellationToken token = default)
@@ -50,12 +50,12 @@ namespace Outkeep.Client
             return factory.GetCacheGrain(key).RemoveAsync();
         }
 
-        public void Set(string key, byte[] value, DistributedCacheEntryOptions options)
+        public void Set(string key, byte[]? value, DistributedCacheEntryOptions options)
         {
-            SetAsync(key, value, options).Wait();
+            SetAsync(key, value, options).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token = default)
+        public Task SetAsync(string key, byte[]? value, DistributedCacheEntryOptions options, CancellationToken token = default)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
             if (value == null) throw new ArgumentNullException(nameof(value));
@@ -76,7 +76,7 @@ namespace Outkeep.Client
                 expiration = null;
             }
 
-            return factory.GetCacheGrain(key).SetAsync(value.AsImmutable(), expiration, options.SlidingExpiration);
+            return factory.GetCacheGrain(key).SetAsync(new Immutable<byte[]?>(value), expiration, options.SlidingExpiration);
         }
     }
 }

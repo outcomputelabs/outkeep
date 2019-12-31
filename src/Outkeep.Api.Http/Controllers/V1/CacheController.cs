@@ -5,7 +5,6 @@ using Orleans.Concurrency;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Outkeep.Api.Http.Controllers.V1
@@ -66,14 +65,15 @@ namespace Outkeep.Api.Http.Controllers.V1
         [SwaggerOperation(OperationId = "SetCache")]
         [Route("{key}")]
         [SwaggerResponse(StatusCodes.Status200OK, "Cache entry set")]
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "N/A")]
         public async Task<ActionResult> SetAsync(
             [Required] [MaxLength(128)] string key,
             DateTimeOffset? absoluteExpiration,
             TimeSpan? slidingExpiration,
             [Required] IFormFile value)
         {
-            var bytes = new byte[value.Length];
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
+            byte[]? bytes = new byte[value.Length];
             using (var stream = value.OpenReadStream())
             {
                 await stream.ReadAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
@@ -81,7 +81,7 @@ namespace Outkeep.Api.Http.Controllers.V1
 
             await factory
                 .GetCacheGrain(key)
-                .SetAsync(bytes.AsImmutable(), absoluteExpiration, slidingExpiration)
+                .SetAsync(new Immutable<byte[]?>(bytes), absoluteExpiration, slidingExpiration)
                 .ConfigureAwait(false);
 
             return Ok();

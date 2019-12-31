@@ -8,7 +8,7 @@ namespace Outkeep.Core
     /// </summary>
     public readonly struct CacheItem : IEquatable<CacheItem>
     {
-        public CacheItem(byte[] value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
+        public CacheItem(byte[]? value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
             Value = value;
             AbsoluteExpiration = absoluteExpiration;
@@ -19,7 +19,7 @@ namespace Outkeep.Core
         /// The cached binary payload.
         /// </summary>
         [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "DTO")]
-        public byte[] Value { get; }
+        public byte[]? Value { get; }
 
         /// <summary>
         /// The absolute expiration schedule for this cache item.

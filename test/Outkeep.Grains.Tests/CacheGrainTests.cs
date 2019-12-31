@@ -144,7 +144,7 @@ namespace Outkeep.Grains.Tests
             var absolute = DateTimeOffset.UtcNow;
             var sliding = TimeSpan.MaxValue;
             await grain.OnActivateAsync().ConfigureAwait(false);
-            await grain.SetAsync(value.AsImmutable(), absolute, sliding).ConfigureAwait(false);
+            await grain.SetAsync(new Immutable<byte[]?>(value), absolute, sliding).ConfigureAwait(false);
 
             // assert value is set in storage
             var stored = await storage.ReadAsync(key).ConfigureAwait(false);

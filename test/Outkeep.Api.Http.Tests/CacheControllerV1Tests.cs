@@ -19,8 +19,8 @@ namespace Outkeep.Api.Http.Tests
         public async Task GettingNonExistingKeyReturnsNoContent()
         {
             var key = Guid.NewGuid().ToString();
-            byte[] value = null!;
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]>>(value.AsImmutable()));
+            byte[]? value = null;
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]?>>(new Immutable<byte[]?>(value)));
             var controller = new CacheController(factory);
 
             var result = await controller.GetAsync(key).ConfigureAwait(false);
@@ -33,8 +33,8 @@ namespace Outkeep.Api.Http.Tests
         public async Task GettingExistingKeyReturnsOk()
         {
             var key = Guid.NewGuid().ToString();
-            var value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]>>(value.AsImmutable()));
+            byte[]? value = Guid.NewGuid().ToByteArray();
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]?>>(new Immutable<byte[]?>(value)));
             var controller = new CacheController(factory);
 
             var result = await controller.GetAsync(key).ConfigureAwait(false);
@@ -52,7 +52,7 @@ namespace Outkeep.Api.Http.Tests
             var value = Guid.NewGuid().ToByteArray();
             var absoluteExpiration = DateTimeOffset.UtcNow.AddHours(1);
             var slidingExpiration = TimeSpan.FromMinutes(1);
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(It.Is<Immutable<byte[]>>(v => v.Value.SequenceEqual(value)), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(It.Is<Immutable<byte[]?>>(v => v.Value.SequenceEqual(value)), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
             var controller = new CacheController(factory);
 
             var file = Mock.Of<IFormFile>(x => x.OpenReadStream() == new MemoryStream(value) && x.Length == value.Length);
