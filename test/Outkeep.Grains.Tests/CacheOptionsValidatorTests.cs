@@ -13,7 +13,7 @@ namespace Outkeep.Grains.Tests
             {
                 ExpirationPolicyEvaluationPeriod = TimeSpan.FromTicks(-1)
             };
-            var validator = new CacheOptionsValidator();
+            var validator = new CacheGrainOptionsValidator();
 
             var result = validator.Validate(null!, options);
 
@@ -28,7 +28,7 @@ namespace Outkeep.Grains.Tests
             {
                 ExpirationPolicyEvaluationPeriod = TimeSpan.Zero
             };
-            var validator = new CacheOptionsValidator();
+            var validator = new CacheGrainOptionsValidator();
 
             var result = validator.Validate(null!, options);
 
@@ -43,7 +43,7 @@ namespace Outkeep.Grains.Tests
             {
                 ExpirationPolicyEvaluationPeriod = TimeSpan.FromTicks(1)
             };
-            var validator = new CacheOptionsValidator();
+            var validator = new CacheGrainOptionsValidator();
 
             var result = validator.Validate(null!, options);
 

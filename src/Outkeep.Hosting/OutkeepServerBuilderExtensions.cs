@@ -30,11 +30,11 @@ namespace Outkeep.Hosting
             return builder.ConfigureSilo((context, silo) => configure(silo));
         }
 
-        public static IOutkeepServerBuilder TryAddCoreServices(this IOutkeepServerBuilder builder)
+        public static IOutkeepServerBuilder AddCoreServices(this IOutkeepServerBuilder builder)
         {
             return builder.ConfigureServices(services =>
             {
-                // todo: add core services here
+                services.AddCoreServices();
             });
         }
     }

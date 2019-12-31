@@ -26,7 +26,7 @@ namespace Microsoft.Extensions.Hosting
             {
                 builder.Properties[HostBuilderContextKey] = outkeep = new OutkeepServerBuilder(builder);
 
-                outkeep.TryAddCoreServices();
+                outkeep.AddCoreServices();
             }
 
             outkeep.ConfigureOutkeep(configure);
