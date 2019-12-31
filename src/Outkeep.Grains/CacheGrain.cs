@@ -92,9 +92,7 @@ namespace Outkeep.Grains
                 (_slidingExpiration.HasValue && _accessed.Add(_slidingExpiration.Value) <= now);
         }
 
-        /// <summary>
-        /// Gets the cached value.
-        /// </summary>
+        /// <inheritdoc />
         public ValueTask<Immutable<byte[]>> GetAsync()
         {
             _accessed = _clock.UtcNow;
@@ -102,9 +100,7 @@ namespace Outkeep.Grains
             return new ValueTask<Immutable<byte[]>>(_result.Value.AsImmutable());
         }
 
-        /// <summary>
-        /// Clear the content from storage and release it from memory.
-        /// </summary>
+        /// <inheritdoc />
         public Task RemoveAsync()
         {
             _result = new ReactiveResult<byte[]>(null!, Guid.NewGuid());
@@ -117,9 +113,7 @@ namespace Outkeep.Grains
             return StorageOperationAsync(StorageOperationType.Clear);
         }
 
-        /// <summary>
-        /// Sets content and expiration options for a cache key.
-        /// </summary>
+        /// <inheritdoc />
         public Task SetAsync(Immutable<byte[]> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
             _result = new ReactiveResult<byte[]>(value.Value, Guid.NewGuid());
@@ -199,15 +193,14 @@ namespace Outkeep.Grains
             }
         }
 
-        /// <summary>
-        /// Touches the cached item without retrieving it as to delay the sliding expiration.
-        /// </summary>
+        /// <inheritdoc />
         public Task RefreshAsync()
         {
             _accessed = _clock.UtcNow;
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public Task<ReactiveResult<byte[]>> PollAsync(Guid etag)
         {
             // if the tags are the same then return the reactive promise
