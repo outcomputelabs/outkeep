@@ -6,7 +6,7 @@
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.0.1</Version>
+    <Version>1.0.0</Version>
     <Authors>Jorge Candeias</Authors>
     <Company>Outcompute</Company>
     <Product>Outkeep</Product>

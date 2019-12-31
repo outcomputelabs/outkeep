@@ -15,7 +15,7 @@ namespace Outkeep.Grains
     [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
-        private static readonly ReactiveResult<Guid, byte[]?> EmptyResult = new ReactiveResult<Guid, byte[]?>(Guid.Empty, null);
+        private static readonly TaggedValue<Guid, byte[]?> EmptyResult = new TaggedValue<Guid, byte[]?>(Guid.Empty, null);
 
         private readonly CacheGrainOptions _options;
         private readonly ILogger<CacheGrain> _logger;
@@ -34,14 +34,14 @@ namespace Outkeep.Grains
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
         }
 
-        private ReactiveResult<Guid, byte[]?> _result = new ReactiveResult<Guid, byte[]?>(Guid.NewGuid(), null);
+        private TaggedValue<Guid, byte[]?> _result = new TaggedValue<Guid, byte[]?>(Guid.NewGuid(), null);
         private DateTimeOffset? _absoluteExpiration;
         private TimeSpan? _slidingExpiration;
         private DateTimeOffset _accessed;
 
         private Task? _outstandingStorageOperation = null;
 
-        private TaskCompletionSource<ReactiveResult<Guid, byte[]?>> _reactiveTask = new TaskCompletionSource<ReactiveResult<Guid, byte[]?>>();
+        private TaskCompletionSource<TaggedValue<Guid, byte[]?>> _reactiveTask = new TaskCompletionSource<TaggedValue<Guid, byte[]?>>();
 
         public override async Task OnActivateAsync()
         {
@@ -52,7 +52,7 @@ namespace Outkeep.Grains
             var item = await _storage.ReadAsync(_identity.PrimaryKeyString).ConfigureAwait(true);
             if (item.HasValue)
             {
-                _result = new ReactiveResult<Guid, byte[]?>(Guid.NewGuid(), item.Value.Value);
+                _result = new TaggedValue<Guid, byte[]?>(Guid.NewGuid(), item.Value.Value);
                 _absoluteExpiration = item.Value.AbsoluteExpiration;
                 _slidingExpiration = item.Value.SlidingExpiration;
             }
@@ -77,7 +77,7 @@ namespace Outkeep.Grains
             _reactiveTask.SetResult(_result);
 
             // create a new pending reactive promise
-            _reactiveTask = new TaskCompletionSource<ReactiveResult<Guid, byte[]?>>();
+            _reactiveTask = new TaskCompletionSource<TaggedValue<Guid, byte[]?>>();
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task RemoveAsync()
         {
-            _result = new ReactiveResult<Guid, byte[]?>(Guid.NewGuid(), null);
+            _result = new TaggedValue<Guid, byte[]?>(Guid.NewGuid(), null);
             _absoluteExpiration = null;
             _slidingExpiration = null;
             _accessed = _clock.UtcNow;
@@ -116,7 +116,7 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
-            _result = new ReactiveResult<Guid, byte[]?>(Guid.NewGuid(), value.Value);
+            _result = new TaggedValue<Guid, byte[]?>(Guid.NewGuid(), value.Value);
             _absoluteExpiration = absoluteExpiration;
             _slidingExpiration = slidingExpiration;
             _accessed = _clock.UtcNow;
@@ -201,7 +201,7 @@ namespace Outkeep.Grains
         }
 
         /// <inheritdoc />
-        public Task<ReactiveResult<Guid, byte[]?>> PollAsync(Guid etag)
+        public Task<TaggedValue<Guid, byte[]?>> PollAsync(Guid etag)
         {
             // if the tags are the same then return the reactive promise
             if (etag == _result.ETag)

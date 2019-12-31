@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Grains
 {
+    /// <summary>
+    /// Default implementation of <see cref="ICacheDirectorGrainService"/>.
+    /// </summary>
     [Reentrant]
     public class CacheDirectorGrainService : GrainService, ICacheDirectorGrainService
     {

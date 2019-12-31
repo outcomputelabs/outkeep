@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Outkeep.Interfaces
 {
     /// <summary>
-    /// Coordinates capacity claims between cache grains within a single host.
+    /// Supports the <see cref="ICacheDirector"/> by running maintenance tasks on the Orleans scheduler to reduce context switching.
     /// </summary>
     public interface ICacheDirectorGrainService : IGrainService
     {
