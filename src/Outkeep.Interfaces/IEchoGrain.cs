@@ -3,8 +3,14 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Interfaces
 {
+    /// <summary>
+    /// Interface for the echo test grain.
+    /// </summary>
     public interface IEchoGrain : IGrainWithGuidKey
     {
-        Task<string> EchoAsync(string message);
+        /// <summary>
+        /// Echoes the given message back.
+        /// </summary>
+        ValueTask<string> EchoAsync(string message);
     }
 }

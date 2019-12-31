@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Grains
 {
+    /// <summary>
+    /// Grain that eachoes messages back to the caller.
+    /// For use with health checking and performance testing.
+    /// </summary>
     [StatelessWorker(1)]
     internal class EchoGrain : Grain, IEchoGrain
     {
@@ -17,11 +21,12 @@ namespace Outkeep.Grains
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Task<string> EchoAsync(string message)
+        /// <inheritdoc />
+        public ValueTask<string> EchoAsync(string message)
         {
             _logger.Echo(message);
 
-            return Task.FromResult(message);
+            return new ValueTask<string>(message);
         }
     }
 }

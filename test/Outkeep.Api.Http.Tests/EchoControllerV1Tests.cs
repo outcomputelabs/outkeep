@@ -16,13 +16,21 @@ namespace Outkeep.Api.Http.Tests
         [Fact]
         public async Task Echoes()
         {
+            // arrange
             var message = "Some Message";
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<IEchoGrain>(Guid.Empty, null).EchoAsync(message) == Task.FromResult(message));
+
+            var factory = Mock.Of<IGrainFactory>();
+            Mock.Get(factory)
+                .Setup(x => x.GetGrain<IEchoGrain>(Guid.Empty, null).EchoAsync(message))
+                .Returns(new ValueTask<string>(message));
+
             var controller = new EchoController(factory);
             RequestContext.ActivityId = Guid.NewGuid();
 
+            // act
             var result = await controller.GetAsync(message).ConfigureAwait(false);
 
+            // assert
             var ok = Assert.IsType<OkObjectResult>(result.Result);
             var value = Assert.IsType<Echo>(ok.Value);
             Assert.Equal(RequestContext.ActivityId, value.ActivityId);
