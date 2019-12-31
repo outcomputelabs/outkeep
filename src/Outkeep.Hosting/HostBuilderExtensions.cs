@@ -4,7 +4,7 @@ using System;
 
 namespace Microsoft.Extensions.Hosting
 {
-    public static class HostBuilderHostingExtensions
+    public static class HostBuilderExtensions
     {
         private const string HostBuilderContextKey = nameof(OutkeepServerBuilder);
 
@@ -25,6 +25,8 @@ namespace Microsoft.Extensions.Hosting
             else
             {
                 builder.Properties[HostBuilderContextKey] = outkeep = new OutkeepServerBuilder(builder);
+
+                outkeep.TryAddCoreServices();
             }
 
             outkeep.ConfigureOutkeep(configure);

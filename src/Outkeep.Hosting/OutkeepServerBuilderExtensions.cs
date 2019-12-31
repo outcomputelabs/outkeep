@@ -4,7 +4,7 @@ using System;
 
 namespace Outkeep.Hosting
 {
-    public static class OutkeepServerBuilderHostingExtensions
+    public static class OutkeepServerBuilderExtensions
     {
         public static IOutkeepServerBuilder Configure<TOptions>(this IOutkeepServerBuilder builder, Action<TOptions> configure) where TOptions : class
         {
@@ -28,6 +28,14 @@ namespace Outkeep.Hosting
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             return builder.ConfigureSilo((context, silo) => configure(silo));
+        }
+
+        public static IOutkeepServerBuilder TryAddCoreServices(this IOutkeepServerBuilder builder)
+        {
+            return builder.ConfigureServices(services =>
+            {
+                // todo: add core services here
+            });
         }
     }
 }
