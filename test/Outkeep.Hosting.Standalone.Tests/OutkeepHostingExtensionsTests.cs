@@ -28,14 +28,12 @@ namespace Outkeep.Hosting.Standalone.Tests
                 .Callback((Action<HostBuilderContext, ISiloBuilder> action) => action(null!, silo))
                 .Returns(outkeep);
 
-            var siloStartPort = 11110;
-            var siloEndPort = 11119;
-            var gatewayStartPort = 31000;
-            var gatewayEndPort = 31009;
+            var siloPort = 11110;
+            var gatewayPort = 31000;
             var serviceId = Guid.NewGuid().ToString();
             var clusterId = Guid.NewGuid().ToString();
 
-            outkeep.UseStandaloneClustering(siloStartPort, siloEndPort, gatewayStartPort, gatewayEndPort, serviceId, clusterId);
+            outkeep.UseStandaloneClustering(siloPort, gatewayPort, serviceId, clusterId, false);
 
             Mock.Get(outkeep).VerifyAll();
             Mock.Get(silo).VerifyAll();
@@ -43,8 +41,8 @@ namespace Outkeep.Hosting.Standalone.Tests
             var provider = services.BuildServiceProvider();
 
             var endpoints = provider.GetService<IOptions<EndpointOptions>>().Value;
-            Assert.InRange(endpoints.SiloPort, siloStartPort, siloEndPort);
-            Assert.InRange(endpoints.GatewayPort, gatewayStartPort, gatewayEndPort);
+            Assert.Equal(siloPort, endpoints.SiloPort);
+            Assert.Equal(gatewayPort, endpoints.GatewayPort);
 
             var cluster = provider.GetService<IOptions<ClusterOptions>>().Value;
             Assert.Equal(serviceId, cluster.ServiceId);

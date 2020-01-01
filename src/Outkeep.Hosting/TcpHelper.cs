@@ -14,11 +14,20 @@ namespace Outkeep.Hosting
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
+        /// <summary>
+        /// Attempts to find a free port starting from the one given.
+        /// </summary>
+        public int GetFreePort(int start) => GetFreePort(start, IPEndPoint.MaxPort);
+
+        /// <summary>
+        /// Attempts to find a free port between the range given.
+        /// </summary>
         public int GetFreePort(int start, int end)
         {
             if (start < 1) throw new ArgumentOutOfRangeException(nameof(start));
-            if (end >= (1 << 16)) throw new ArgumentOutOfRangeException(nameof(end));
+            if (start > IPEndPoint.MaxPort) throw new ArgumentOutOfRangeException(nameof(start));
             if (end < start) throw new ArgumentOutOfRangeException(nameof(end));
+            if (end > IPEndPoint.MaxPort) throw new ArgumentOutOfRangeException(nameof(end));
 
             for (var port = start; port <= end; ++port)
             {

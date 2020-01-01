@@ -6,24 +6,22 @@ namespace Outkeep.Hosting
 {
     public static class OutkeepHostingExtensions
     {
-        public static IOutkeepServerBuilder UseStandaloneClustering(this IOutkeepServerBuilder outkeep,
-            int siloStartPort = 11111,
-            int siloEndPort = 11199,
-            int gatewayStartPort = 30000,
-            int gatewayEndPort = 30099,
+        public static IOutkeepServerBuilder UseStandaloneClustering(
+            this IOutkeepServerBuilder outkeep,
+            int siloPort = 11111,
+            int gatewayPort = 30000,
             string serviceId = "dev",
-            string clusterId = "dev")
+            string clusterId = "dev",
+            bool searchPorts = false)
         {
             if (outkeep == null) throw new ArgumentNullException(nameof(outkeep));
 
             outkeep.ConfigureSilo((context, silo) =>
             {
-                silo.UseLocalhostClustering(
-                    TcpHelper.Default.GetFreePort(siloStartPort, siloEndPort),
-                    TcpHelper.Default.GetFreePort(gatewayStartPort, gatewayEndPort),
-                    new IPEndPoint(IPAddress.Loopback, siloStartPort),
-                    serviceId,
-                    clusterId);
+                var actualSiloPort = searchPorts ? TcpHelper.Default.GetFreePort(siloPort) : siloPort;
+                var actualGatewayPort = searchPorts ? TcpHelper.Default.GetFreePort(gatewayPort) : gatewayPort;
+
+                silo.UseLocalhostClustering(actualSiloPort, actualGatewayPort, new IPEndPoint(IPAddress.Loopback, siloPort), serviceId, clusterId);
             });
 
             return outkeep;
