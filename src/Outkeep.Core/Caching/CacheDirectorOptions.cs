@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Outkeep.Core.Annotations;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Outkeep.Core.Caching
@@ -13,17 +14,18 @@ namespace Outkeep.Core.Caching
         public long TargetCapacity { get; set; }
 
         /// <summary>
-        /// The maximum capacity that the capacity director will respect by refusing new entries.
+        /// The maximum capacity that the director will respect by refusing new entries.
         /// Must be equal to or greater than <see cref="TargetCapacity"/>.
         /// </summary>
         [Range(1, int.MaxValue)]
+        [GreaterThanOrEqual(nameof(TargetCapacity))]
         public long MaxCapacity { get; set; }
 
+        /// <summary>
+        /// The frequency at which to perform an expiration scan.
+        /// </summary>
         [Range(typeof(TimeSpan), "00:00:00.001", "1.00:00:00", ConvertValueInInvariantCulture = true)]
         public TimeSpan ExpirationScanFrequency { get; set; } = TimeSpan.FromSeconds(1);
-
-        [Range(0, 1)]
-        public double TargetCompactionRatio { get; set; } = 0.8;
 
         public bool AutomaticOvercapacityCompaction { get; set; } = true;
 
