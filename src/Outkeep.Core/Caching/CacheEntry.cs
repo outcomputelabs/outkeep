@@ -196,16 +196,30 @@ namespace Outkeep.Core.Caching
             Interlocked.CompareExchange(ref _postEvictionCallbackRegistration, null, registration);
         }
 
+        #region Disposable
+
+        private bool _disposed;
+
         /// <summary>
         /// Disposing the cache entry removes it from the owning cache director.
         /// </summary>
         public void Dispose()
         {
-            // set the cause for eviction
-            SetExpired(EvictionCause.Disposed);
+            if (_disposed) return;
 
-            // notify the owning context tnhat this entry has expired
+            SetExpired(EvictionCause.Disposed);
             _context.OnEntryExpired(this);
+
+            _disposed = true;
+
+            GC.SuppressFinalize(this);
         }
+
+        ~CacheEntry()
+        {
+            Dispose();
+        }
+
+        #endregion Disposable
     }
 }
