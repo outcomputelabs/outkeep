@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using System;
 
 namespace Outkeep.Core.Caching
@@ -16,7 +15,6 @@ namespace Outkeep.Core.Caching
         {
             return services
                 .AddSingleton<ICacheDirector, CacheDirector>()
-                .AddSingleton<IValidateOptions<CacheDirectorOptions>, CacheDirectorOptionsValidator>()
                 .AddOptions<CacheDirectorOptions>()
                 .Configure(configure)
                 .ValidateDataAnnotations()
