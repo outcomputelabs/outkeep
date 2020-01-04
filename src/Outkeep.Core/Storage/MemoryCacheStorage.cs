@@ -1,9 +1,8 @@
-﻿using Outkeep.Core.Storage;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Outkeep.Core
+namespace Outkeep.Core.Storage
 {
     /// <summary>
     /// Implements an <see cref="ICacheStorage"/> that keeps data in memory.
