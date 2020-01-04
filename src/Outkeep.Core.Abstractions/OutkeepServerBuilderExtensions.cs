@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Orleans.Hosting;
-using Outkeep.Core.Storage;
 using System;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
@@ -32,32 +30,6 @@ namespace Outkeep.Core
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             return builder.ConfigureSilo((context, silo) => configure(silo));
-        }
-
-        /// <summary>
-        /// Adds a singleton <see cref="MemoryCacheStorage"/> to the <see cref="IOutkeepServerBuilder"/>.
-        /// </summary>
-        public static IOutkeepServerBuilder AddMemoryCacheStorage(this IOutkeepServerBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.ConfigureServices((context, services) =>
-            {
-                services.AddSingleton<ICacheStorage, MemoryCacheStorage>();
-            });
-        }
-
-        /// <summary>
-        /// Adds a singleton <see cref="MemoryCacheStorage"/> to the <see cref="IOutkeepServerBuilder"/> if an <see cref="ICacheStorage"/> implementation is not yet present.
-        /// </summary>
-        public static IOutkeepServerBuilder TryAddMemoryCacheStorage(this IOutkeepServerBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.ConfigureServices((context, services) =>
-            {
-                services.TryAddSingleton<ICacheStorage, MemoryCacheStorage>();
-            });
         }
 
         /// <inheritdoc cref="OptionsServiceCollectionExtensions.Configure{TOptions}(IServiceCollection, Action{TOptions})"/>
