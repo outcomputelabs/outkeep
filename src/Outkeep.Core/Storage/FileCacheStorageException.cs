@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Outkeep.Core
+namespace Outkeep.Core.Storage
 {
     [Serializable]
     public class FileCacheStorageException : StorageException
