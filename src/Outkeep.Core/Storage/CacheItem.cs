@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Outkeep.Core
+namespace Outkeep.Core.Storage
 {
     /// <summary>
     /// Represents a cached item.
