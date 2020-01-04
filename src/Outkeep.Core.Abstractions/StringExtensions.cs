@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace System
+namespace Outkeep.Core
 {
     /// <summary>
     /// Quality-of-life extensions for strings.
