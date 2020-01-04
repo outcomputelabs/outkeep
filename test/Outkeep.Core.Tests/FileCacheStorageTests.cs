@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Orleans;
 using Outkeep.Core.Properties;
+using Outkeep.Core.Storage;
 using System;
 using System.Collections.Immutable;
 using System.Globalization;
@@ -50,12 +51,12 @@ namespace Outkeep.Core.Tests
 
             try
             {
-                var logger = new NullLogger<FileCacheStorage>();
-                var options = new FileCacheStorageOptions
+                var logger = new NullLogger<JsonFileCacheStorage>();
+                var options = new JsonFileCacheStorageOptions
                 {
                     StorageDirectory = directory
                 };
-                var storage = new FileCacheStorage(logger, Options.Create(options));
+                var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
                 await storage.ClearAsync(key).ConfigureAwait(false);
 
@@ -77,12 +78,12 @@ namespace Outkeep.Core.Tests
 
             Assert.False(File.Exists(path));
 
-            var logger = new NullLogger<FileCacheStorage>();
-            var options = new FileCacheStorageOptions
+            var logger = new NullLogger<JsonFileCacheStorage>();
+            var options = new JsonFileCacheStorageOptions
             {
                 StorageDirectory = directory
             };
-            var storage = new FileCacheStorage(logger, Options.Create(options));
+            var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
             await storage.ClearAsync(key).ConfigureAwait(false);
 
@@ -102,12 +103,12 @@ namespace Outkeep.Core.Tests
             {
                 Assert.True(File.Exists(path));
 
-                var logger = new NullLogger<FileCacheStorage>();
-                var options = new FileCacheStorageOptions
+                var logger = new NullLogger<JsonFileCacheStorage>();
+                var options = new JsonFileCacheStorageOptions
                 {
                     StorageDirectory = directory
                 };
-                var storage = new FileCacheStorage(logger, Options.Create(options));
+                var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
                 var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ClearAsync(key))
                     .ConfigureAwait(false);
@@ -156,12 +157,12 @@ namespace Outkeep.Core.Tests
 
             try
             {
-                var logger = new NullLogger<FileCacheStorage>();
-                var options = new FileCacheStorageOptions
+                var logger = new NullLogger<JsonFileCacheStorage>();
+                var options = new JsonFileCacheStorageOptions
                 {
                     StorageDirectory = directory
                 };
-                var storage = new FileCacheStorage(logger, Options.Create(options));
+                var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
                 var result = await storage.ReadAsync(key).ConfigureAwait(false);
 
@@ -204,12 +205,12 @@ namespace Outkeep.Core.Tests
 
             try
             {
-                var logger = new NullLogger<FileCacheStorage>();
-                var options = new FileCacheStorageOptions
+                var logger = new NullLogger<JsonFileCacheStorage>();
+                var options = new JsonFileCacheStorageOptions
                 {
                     StorageDirectory = directory
                 };
-                var storage = new FileCacheStorage(logger, Options.Create(options));
+                var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
                 var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
 
@@ -250,12 +251,12 @@ namespace Outkeep.Core.Tests
 
             try
             {
-                var logger = new NullLogger<FileCacheStorage>();
-                var options = new FileCacheStorageOptions
+                var logger = new NullLogger<JsonFileCacheStorage>();
+                var options = new JsonFileCacheStorageOptions
                 {
                     StorageDirectory = directory
                 };
-                var storage = new FileCacheStorage(logger, Options.Create(options));
+                var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
                 var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
 
@@ -296,12 +297,12 @@ namespace Outkeep.Core.Tests
 
             try
             {
-                var logger = new NullLogger<FileCacheStorage>();
-                var options = new FileCacheStorageOptions
+                var logger = new NullLogger<JsonFileCacheStorage>();
+                var options = new JsonFileCacheStorageOptions
                 {
                     StorageDirectory = directory
                 };
-                var storage = new FileCacheStorage(logger, Options.Create(options));
+                var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
                 var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
 

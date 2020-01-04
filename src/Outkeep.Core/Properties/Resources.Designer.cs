@@ -142,6 +142,15 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The cache key {0} is not valid for this storage provider..
+        /// </summary>
+        internal static string Exception_CacheKey_X_IsNotValidForThisStorageProvider {
+            get {
+                return ResourceManager.GetString("Exception_CacheKey_X_IsNotValidForThisStorageProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to StorageDirectory must be configured.
         /// </summary>
         internal static string Exception_CacheStorageOptions_StorageDirectory_MustBeConfigured {

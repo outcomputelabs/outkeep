@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Options;
 using Outkeep.Core.Properties;
+using Outkeep.Core.Storage;
 using System;
 
 namespace Outkeep.Core
 {
-    public class FileCacheStorageOptionsValidator : IValidateOptions<FileCacheStorageOptions>
+    public class FileCacheStorageOptionsValidator : IValidateOptions<JsonFileCacheStorageOptions>
     {
-        public ValidateOptionsResult Validate(string name, FileCacheStorageOptions options)
+        public ValidateOptionsResult Validate(string name, JsonFileCacheStorageOptions options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 

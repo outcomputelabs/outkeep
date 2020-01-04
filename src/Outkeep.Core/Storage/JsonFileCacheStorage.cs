@@ -2,20 +2,30 @@
 using Microsoft.Extensions.Options;
 using Orleans;
 using Outkeep.Core.Properties;
+using Outkeep.Core.Storage;
 using System;
 using System.Buffers;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Outkeep.Core
 {
-    public class FileCacheStorage : ICacheStorage
+    /// <summary>
+    /// Implements a simple <see cref="ICacheStorage"/> that stores data in individual json files.
+    /// </summary>
+    internal sealed class JsonFileCacheStorage : ICacheStorage
     {
+        private static readonly ImmutableHashSet<char> InvalidChars = Enumerable.Concat(Path.GetInvalidFileNameChars(), Path.GetInvalidPathChars()).ToImmutableHashSet();
+
+        private readonly ILogger<JsonFileCacheStorage> _logger;
+        private readonly JsonFileCacheStorageOptions _options;
+
         private const string KeyPropertyName = "key";
         private const string ValuePropertyName = "value";
         private const string AbsoluteExpirationPropertyName = "absoluteExpiration";
@@ -23,16 +33,12 @@ namespace Outkeep.Core
         private const string Extension = ".json";
         private const char InvalidFileNameReplacementChar = '_';
         private const char HashSeparator = '.';
-        private static readonly ImmutableHashSet<char> InvalidFileNameChars = Path.GetInvalidFileNameChars().ToImmutableHashSet();
 
-        public FileCacheStorage(ILogger<FileCacheStorage> logger, IOptions<FileCacheStorageOptions> options)
+        public JsonFileCacheStorage(ILogger<JsonFileCacheStorage> logger, IOptions<JsonFileCacheStorageOptions> options)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
-
-        private readonly ILogger<FileCacheStorage> _logger;
-        private readonly FileCacheStorageOptions _options;
 
         [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters")]
         private string KeyToFileName(string key)
@@ -40,47 +46,45 @@ namespace Outkeep.Core
             Span<char> path = stackalloc char[1 << 10];
 
             // format the storage directory into the file path
-            _options.StorageDirectory.AsSpan().CopyTo(path);
+            if (!_options.StorageDirectory.AsSpan().TryCopyTo(path))
+            {
+                throw new PathTooLongException();
+            }
             var count = _options.StorageDirectory.Length;
 
             // add in the path separator if not there yet
             if (path[count - 1] != Path.DirectorySeparatorChar && path[count - 1] != Path.AltDirectorySeparatorChar)
             {
-                path[count] = Path.DirectorySeparatorChar;
-                ++count;
+                path[count++] = Path.DirectorySeparatorChar;
             }
 
             // format the key into the title by replacing invalid characters
             for (var i = 0; i < key.Length; ++i)
             {
-                path[count + i] = InvalidFileNameChars.Contains(key[i]) ?
+                path[count++] = InvalidChars.Contains(key[i]) ?
                     InvalidFileNameReplacementChar :
                     key[i];
             }
-            count += key.Length;
 
             // add in the hash separator
-            path[count] = HashSeparator;
-            ++count;
+            path[count++] = HashSeparator;
 
             // add in the hash itself
             if (!JenkinsHash.ComputeHash(key).TryFormat(path.Slice(count), out var charsWritten))
             {
-                ThrowInvalidOperationException();
+                throw new PathTooLongException();
             }
             count += charsWritten;
 
             // add the file extension
             if (!Extension.AsSpan().TryCopyTo(path.Slice(count)))
             {
-                ThrowInvalidOperationException();
+                throw new PathTooLongException();
             }
             count += Extension.Length;
 
             // all done
             return path.Slice(0, count).ToString();
-
-            static void ThrowInvalidOperationException() => throw new InvalidOperationException();
         }
 
         public Task ClearAsync(string key, CancellationToken cancellationToken = default)

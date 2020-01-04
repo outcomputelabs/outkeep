@@ -11,27 +11,27 @@ namespace Outkeep.Core
         {
         }
 
-        public FileCacheStorageException(string message)
+        public FileCacheStorageException(string? message)
             : this(message, null, null, null, null)
         {
         }
 
-        public FileCacheStorageException(string message, string path, string key)
+        public FileCacheStorageException(string? message, string? path, string? key)
             : this(message, path, key, null, null)
         {
         }
 
-        public FileCacheStorageException(string message, string path, string key, string otherKey)
+        public FileCacheStorageException(string? message, string? path, string? key, string? otherKey)
             : this(message, path, key, otherKey, null)
         {
         }
 
-        public FileCacheStorageException(string message, Exception innerException)
+        public FileCacheStorageException(string? message, Exception? innerException)
             : this(message, null, null, null, innerException)
         {
         }
 
-        public FileCacheStorageException(string message, string path, string key, Exception innerException)
+        public FileCacheStorageException(string? message, string? path, string? key, Exception? innerException)
             : this(message, path, key, null, innerException)
         {
         }

@@ -1,4 +1,5 @@
 ﻿using Outkeep.Core.Properties;
+using Outkeep.Core.Storage;
 using Xunit;
 
 namespace Outkeep.Core.Tests
@@ -9,7 +10,7 @@ namespace Outkeep.Core.Tests
         public void RequiresStorageDirectory()
         {
             // arrange
-            var options = new FileCacheStorageOptions();
+            var options = new JsonFileCacheStorageOptions();
             var validator = new FileCacheStorageOptionsValidator();
 
             // act
