@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Orleans.Hosting;
+using Outkeep.Core.Storage;
 using System;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 

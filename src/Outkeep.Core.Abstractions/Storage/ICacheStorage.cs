@@ -1,8 +1,7 @@
-﻿using Outkeep.Core.Storage;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Outkeep.Core
+namespace Outkeep.Core.Storage
 {
     /// <summary>
     /// Abstracts storage providers for the caching component.
