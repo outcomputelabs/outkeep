@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Outkeep.Core.Storage;
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Xunit;
