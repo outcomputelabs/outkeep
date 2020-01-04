@@ -110,7 +110,7 @@ namespace Outkeep.Core.Tests
                 };
                 var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
-                var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ClearAsync(key))
+                var error = await Assert.ThrowsAsync<JsonFileCacheStorageException>(() => storage.ClearAsync(key))
                     .ConfigureAwait(false);
 
                 Assert.Equal(key, error.Key);
@@ -212,7 +212,7 @@ namespace Outkeep.Core.Tests
                 };
                 var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
-                var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
+                var error = await Assert.ThrowsAsync<JsonFileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
 
                 Assert.Equal(Resources.Exception_CacheFile_X_ContainsKey_X_YetWeExpected_X.Format(path, otherKey, key), error.Message);
                 Assert.Equal(path, error.Path);
@@ -258,7 +258,7 @@ namespace Outkeep.Core.Tests
                 };
                 var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
-                var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
+                var error = await Assert.ThrowsAsync<JsonFileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
 
                 Assert.Equal(Resources.Exception_CacheFile_X_DoesNotContainExpectedKey_X.Format(path, key), error.Message);
                 Assert.Equal(path, error.Path);
@@ -304,7 +304,7 @@ namespace Outkeep.Core.Tests
                 };
                 var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
-                var error = await Assert.ThrowsAsync<FileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
+                var error = await Assert.ThrowsAsync<JsonFileCacheStorageException>(() => storage.ReadAsync(key)).ConfigureAwait(false);
 
                 Assert.Equal(Resources.Exception_CacheFile_X_ContainsNullKey_YetWeExpected_X.Format(path, key), error.Message);
                 Assert.Equal(path, error.Path);

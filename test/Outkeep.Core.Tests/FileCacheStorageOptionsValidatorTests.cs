@@ -11,7 +11,7 @@ namespace Outkeep.Core.Tests
         {
             // arrange
             var options = new JsonFileCacheStorageOptions();
-            var validator = new FileCacheStorageOptionsValidator();
+            var validator = new JsonFileCacheStorageOptionsValidator();
 
             // act
             var result = validator.Validate(null!, options);

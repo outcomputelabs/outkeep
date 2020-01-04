@@ -122,7 +122,7 @@ namespace Outkeep.Core
             catch (Exception ex)
             {
                 // this is not okay
-                var error = new FileCacheStorageException(Resources.Exception_FailedToClearCacheFile_X_ForKey_X.Format(path, key), path, key, ex);
+                var error = new JsonFileCacheStorageException(Resources.Exception_FailedToClearCacheFile_X_ForKey_X.Format(path, key), path, key, ex);
                 _logger.FileCacheStorageFailed(path, key, error);
                 throw error;
             }
@@ -162,16 +162,16 @@ namespace Outkeep.Core
 
                             if (readKey == null)
                             {
-                                throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ContainsNullKey_YetWeExpected_X.Format(path, key), path, key);
+                                throw new JsonFileCacheStorageException(Resources.Exception_CacheFile_X_ContainsNullKey_YetWeExpected_X.Format(path, key), path, key);
                             }
                             else if (readKey != key)
                             {
-                                throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ContainsKey_X_YetWeExpected_X.Format(path, readKey, key), path, key, readKey);
+                                throw new JsonFileCacheStorageException(Resources.Exception_CacheFile_X_ContainsKey_X_YetWeExpected_X.Format(path, readKey, key), path, key, readKey);
                             }
                         }
                         else
                         {
-                            throw new FileCacheStorageException(Resources.Exception_CacheFile_X_DoesNotContainExpectedKey_X.Format(path, key), path, key);
+                            throw new JsonFileCacheStorageException(Resources.Exception_CacheFile_X_DoesNotContainExpectedKey_X.Format(path, key), path, key);
                         }
 
                         if (document.RootElement.TryGetProperty(ValuePropertyName, out var valueValue))
@@ -180,7 +180,7 @@ namespace Outkeep.Core
                         }
                         else
                         {
-                            throw new FileCacheStorageException(Resources.Exception_CacheFile_X_ForKey_X_DoesNotContainValue.Format(path, key));
+                            throw new JsonFileCacheStorageException(Resources.Exception_CacheFile_X_ForKey_X_DoesNotContainValue.Format(path, key));
                         }
 
                         if (document.RootElement.TryGetProperty(AbsoluteExpirationPropertyName, out var absoluteExpirationValue))
@@ -204,7 +204,7 @@ namespace Outkeep.Core
                 _logger.FileCacheStorageFileNotFound(path, key);
                 return null;
             }
-            catch (FileCacheStorageException ex)
+            catch (JsonFileCacheStorageException ex)
             {
                 // bubble these up
                 _logger.FileCacheStorageFailed(path, key, ex);
@@ -213,7 +213,7 @@ namespace Outkeep.Core
             catch (Exception ex)
             {
                 // wrap everything else
-                var error = new FileCacheStorageException(Resources.Exception_FailedToReadCacheFile, path, key, ex);
+                var error = new JsonFileCacheStorageException(Resources.Exception_FailedToReadCacheFile, path, key, ex);
                 _logger.FileCacheStorageFailed(path, key, error);
                 throw error;
             }
@@ -283,7 +283,7 @@ namespace Outkeep.Core
             }
             catch (Exception ex)
             {
-                var error = new FileCacheStorageException(Resources.Exception_FailedToWriteCacheFile_X_For_Key_X.Format(path, key), path, key, ex);
+                var error = new JsonFileCacheStorageException(Resources.Exception_FailedToWriteCacheFile_X_For_Key_X.Format(path, key), path, key, ex);
                 _logger.FileCacheStorageFailed(path, key, error);
                 throw error;
             }

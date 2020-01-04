@@ -12,7 +12,7 @@ namespace Outkeep.Core.Tests
         public void Constructs()
         {
             // arrange
-            var exception = new FileCacheStorageException();
+            var exception = new JsonFileCacheStorageException();
 
             // assert
             Assert.Null(exception.Path);
@@ -26,7 +26,7 @@ namespace Outkeep.Core.Tests
         {
             // arrange
             var message = "SomeMessage";
-            var exception = new FileCacheStorageException(message);
+            var exception = new JsonFileCacheStorageException(message);
 
             // assert
             Assert.Null(exception.Path);
@@ -42,7 +42,7 @@ namespace Outkeep.Core.Tests
             var message = "SomeMessage";
             var path = "SomePath";
             var key = "SomeKey";
-            var exception = new FileCacheStorageException(message, path, key);
+            var exception = new JsonFileCacheStorageException(message, path, key);
 
             // assert
             Assert.Equal(path, exception.Path);
@@ -59,7 +59,7 @@ namespace Outkeep.Core.Tests
             var path = "SomePath";
             var key = "SomeKey";
             var otherKey = "SomeOtherKey";
-            var exception = new FileCacheStorageException(message, path, key, otherKey);
+            var exception = new JsonFileCacheStorageException(message, path, key, otherKey);
 
             // assert
             Assert.Equal(path, exception.Path);
@@ -74,7 +74,7 @@ namespace Outkeep.Core.Tests
             // arrange
             var message = "SomeMessage";
             var inner = new Exception();
-            var exception = new FileCacheStorageException(message, inner);
+            var exception = new JsonFileCacheStorageException(message, inner);
 
             // assert
             Assert.Null(exception.Path);
@@ -92,7 +92,7 @@ namespace Outkeep.Core.Tests
             var path = "SomePath";
             var key = "SomeKey";
             var inner = new Exception();
-            var exception = new FileCacheStorageException(message, path, key, inner);
+            var exception = new JsonFileCacheStorageException(message, path, key, inner);
 
             // assert
             Assert.Equal(path, exception.Path);
@@ -111,7 +111,7 @@ namespace Outkeep.Core.Tests
             var key = "SomeKey";
             var otherKey = "SomeOtherKey";
             var inner = new Exception();
-            var exception = new FileCacheStorageException(message, path, key, otherKey, inner);
+            var exception = new JsonFileCacheStorageException(message, path, key, otherKey, inner);
 
             // assert
             Assert.Equal(path, exception.Path);
@@ -130,7 +130,7 @@ namespace Outkeep.Core.Tests
             var key = "SomeKey";
             var otherKey = "SomeOtherKey";
             var inner = new Exception("Some Inner Exception");
-            var exception = new FileCacheStorageException(message, path, key, otherKey, inner);
+            var exception = new JsonFileCacheStorageException(message, path, key, otherKey, inner);
             var formatter = new BinaryFormatter();
 
             // act
@@ -144,7 +144,7 @@ namespace Outkeep.Core.Tests
 
             // assert
             Assert.NotNull(obj);
-            var result = Assert.IsType<FileCacheStorageException>(obj);
+            var result = Assert.IsType<JsonFileCacheStorageException>(obj);
             Assert.Equal(path, result.Path);
             Assert.Equal(key, result.Key);
             Assert.Equal(otherKey, result.OtherKey);
@@ -161,8 +161,8 @@ namespace Outkeep.Core.Tests
             var path = "SomePath";
             var message = "SomeMessage";
             var innerException = new Exception("Some Inner Exception Message");
-            var expected = $"{nameof(FileCacheStorageException)}: Key='{key}', OtherKey='{otherKey}', Path='{path}', Message='{message}', InnerException='{innerException}'";
-            var exception = new FileCacheStorageException(message, path, key, otherKey, innerException);
+            var expected = $"{nameof(JsonFileCacheStorageException)}: Key='{key}', OtherKey='{otherKey}', Path='{path}', Message='{message}', InnerException='{innerException}'";
+            var exception = new JsonFileCacheStorageException(message, path, key, otherKey, innerException);
 
             // act
             var result = exception.ToString();

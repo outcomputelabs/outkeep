@@ -5,7 +5,7 @@ using System;
 
 namespace Outkeep.Core
 {
-    public class FileCacheStorageOptionsValidator : IValidateOptions<JsonFileCacheStorageOptions>
+    public class JsonFileCacheStorageOptionsValidator : IValidateOptions<JsonFileCacheStorageOptions>
     {
         public ValidateOptionsResult Validate(string name, JsonFileCacheStorageOptions options)
         {

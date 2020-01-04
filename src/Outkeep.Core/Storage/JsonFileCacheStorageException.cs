@@ -4,39 +4,39 @@ using System.Runtime.Serialization;
 namespace Outkeep.Core.Storage
 {
     [Serializable]
-    public class FileCacheStorageException : StorageException
+    public class JsonFileCacheStorageException : StorageException
     {
-        public FileCacheStorageException()
+        public JsonFileCacheStorageException()
             : this(null, null, null, null, null)
         {
         }
 
-        public FileCacheStorageException(string? message)
+        public JsonFileCacheStorageException(string? message)
             : this(message, null, null, null, null)
         {
         }
 
-        public FileCacheStorageException(string? message, string? path, string? key)
+        public JsonFileCacheStorageException(string? message, string? path, string? key)
             : this(message, path, key, null, null)
         {
         }
 
-        public FileCacheStorageException(string? message, string? path, string? key, string? otherKey)
+        public JsonFileCacheStorageException(string? message, string? path, string? key, string? otherKey)
             : this(message, path, key, otherKey, null)
         {
         }
 
-        public FileCacheStorageException(string? message, Exception? innerException)
+        public JsonFileCacheStorageException(string? message, Exception? innerException)
             : this(message, null, null, null, innerException)
         {
         }
 
-        public FileCacheStorageException(string? message, string? path, string? key, Exception? innerException)
+        public JsonFileCacheStorageException(string? message, string? path, string? key, Exception? innerException)
             : this(message, path, key, null, innerException)
         {
         }
 
-        public FileCacheStorageException(string? message, string? path, string? key, string? otherKey, Exception? innerException) : base(message!, innerException!)
+        public JsonFileCacheStorageException(string? message, string? path, string? key, string? otherKey, Exception? innerException) : base(message!, innerException!)
         {
             Path = path;
             Key = key;
@@ -47,9 +47,9 @@ namespace Outkeep.Core.Storage
         public string? Key { get; }
         public string? OtherKey { get; }
 
-        public override string ToString() => $"{nameof(FileCacheStorageException)}: Key='{Key}', OtherKey='{OtherKey}', Path='{Path}', Message='{Message}', InnerException='{InnerException}'";
+        public override string ToString() => $"{nameof(JsonFileCacheStorageException)}: Key='{Key}', OtherKey='{OtherKey}', Path='{Path}', Message='{Message}', InnerException='{InnerException}'";
 
-        protected FileCacheStorageException(SerializationInfo serializationInfo, StreamingContext streamingContext)
+        protected JsonFileCacheStorageException(SerializationInfo serializationInfo, StreamingContext streamingContext)
             : base(serializationInfo, streamingContext)
         {
             Path = serializationInfo.GetString(nameof(Path));
