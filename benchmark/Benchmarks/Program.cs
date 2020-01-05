@@ -1,4 +1,7 @@
 ﻿using BenchmarkDotNet.Running;
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: ExcludeFromCodeCoverage()]
 
 namespace Benchmarks
 {
