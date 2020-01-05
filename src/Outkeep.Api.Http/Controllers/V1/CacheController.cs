@@ -65,14 +65,23 @@ namespace Outkeep.Api.Http.Controllers.V1
         [SwaggerOperation(OperationId = "SetCache")]
         [Route("{key}")]
         [SwaggerResponse(StatusCodes.Status200OK, "Cache entry set")]
-        public async Task<ActionResult> SetAsync(
+        public Task<ActionResult> SetAsync(
             [Required] [MaxLength(128)] string key,
             DateTimeOffset? absoluteExpiration,
             TimeSpan? slidingExpiration,
             [Required] IFormFile value)
         {
+            if (key == null) throw new ArgumentNullException(nameof(key));
             if (value == null) throw new ArgumentNullException(nameof(value));
 
+            return InnerSetAsync(key, absoluteExpiration, slidingExpiration, value);
+        }
+
+        /// <summary>
+        /// Inner Async block for <see cref="SetAsync(string, DateTimeOffset?, TimeSpan?, IFormFile)"/>
+        /// </summary>
+        private async Task<ActionResult> InnerSetAsync(string key, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration, IFormFile value)
+        {
             byte[]? bytes = new byte[value.Length];
             using (var stream = value.OpenReadStream())
             {
