@@ -21,5 +21,20 @@ namespace Outkeep.Core.Tests
             Mock.Get(entry).VerifySet(x => x.AbsoluteExpiration = absoluteExpiration);
             Assert.Same(entry, result);
         }
+
+        [Fact]
+        public void SetSlidingExpiration()
+        {
+            // arrange
+            var entry = Mock.Of<ICacheEntry>();
+            var slidingExpiration = TimeSpan.FromMinutes(1);
+
+            // act
+            var result = entry.SetSlidingExpiration(slidingExpiration);
+
+            // assert
+            Mock.Get(entry).VerifySet(x => x.SlidingExpiration = slidingExpiration);
+            Assert.Same(entry, result);
+        }
     }
 }
