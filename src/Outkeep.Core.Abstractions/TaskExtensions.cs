@@ -1,4 +1,8 @@
-﻿namespace System.Threading.Tasks
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Outkeep.Core
 {
     public static class TaskExtensions
     {
@@ -9,6 +13,7 @@
         public static Task<T> WithDefaultOnTimeout<T>(this Task<T> task, T defaultValue, TimeSpan timeout, CancellationToken cancellationToken = default)
         {
             if (task == null) throw new ArgumentNullException(nameof(task));
+            if (timeout < TimeSpan.Zero) throw new ArgumentOutOfRangeException(nameof(timeout));
 
             // quick path for completed task
             if (task.IsCompleted) return task;
@@ -20,10 +25,8 @@
             if (timeout == TimeSpan.Zero) return Task.FromResult(defaultValue);
 
             // slow path for regular completion
-            return Task.WhenAny(
-                task,
-                Task.Delay(timeout).ContinueWith((x, dv) => (T)dv, defaultValue, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default))
-                .Unwrap();
+            var delay = Task.Delay(timeout).ContinueWith((x, dv) => (T)dv, defaultValue, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+            return Task.WhenAny(task, delay).Unwrap();
         }
     }
 }
