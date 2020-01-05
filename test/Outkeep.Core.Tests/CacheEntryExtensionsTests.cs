@@ -36,5 +36,20 @@ namespace Outkeep.Core.Tests
             Mock.Get(entry).VerifySet(x => x.SlidingExpiration = slidingExpiration);
             Assert.Same(entry, result);
         }
+
+        [Fact]
+        public void SetPriority()
+        {
+            // arrange
+            var entry = Mock.Of<ICacheEntry>();
+            var priority = CachePriority.Normal;
+
+            // act
+            var result = entry.SetPriority(priority);
+
+            // assert
+            Mock.Get(entry).VerifySet(x => x.Priority = priority);
+            Assert.Same(entry, result);
+        }
     }
 }
