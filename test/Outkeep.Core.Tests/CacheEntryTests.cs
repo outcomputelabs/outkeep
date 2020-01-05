@@ -8,7 +8,7 @@ namespace Outkeep.Core.Tests
     public class CacheEntryTests
     {
         [Fact]
-        public void Test()
+        public void Cycles()
         {
             // arrange
             var key = Guid.NewGuid().ToString();
@@ -21,6 +21,12 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(size, entry.Size);
             Assert.Equal(key, entry.Key);
+
+            // act
+            entry.Commit();
+
+            // assert
+            Mock.Get(context).Verify(x => x.OnEntryCommitted(entry));
 
             // act
             entry.Dispose();
