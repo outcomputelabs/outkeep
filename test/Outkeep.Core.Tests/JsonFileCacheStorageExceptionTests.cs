@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Outkeep.Core.Tests
 {
-    public class FileCacheStorageExceptionTests
+    public class JsonFileCacheStorageExceptionTests
     {
         [Fact]
         public void Constructs()

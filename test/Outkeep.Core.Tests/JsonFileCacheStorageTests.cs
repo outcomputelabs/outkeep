@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Outkeep.Core.Tests
 {
-    public class FileCacheStorageTests
+    public class JsonFileCacheStorageTests
     {
         private static readonly ImmutableHashSet<char> InvalidFileNameChars = Path.GetInvalidFileNameChars().ToImmutableHashSet();
         private const char InvalidFileNameReplacementChar = '_';
