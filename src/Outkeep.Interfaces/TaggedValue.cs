@@ -22,18 +22,6 @@ namespace Outkeep.Interfaces
 
         public TValue Value { get; }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is null) return false;
-            if (obj is TaggedValue<TETag, TValue> other) return Equals(other);
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Value, ETag);
-        }
-
         public static bool operator ==(TaggedValue<TETag, TValue> left, TaggedValue<TETag, TValue> right)
         {
             return left.Equals(right);
@@ -48,6 +36,18 @@ namespace Outkeep.Interfaces
         {
             return (ETag is null ? other.ETag is null : ETag.Equals(other.ETag))
                 && (Value is null ? other.Value is null : Value.Equals(other.Value));
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (obj is TaggedValue<TETag, TValue> other) return Equals(other);
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Value, ETag);
         }
     }
 }
