@@ -14,7 +14,7 @@ namespace Outkeep.Core.Caching
         /// <param name="entry">The cache entry instance upon which to set the absolute expiration.</param>
         /// <param name="absoluteExpiration">The absolute expiration to set upon the cache entry.</param>
         /// <returns>The same cache entry instance to allow chaining.</returns>
-        public static ICacheEntry SetAbsoluteExpiration(this ICacheEntry entry, DateTime absoluteExpiration)
+        public static ICacheEntry SetAbsoluteExpiration(this ICacheEntry entry, DateTimeOffset absoluteExpiration)
         {
             if (entry == null) throw new ArgumentNullException(nameof(entry));
 
