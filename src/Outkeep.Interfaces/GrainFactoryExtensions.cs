@@ -14,6 +14,7 @@ namespace Orleans
         public static ICacheGrain GetCacheGrain(this IGrainFactory factory, string key)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
+            if (key == null) throw new ArgumentNullException(nameof(key));
 
             return factory.GetGrain<ICacheGrain>(key);
         }

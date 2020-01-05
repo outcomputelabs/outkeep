@@ -22,9 +22,9 @@ namespace Outkeep.Interfaces.Tests
         [Fact]
         public void GetCacheGrainThrowsOnNullClient()
         {
-            IClusterClient client = null!;
+            IGrainFactory? factory = null;
 
-            Assert.Throws<ArgumentNullException>(nameof(client), () => client.GetCacheGrain("SomeKey"));
+            Assert.Throws<ArgumentNullException>(nameof(factory), () => factory!.GetCacheGrain("SomeKey"));
         }
 
         [Fact]
@@ -41,9 +41,9 @@ namespace Outkeep.Interfaces.Tests
         [Fact]
         public void GetEchoGrainThrowsOnNullClient()
         {
-            IClusterClient client = null!;
+            IGrainFactory factory = null!;
 
-            Assert.Throws<ArgumentNullException>(nameof(client), () => client.GetEchoGrain());
+            Assert.Throws<ArgumentNullException>(nameof(factory), () => factory.GetEchoGrain());
         }
     }
 }

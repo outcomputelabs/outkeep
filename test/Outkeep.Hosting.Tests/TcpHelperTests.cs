@@ -17,7 +17,7 @@ namespace Outkeep.Hosting.Tests
             var helper = new TcpHelper(factory);
 
             // act and assert
-            Assert.Throws<ArgumentOutOfRangeException>("start", () => helper.GetFreePort(0, 1 << 16 - 1));
+            Assert.Throws<ArgumentOutOfRangeException>("start", () => helper.GetFreePort(0, IPEndPoint.MaxPort));
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace Outkeep.Hosting.Tests
             var helper = new TcpHelper(factory);
 
             // act and assert
-            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1, 1 << 16));
+            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1, IPEndPoint.MaxPort + 1));
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace Outkeep.Hosting.Tests
             var helper = new TcpHelper(factory);
 
             // act and assert
-            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(1 << 16, 1 << 16 - 1));
+            Assert.Throws<ArgumentOutOfRangeException>("end", () => helper.GetFreePort(IPEndPoint.MaxPort, IPEndPoint.MaxPort - 1));
         }
 
         [Fact]
