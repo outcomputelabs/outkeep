@@ -96,7 +96,7 @@ namespace Outkeep.Grains
             // the cache director is at overcapacity
             try
             {
-                // todo: execute compaction here
+                args.Director.Compact();
             }
             catch (Exception ex)
             {
