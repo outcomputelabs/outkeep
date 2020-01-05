@@ -116,8 +116,6 @@ namespace Outkeep.Core.Caching
         /// </summary>
         internal void SetExpired(EvictionCause reason)
         {
-            EnsureCommitted();
-
             // the first thread to set an eviction cause wins
             Interlocked.CompareExchange(ref Unsafe.As<EvictionCause, int>(ref _evictionCause), (int)reason, (int)EvictionCause.None);
         }
