@@ -288,7 +288,7 @@ namespace Outkeep.Core
                 throw error;
             }
 
-            _logger.FileCacheStorageWroteFile(path, key, size);
+            Log.FileCacheStorageWroteFile(_logger, path, key, size);
         }
 
         private static class Log
@@ -331,6 +331,19 @@ namespace Outkeep.Core
                 _fileCacheStorageReadFile(logger, path, key, size, null);
 
             #endregion ReadFile
+
+            #region WroteFile
+
+            private static readonly Action<ILogger, string, string, long, Exception?> _fileCacheStorageWroteFile =
+                LoggerMessage.Define<string, string, long>(
+                    LogLevel.Debug,
+                    new EventId(0, nameof(FileCacheStorageWroteFile)),
+                    Resources.Log_WroteCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes);
+
+            public static void FileCacheStorageWroteFile(ILogger logger, string path, string key, long size) =>
+                _fileCacheStorageWroteFile(logger, path, key, size, null);
+
+            #endregion WroteFile
         }
     }
 }
