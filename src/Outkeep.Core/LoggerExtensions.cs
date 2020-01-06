@@ -77,19 +77,6 @@ namespace Outkeep.Core
 
         #region CacheDirector
 
-        #region CacheDirectorStartingOvercapacityCompaction
-
-        private static readonly Action<ILogger, long, Exception?> _cacheDirectorstartingOvercapacityCompaction =
-            LoggerMessage.Define<long>(
-                LogLevel.Debug,
-                new EventId(0, nameof(CacheDirectorStartingOvercapacityCompaction)),
-                Resources.Log_StartingOvercapacityCompactionWithSizeOf_X);
-
-        public static void CacheDirectorStartingOvercapacityCompaction(this ILogger logger, long size) =>
-            _cacheDirectorstartingOvercapacityCompaction(logger, size, null);
-
-        #endregion CacheDirectorStartingOvercapacityCompaction
-
         #region CacheDirectorCompletedOvercapacityCompaction
 
         private static readonly Action<ILogger, long, Exception?> _cacheDirectorCompletedOvercapacityCompaction =
