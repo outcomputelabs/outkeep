@@ -79,15 +79,6 @@ namespace Outkeep.Core
 
         #region CacheDirectorCompletedOvercapacityCompaction
 
-        private static readonly Action<ILogger, long, Exception?> _cacheDirectorCompletedOvercapacityCompaction =
-            LoggerMessage.Define<long>(
-                LogLevel.Debug,
-                new EventId(0, nameof(CacheDirectorCompletedOvercapacityCompaction)),
-                Resources.Log_CompletedOvercapacityCompactionWithSizeOf_X);
-
-        public static void CacheDirectorCompletedOvercapacityCompaction(this ILogger logger, long size) =>
-            _cacheDirectorCompletedOvercapacityCompaction(logger, size, null);
-
         private static readonly Action<ILogger, long, Exception?> _cacheDirectorCannotCompactToTargetSisze =
             LoggerMessage.Define<long>(
                 LogLevel.Warning,
