@@ -116,7 +116,7 @@ namespace Outkeep.Core
             catch (FileNotFoundException)
             {
                 // this is okay
-                _logger.FileCacheStorageFileNotFound(path, key);
+                Log.FileCacheStorageFileNotFound(_logger, path, key);
                 return;
             }
             catch (Exception ex)
@@ -201,7 +201,7 @@ namespace Outkeep.Core
             catch (FileNotFoundException)
             {
                 // this is okay
-                _logger.FileCacheStorageFileNotFound(path, key);
+                Log.FileCacheStorageFileNotFound(_logger, path, key);
                 return null;
             }
             catch (JsonFileCacheStorageException ex)
@@ -344,6 +344,19 @@ namespace Outkeep.Core
                 _fileCacheStorageWroteFile(logger, path, key, size, null);
 
             #endregion WroteFile
+
+            #region FileNotFound
+
+            private static readonly Action<ILogger, string, string, Exception?> _fileCacheStorageFileNotFound =
+                LoggerMessage.Define<string, string>(
+                    LogLevel.Debug,
+                    new EventId(0, nameof(FileCacheStorageFileNotFound)),
+                    Resources.Log_CacheFile_X_ForKey_X_NotFound);
+
+            public static void FileCacheStorageFileNotFound(ILogger logger, string path, string key) =>
+                _fileCacheStorageFileNotFound(logger, path, key, null);
+
+            #endregion FileNotFound
         }
     }
 }
