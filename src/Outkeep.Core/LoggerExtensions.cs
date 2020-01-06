@@ -74,22 +74,5 @@ namespace Outkeep.Core
         #endregion FileNotFound
 
         #endregion FileCacheStorage
-
-        #region CacheDirector
-
-        #region CacheDirectorCompletedOvercapacityCompaction
-
-        private static readonly Action<ILogger, long, Exception?> _cacheDirectorCannotCompactToTargetSisze =
-            LoggerMessage.Define<long>(
-                LogLevel.Warning,
-                new EventId(0, nameof(CacheDirectorCannotCompactToTargetSize)),
-                Resources.Log_CacheDirectorCannotCompactToTargetSizeOf_X);
-
-        public static void CacheDirectorCannotCompactToTargetSize(this ILogger logger, long target) =>
-            _cacheDirectorCannotCompactToTargetSisze(logger, target, null);
-
-        #endregion CacheDirectorCompletedOvercapacityCompaction
-
-        #endregion CacheDirector
     }
 }

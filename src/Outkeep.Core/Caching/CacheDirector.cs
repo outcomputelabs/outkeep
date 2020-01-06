@@ -344,7 +344,7 @@ namespace Outkeep.Core.Caching
                 if (TryEvictQuota(ref quota, _compactHighPriorityEntries)) return;
 
                 // nope
-                _logger.CacheDirectorCannotCompactToTargetSize(_options.TargetCapacity);
+                Log.CacheDirectorCannotCompactToTargetSize(_logger, _options.TargetCapacity);
             }
             finally
             {
@@ -368,6 +368,18 @@ namespace Outkeep.Core.Caching
             }
 
             return false;
+        }
+
+        private static class Log
+        {
+            private static readonly Action<ILogger, long, Exception?> _cacheDirectorCannotCompactToTargetSisze =
+                LoggerMessage.Define<long>(
+                    LogLevel.Warning,
+                    new EventId(0, nameof(CacheDirectorCannotCompactToTargetSize)),
+                    Resources.Log_CacheDirectorCannotCompactToTargetSizeOf_X);
+
+            public static void CacheDirectorCannotCompactToTargetSize(ILogger logger, long target) =>
+                _cacheDirectorCannotCompactToTargetSisze(logger, target, null);
         }
     }
 }
