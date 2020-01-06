@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Concurrency;
+using Outkeep.Grains.Properties;
 using Outkeep.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -24,9 +25,25 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public ValueTask<string> EchoAsync(string message)
         {
-            _logger.Echo(message);
+            Log.Echo(_logger, message);
 
             return new ValueTask<string>(message);
+        }
+
+        private static class Log
+        {
+            #region Echo
+
+            public static void Echo(ILogger logger, string message) =>
+                _echo(logger, message, null);
+
+            private static readonly Action<ILogger, string, Exception?> _echo =
+                LoggerMessage.Define<string>(
+                    LogLevel.Debug,
+                    new EventId(0, nameof(Echo)),
+                    Resources.Log_Echo_X);
+
+            #endregion Echo
         }
     }
 }
