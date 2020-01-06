@@ -123,7 +123,7 @@ namespace Outkeep.Core
             {
                 // this is not okay
                 var error = new JsonFileCacheStorageException(Resources.Exception_FailedToClearCacheFile_X_ForKey_X.Format(path, key), path, key, ex);
-                _logger.FileCacheStorageFailed(path, key, error);
+                Log.FileCacheStorageFailed(_logger, path, key, error);
                 throw error;
             }
 
@@ -207,14 +207,14 @@ namespace Outkeep.Core
             catch (JsonFileCacheStorageException ex)
             {
                 // bubble these up
-                _logger.FileCacheStorageFailed(path, key, ex);
+                Log.FileCacheStorageFailed(_logger, path, key, ex);
                 throw;
             }
             catch (Exception ex)
             {
                 // wrap everything else
                 var error = new JsonFileCacheStorageException(Resources.Exception_FailedToReadCacheFile, path, key, ex);
-                _logger.FileCacheStorageFailed(path, key, error);
+                Log.FileCacheStorageFailed(_logger, path, key, error);
                 throw error;
             }
 
@@ -284,11 +284,27 @@ namespace Outkeep.Core
             catch (Exception ex)
             {
                 var error = new JsonFileCacheStorageException(Resources.Exception_FailedToWriteCacheFile_X_For_Key_X.Format(path, key), path, key, ex);
-                _logger.FileCacheStorageFailed(path, key, error);
+                Log.FileCacheStorageFailed(_logger, path, key, error);
                 throw error;
             }
 
             _logger.FileCacheStorageWroteFile(path, key, size);
+        }
+
+        private static class Log
+        {
+            #region Failed
+
+            private static readonly Action<ILogger, string, string, Exception> _fileCacheStorageFailed =
+                LoggerMessage.Define<string, string>(
+                    LogLevel.Error,
+                    new EventId(0, nameof(FileCacheStorageFailed)),
+                    Resources.Log_FailedOperationOnCacheFile_X_ForKey_X);
+
+            public static void FileCacheStorageFailed(ILogger logger, string path, string key, Exception exception) =>
+                _fileCacheStorageFailed(logger, path, key, exception);
+
+            #endregion Failed
         }
     }
 }
