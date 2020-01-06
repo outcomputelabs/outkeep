@@ -8,19 +8,6 @@ namespace Outkeep.Core
     {
         #region FileCacheStorage
 
-        #region ReadFile
-
-        private static readonly Action<ILogger, string, string, int, Exception?> _fileCacheStorageReadFile =
-            LoggerMessage.Define<string, string, int>(
-                LogLevel.Debug,
-                new EventId(0, nameof(FileCacheStorageReadFile)),
-                Resources.Log_ReadCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes);
-
-        public static void FileCacheStorageReadFile(this ILogger logger, string path, string key, int size) =>
-            _fileCacheStorageReadFile(logger, path, key, size, null);
-
-        #endregion ReadFile
-
         #region WroteFile
 
         private static readonly Action<ILogger, string, string, long, Exception?> _fileCacheStorageWroteFile =

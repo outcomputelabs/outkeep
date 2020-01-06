@@ -218,7 +218,7 @@ namespace Outkeep.Core
                 throw error;
             }
 
-            _logger.FileCacheStorageReadFile(path, key, value.Length);
+            Log.FileCacheStorageReadFile(_logger, path, key, value.Length);
             return new CacheItem(value, absoluteExpiration, slidingExpiration);
         }
 
@@ -318,6 +318,19 @@ namespace Outkeep.Core
                 _fileCacheStorageDeletedFileForKey(logger, path, key, null);
 
             #endregion DeletedFile
+
+            #region ReadFile
+
+            private static readonly Action<ILogger, string, string, int, Exception?> _fileCacheStorageReadFile =
+                LoggerMessage.Define<string, string, int>(
+                    LogLevel.Debug,
+                    new EventId(0, nameof(FileCacheStorageReadFile)),
+                    Resources.Log_ReadCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes);
+
+            public static void FileCacheStorageReadFile(ILogger logger, string path, string key, int size) =>
+                _fileCacheStorageReadFile(logger, path, key, size, null);
+
+            #endregion ReadFile
         }
     }
 }
