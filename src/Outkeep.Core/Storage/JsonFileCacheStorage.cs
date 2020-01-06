@@ -127,7 +127,7 @@ namespace Outkeep.Core
                 throw error;
             }
 
-            _logger.FileCacheStorageDeletedFile(path, key);
+            Log.FileCacheStorageDeletedFile(_logger, path, key);
         }
 
         public Task<CacheItem?> ReadAsync(string key, CancellationToken cancellationToken = default)
@@ -305,6 +305,19 @@ namespace Outkeep.Core
                 _fileCacheStorageFailed(logger, path, key, exception);
 
             #endregion Failed
+
+            #region DeletedFile
+
+            private static readonly Action<ILogger, string, string, Exception?> _fileCacheStorageDeletedFileForKey =
+                LoggerMessage.Define<string, string>(
+                    LogLevel.Debug,
+                    new EventId(0, nameof(FileCacheStorageDeletedFile)),
+                    Resources.Log_DeletedCacheFile_X_ForKey_X);
+
+            public static void FileCacheStorageDeletedFile(ILogger logger, string path, string key) =>
+                _fileCacheStorageDeletedFileForKey(logger, path, key, null);
+
+            #endregion DeletedFile
         }
     }
 }

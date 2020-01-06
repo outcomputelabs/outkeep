@@ -8,19 +8,6 @@ namespace Outkeep.Core
     {
         #region FileCacheStorage
 
-        #region DeletedFile
-
-        private static readonly Action<ILogger, string, string, Exception?> _fileCacheStorageDeletedFileForKey =
-            LoggerMessage.Define<string, string>(
-                LogLevel.Debug,
-                new EventId(0, nameof(FileCacheStorageDeletedFile)),
-                Resources.Log_DeletedCacheFile_X_ForKey_X);
-
-        public static void FileCacheStorageDeletedFile(this ILogger logger, string path, string key) =>
-            _fileCacheStorageDeletedFileForKey(logger, path, key, null);
-
-        #endregion DeletedFile
-
         #region ReadFile
 
         private static readonly Action<ILogger, string, string, int, Exception?> _fileCacheStorageReadFile =
