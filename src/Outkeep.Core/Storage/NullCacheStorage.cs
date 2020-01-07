@@ -7,7 +7,7 @@ namespace Outkeep.Core.Storage
     /// Implements a <see cref="ICacheStorage"/> provider that does not store anything.
     /// Use this to disable cache storage altogether.
     /// </summary>
-    public class NullCacheStorage : ICacheStorage
+    internal class NullCacheStorage : ICacheStorage
     {
         private static readonly Task<CacheItem?> NullTask = Task.FromResult<CacheItem?>(null);
 

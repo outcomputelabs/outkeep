@@ -20,5 +20,18 @@ namespace Outkeep.Core.Storage
                 services.AddSingleton<ICacheStorage, MemoryCacheStorage>();
             });
         }
+
+        /// <summary>
+        /// Adds a singleton <see cref="NullCacheStorage"/> to the <see cref="IOutkeepServerBuilder"/>.
+        /// </summary>
+        public static IOutkeepServerBuilder AddNullCacheStorage(this IOutkeepServerBuilder builder)
+        {
+            if (builder is null) throw new ArgumentNullException(nameof(builder));
+
+            return builder.ConfigureServices((context, services) =>
+            {
+                services.AddSingleton<ICacheStorage, NullCacheStorage>();
+            });
+        }
     }
 }
