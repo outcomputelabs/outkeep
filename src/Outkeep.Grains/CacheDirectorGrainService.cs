@@ -75,7 +75,7 @@ namespace Outkeep.Grains
 
             try
             {
-                args.Director.RemoveExpired();
+                args.Director.EvictExpiredEntries();
             }
             catch (Exception ex)
             {

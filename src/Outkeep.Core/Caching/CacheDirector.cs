@@ -263,13 +263,13 @@ namespace Outkeep.Core.Caching
         }
 
         /// <inheritdoc />
-        public void RemoveExpired()
+        public void EvictExpiredEntries()
         {
             var now = _clock.UtcNow;
 
-            // todo: attempt to refactor this into context calls
-            foreach (var entry in _entries.Values)
+            foreach (var pair in _entries)
             {
+                var entry = pair.Value;
                 if (entry.TrySetExpiredOnTimeout(now))
                 {
                     TryEvictEntry(entry);
