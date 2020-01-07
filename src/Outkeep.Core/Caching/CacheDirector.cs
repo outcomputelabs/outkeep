@@ -94,87 +94,89 @@ namespace Outkeep.Core.Caching
             // try to allocate space for the new entry
             var allocated = TryClaimSpace(entry);
 
-            // check if we can add the entry
-            if (!entry.TrySetExpiredOnTimeout(now) && allocated)
+            // check if we could not allocate enough space
+            if (!allocated)
             {
-                // the entry did not expire early and it claimed space without contention
-                bool added;
+                // early expire this entry in case it is not already
+                entry.SetExpired(EvictionCause.Capacity);
 
-                // check if we had found a previous entry
-                if (previous == null)
-                {
-                    // if we found no previous entry then we can try to add the current one as a new one
-                    // this will fail if a concurrent thread added an entry with the same key before the current thread got here
-                    added = _entries.TryAdd(entry.Key, entry);
-                }
-                else
-                {
-                    // if we found a previous entry then we can try to replace it in-place with a check
-                    // this will fail if a concurrent thread replaced the previous entry before the current thread got here
-                    added = _entries.TryUpdate(entry.Key, entry, previous);
-
-                    // check if we replaced the entry or faced a concurrency issue
-                    if (added)
-                    {
-                        // we did replace the previous entry
-                        // in this case we need to free the space used by that entry
-                        Interlocked.Add(ref _size, -previous.Size);
-                    }
-                    else
-                    {
-                        // we did not replace the entry
-                        // this means a concurrent thread won the race to replace or remove the previous entry before this thread got here
-                        // just in case the previous value was removed (and not replaced) we make a best effort attempt to add the new value and win the race
-                        added = _entries.TryAdd(entry.Key, entry);
-                    }
-                }
-
-                // check if we succeeded in adding the entry to the dictionary
-                if (!added)
-                {
-                    // we were not successful
-                    // a concurrent thread either added or replaced the same entry in a way that this thread could not handle in a graceful way
-                    // in this case we need we go through the expiration steps early
-                    // this should be a very rare occurrence if at all as each entry should only be accessed by their own thread-safe grain instance in the first place
-
-                    // rollback the space claim so other entries can claim it
-                    Interlocked.Add(ref _size, -entry.Size);
-
-                    // early expire this entry
-                    entry.SetExpired(EvictionCause.Replaced);
-
-                    // early notify the user
-                    entry.ScheduleEvictionCallback();
-                }
-
-                // regardless of how we got here any previous entry was replaced and expired
-                // therefore invoke any user registered callbacks on it
-                if (previous != null)
-                {
-                    previous.ScheduleEvictionCallback();
-                }
-            }
-            else
-            {
-                // the entry either expired early or failed to claim space
-
-                // check if it failed to claim space
-                if (!allocated)
-                {
-                    // early expire this entry in case it is not already
-                    entry.SetExpired(EvictionCause.Capacity);
-                }
-
-                // early invoke any user registered eviction callbacks now
+                // early invoke any user registered eviction callbacks
                 entry.ScheduleEvictionCallback();
 
                 // if we found a previous entry then evict it as well
                 // an attempt to add an entry must remove any old entry to avoid keeping stale data
                 // however only remove the previous entry if it was the same we found otherwise a concurrent thread already took care of it
-                if (previous != null)
+                if (previous != null) TryEvictEntry(previous);
+
+                return;
+            }
+
+            // attempt to early expire the entry to account for this thread suspending or early timeouts
+            if (entry.TrySetExpiredOnTimeout(now))
+            {
+                // early invoke any user registered eviction callbacks
+                entry.ScheduleEvictionCallback();
+
+                // ensure eviction of previous entry regardless
+                if (previous != null) TryEvictEntry(previous);
+
+                // rollback the space claim
+                Interlocked.Add(ref _size, -entry.Size);
+
+                return;
+            }
+
+            // the entry claimed space without contention and did not expire early
+            bool added;
+
+            // check if we had found a previous entry
+            if (previous is null)
+            {
+                // if we found no previous entry then we can try to add the current one as a new one
+                // this will fail if a concurrent thread added an entry with the same key before the current thread got here
+                added = _entries.TryAdd(entry.Key, entry);
+            }
+            else
+            {
+                // if we found a previous entry then we can try to replace it in-place with a check
+                // this will fail if a concurrent thread replaced the previous entry before the current thread got here
+                added = _entries.TryUpdate(entry.Key, entry, previous);
+
+                // check if we replaced the entry or faced a concurrency issue
+                if (added)
                 {
-                    TryEvictEntry(previous);
+                    // we did replace the previous entry
+                    // in this case we need to free the space used by that entry
+                    Interlocked.Add(ref _size, -previous.Size);
+
+                    // notify subscribers that the previous entry was evicted
+                    previous.ScheduleEvictionCallback();
                 }
+                else
+                {
+                    // we did not replace the entry
+                    // this means a concurrent thread won the race to replace or remove the previous entry before this thread got here
+                    // just in case the previous value was removed (and not replaced) we make a best effort attempt to add the new value and win the race
+                    added = _entries.TryAdd(entry.Key, entry);
+                }
+            }
+
+            // check if we succeeded in adding the entry to the dictionary
+            if (!added)
+            {
+                // we were not successful
+                // a concurrent thread either added or replaced the same entry in a way that this thread could not handle in a graceful way
+                // in this case we need we go through the expiration steps early
+                // this should be a very rare occurrence if at all as each entry should only be accessed by their own thread-safe grain instance in the first place
+
+                // early expire this entry
+                entry.SetExpired(EvictionCause.Replaced);
+
+                // early notify the user
+                entry.ScheduleEvictionCallback();
+
+                // rollback the space claim so other entries can claim it
+                Interlocked.Add(ref _size, -entry.Size);
             }
         }
 
