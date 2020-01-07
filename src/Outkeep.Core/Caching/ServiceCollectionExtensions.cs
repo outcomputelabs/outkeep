@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace Outkeep.Core.Caching
 {
@@ -11,12 +10,11 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Adds a <see cref="CacheDirector"/> to the <see cref="IServiceCollection"/> as an <see cref="ICacheDirector"/>.
         /// </summary>
-        public static IServiceCollection AddCacheDirector(this IServiceCollection services, Action<CacheDirectorOptions> configure)
+        public static IServiceCollection AddCacheDirector(this IServiceCollection services)
         {
             return services
                 .AddSingleton<ICacheDirector, CacheDirector>()
                 .AddOptions<CacheDirectorOptions>()
-                .Configure(configure)
                 .ValidateDataAnnotations()
                 .Services;
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 
 namespace Outkeep.Core.Caching
@@ -14,7 +15,9 @@ namespace Outkeep.Core.Caching
 
             return builder.ConfigureServices((context, services) =>
             {
-                services.AddCacheDirector(options => configure(context, options));
+                services
+                    .AddCacheDirector()
+                    .Configure<CacheDirectorOptions>(options => configure(context, options));
             });
         }
     }

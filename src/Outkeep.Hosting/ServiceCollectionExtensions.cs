@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Outkeep.Core.Caching;
 using Outkeep.Grains;
 using Outkeep.Hosting;
 
@@ -11,9 +12,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCoreServices(this IServiceCollection services)
         {
+            // todo: add cache director as a core service
             return services
                 .AddHostedService<OutkeepServerHostedService>()
-                .AddSingleton<IValidateOptions<CacheGrainOptions>, CacheGrainOptionsValidator>();
+                .AddSingleton<IValidateOptions<CacheGrainOptions>, CacheGrainOptionsValidator>()
+                .AddCacheDirector();
         }
     }
 }
