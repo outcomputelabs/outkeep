@@ -27,7 +27,6 @@ namespace Outkeep.Interfaces.Tests
         {
             // arrange
             var key = "SomeKey";
-            var grain = Mock.Of<ICacheGrain>();
             IGrainFactory factory = null!;
 
             // act
