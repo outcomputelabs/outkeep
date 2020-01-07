@@ -13,7 +13,7 @@ namespace Outkeep.Core.Storage
         /// </summary>
         public static IOutkeepServerBuilder AddMemoryCacheStorage(this IOutkeepServerBuilder builder)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (builder is null) throw new ArgumentNullException(nameof(builder));
 
             return builder.ConfigureServices((context, services) =>
             {
