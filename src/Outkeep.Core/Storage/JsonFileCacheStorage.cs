@@ -247,7 +247,6 @@ namespace Outkeep.Core
                     // clear any existing data
                     stream.SetLength(0);
 
-                    // todo: the writer supports resetting to a new stream so create an ownership pool to reduce allocations
                     using (var writer = new Utf8JsonWriter(stream))
                     {
                         writer.WriteStartObject();
