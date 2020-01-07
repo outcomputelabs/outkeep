@@ -204,9 +204,6 @@ namespace Outkeep.Core.Caching
                     if (newSize < 0 || newSize > _options.MaxCapacity)
                     {
                         // we went overboard either way
-
-                        // todo: attempt to free the difference
-
                         return false;
                     }
 
