@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 
 namespace Outkeep.Core.Storage
@@ -19,19 +18,6 @@ namespace Outkeep.Core.Storage
             return builder.ConfigureServices((context, services) =>
             {
                 services.AddSingleton<ICacheStorage, MemoryCacheStorage>();
-            });
-        }
-
-        /// <summary>
-        /// Adds a singleton <see cref="MemoryCacheStorage"/> to the <see cref="IOutkeepServerBuilder"/> if an <see cref="ICacheStorage"/> implementation is not yet present.
-        /// </summary>
-        public static IOutkeepServerBuilder TryAddMemoryCacheStorage(this IOutkeepServerBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.ConfigureServices((context, services) =>
-            {
-                services.TryAddSingleton<ICacheStorage, MemoryCacheStorage>();
             });
         }
     }
