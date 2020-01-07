@@ -70,7 +70,6 @@ namespace Outkeep.Interfaces.Tests
         public void GetEchoGrainThrowsOnNullFactory()
         {
             // arrange
-            var grain = Mock.Of<IEchoGrain>();
             IGrainFactory factory = null!;
 
             // act
