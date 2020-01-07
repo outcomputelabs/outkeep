@@ -169,6 +169,24 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot compare properties {0} and {1}.
+        /// </summary>
+        internal static string Exception_CannotCompareProperties_X_And_X {
+            get {
+                return ResourceManager.GetString("Exception_CannotCompareProperties_X_And_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot find a public instance property named {0}.
+        /// </summary>
+        internal static string Exception_CannotFindAPublicInstancePropertyNamed_X {
+            get {
+                return ResourceManager.GetString("Exception_CannotFindAPublicInstancePropertyNamed_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Condition for type {0} with value {1} is not supported.
         /// </summary>
         internal static string Exception_ConditionForType_X_WithValue_X_IsNotSupported {
@@ -201,6 +219,34 @@ namespace Outkeep.Core.Properties {
         internal static string Exception_FailedToWriteCacheFile_X_For_Key_X {
             get {
                 return ResourceManager.GetString("Exception_FailedToWriteCacheFile_X_For_Key_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property {0} must implement IComparable.
+        /// </summary>
+        internal static string Exception_Property_X_MustImplementIComparable {
+            get {
+                return ResourceManager.GetString("Exception_Property_X_MustImplementIComparable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property {0} value must not be null.
+        /// </summary>
+        internal static string Exception_Property_X_ValueMustNotBeNull {
+            get {
+                return ResourceManager.GetString("Exception_Property_X_ValueMustNotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property {0} with value {1} must be greater than or equal to {2} with value {3}.
+        /// </summary>
+        internal static string Exception_Property_X_WithValue_X_MustBeGreaterThanOrEqualToProperty_X_WithValue_X {
+            get {
+                return ResourceManager.GetString("Exception_Property_X_WithValue_X_MustBeGreaterThanOrEqualToProperty_X_WithValue_X" +
+                        "", resourceCulture);
             }
         }
         
