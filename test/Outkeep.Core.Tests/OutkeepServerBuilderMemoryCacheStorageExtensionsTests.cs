@@ -12,6 +12,7 @@ namespace Outkeep.Core.Tests
         [Fact]
         public void AddMemoryCacheStorageConfiguresServices()
         {
+            // arrange
             var services = new ServiceCollection();
 
             var builder = Mock.Of<IOutkeepServerBuilder>();
@@ -20,13 +21,15 @@ namespace Outkeep.Core.Tests
                 .Callback((Action<HostBuilderContext, IServiceCollection> action) => action(null!, services))
                 .Returns(builder);
 
+            // act
             var result = builder.AddMemoryCacheStorage();
 
+            // assert
             Mock.Get(builder).VerifyAll();
             Assert.Same(builder, result);
 
             var provider = services.BuildServiceProvider();
-            Assert.IsType<MemoryCacheStorage>(services.BuildServiceProvider().GetService<ICacheStorage>());
+            Assert.IsType<MemoryCacheStorage>(provider.GetService<ICacheStorage>());
         }
     }
 }

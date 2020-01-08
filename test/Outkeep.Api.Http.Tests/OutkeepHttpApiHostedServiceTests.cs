@@ -14,6 +14,7 @@ namespace Outkeep.Api.Http.Tests
         [Fact]
         public async Task Cycles()
         {
+            // arrange
             var logger = new NullLogger<OutkeepHttpApiHostedService>();
             var options = new OutkeepHttpApiServerOptions
             {
@@ -22,9 +23,13 @@ namespace Outkeep.Api.Http.Tests
             var loggerProviders = new ILoggerProvider[] { NullLoggerProvider.Instance };
             var grainFactory = Mock.Of<IGrainFactory>();
 
+            // act
             var service = new OutkeepHttpApiHostedService(logger, Options.Create(options), loggerProviders, grainFactory);
             await service.StartAsync(default).ConfigureAwait(false);
             await service.StopAsync(default).ConfigureAwait(false);
+
+            // assert
+            Assert.True(true);
         }
     }
 }

@@ -27,7 +27,6 @@ namespace Outkeep.Interfaces.Tests
         {
             // arrange
             var key = "SomeKey";
-            var grain = Mock.Of<ICacheGrain>();
             IGrainFactory factory = null!;
 
             // act
@@ -70,7 +69,6 @@ namespace Outkeep.Interfaces.Tests
         public void GetEchoGrainThrowsOnNullFactory()
         {
             // arrange
-            var grain = Mock.Of<IEchoGrain>();
             IGrainFactory factory = null!;
 
             // act

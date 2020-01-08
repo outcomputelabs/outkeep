@@ -38,6 +38,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="3.1.0" />
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.1.0.13383">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.0.0-rc4" />
   </ItemGroup>

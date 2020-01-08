@@ -153,6 +153,12 @@
   <data name="Exception_CacheStorageOptions_StorageDirectory_X_IsNotWellAbsoluteFormed" xml:space="preserve">
     <value>StorageDirectory {0} is not a well formed absolute URI</value>
   </data>
+  <data name="Exception_CannotCompareProperties_X_And_X" xml:space="preserve">
+    <value>Cannot compare properties {0} and {1}</value>
+  </data>
+  <data name="Exception_CannotFindAPublicInstancePropertyNamed_X" xml:space="preserve">
+    <value>Cannot find a public instance property named {0}</value>
+  </data>
   <data name="Exception_ConditionForType_X_WithValue_X_IsNotSupported" xml:space="preserve">
     <value>Condition for type {0} with value {1} is not supported</value>
   </data>
@@ -164,6 +170,15 @@
   </data>
   <data name="Exception_FailedToWriteCacheFile_X_For_Key_X" xml:space="preserve">
     <value>Failed to write cache file '{0}' for key '{1}'</value>
+  </data>
+  <data name="Exception_Property_X_MustImplementIComparable" xml:space="preserve">
+    <value>Property {0} must implement IComparable</value>
+  </data>
+  <data name="Exception_Property_X_ValueMustNotBeNull" xml:space="preserve">
+    <value>Property {0} value must not be null</value>
+  </data>
+  <data name="Exception_Property_X_WithValue_X_MustBeGreaterThanOrEqualToProperty_X_WithValue_X" xml:space="preserve">
+    <value>Property {0} with value {1} must be greater than or equal to {2} with value {3}</value>
   </data>
   <data name="Log_CacheDirectorCannotCompactToTargetSizeOf_X" xml:space="preserve">
     <value>The cache director could not compact the cache to target capacity of {Size}</value>

@@ -38,7 +38,7 @@
         /// Scans the cache for expired entries and removes them as appropriate, scheduling callback invocation.
         /// Does not compact the cache.
         /// </summary>
-        void RemoveExpired();
+        void EvictExpiredEntries();
 
         /// <summary>
         /// Expires enough entries to keep the cache at or below <see cref="TargetCapacity"/>.
