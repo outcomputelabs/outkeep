@@ -11,9 +11,6 @@ namespace Outkeep.Grains
         {
         }
 
-        public Task PingAsync()
-        {
-            throw new System.NotImplementedException();
-        }
+        public Task PingAsync() => GrainService.PingAsync();
     }
 }
