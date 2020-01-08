@@ -341,12 +341,7 @@ namespace Outkeep.Core.Caching
                 EvictQuota(ref quota, _compactLowPriorityEntries);
                 EvictQuota(ref quota, _compactNormalPriorityEntries);
                 EvictQuota(ref quota, _compactHighPriorityEntries);
-
-                // nope
-                if (quota > 0)
-                {
-                    Log.CacheDirectorCannotCompactToTargetSize(_logger, _options.TargetCapacity);
-                }
+                LogIfNotEnough(quota);
             }
             finally
             {
@@ -369,6 +364,14 @@ namespace Outkeep.Core.Caching
                     quota -= entry.Size;
                     if (quota <= 0) return;
                 }
+            }
+        }
+
+        private void LogIfNotEnough(long quota)
+        {
+            if (quota > 0)
+            {
+                Log.CacheDirectorCannotCompactToTargetSize(_logger, _options.TargetCapacity);
             }
         }
 
