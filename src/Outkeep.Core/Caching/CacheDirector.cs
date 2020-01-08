@@ -338,12 +338,15 @@ namespace Outkeep.Core.Caching
                 }
 
                 // evict each bucket
-                if (TryEvictQuota(ref quota, _compactLowPriorityEntries)) return;
-                if (TryEvictQuota(ref quota, _compactNormalPriorityEntries)) return;
-                if (TryEvictQuota(ref quota, _compactHighPriorityEntries)) return;
+                EvictQuota(ref quota, _compactLowPriorityEntries);
+                EvictQuota(ref quota, _compactNormalPriorityEntries);
+                EvictQuota(ref quota, _compactHighPriorityEntries);
 
                 // nope
-                Log.CacheDirectorCannotCompactToTargetSize(_logger, _options.TargetCapacity);
+                if (quota > 0)
+                {
+                    Log.CacheDirectorCannotCompactToTargetSize(_logger, _options.TargetCapacity);
+                }
             }
             finally
             {
@@ -354,19 +357,19 @@ namespace Outkeep.Core.Caching
             }
         }
 
-        private bool TryEvictQuota(ref long quota, List<CacheEntry> entries)
+        private void EvictQuota(ref long quota, List<CacheEntry> entries)
         {
+            if (quota <= 0) return;
+
             for (var i = 0; i < entries.Count; ++i)
             {
                 var entry = entries[i];
                 if (TryEvictEntry(entry))
                 {
                     quota -= entry.Size;
-                    if (quota <= 0) return true;
+                    if (quota <= 0) return;
                 }
             }
-
-            return false;
         }
 
         private static class Log
