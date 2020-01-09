@@ -59,6 +59,7 @@ namespace Outkeep.Grains.Tests
         {
             public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
             {
+                // placeholder
             }
         }
     }
