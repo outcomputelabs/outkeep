@@ -99,24 +99,25 @@ namespace Outkeep.Core.Tests
             var path = Path.Combine(directory, title);
 
             // keep the file open
-            using (var file = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.DeleteOnClose))
+            using var file = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.DeleteOnClose);
+
+            Assert.True(File.Exists(path));
+
+            var logger = new NullLogger<JsonFileCacheStorage>();
+            var options = new JsonFileCacheStorageOptions
             {
-                Assert.True(File.Exists(path));
+                StorageDirectory = directory
+            };
+            var storage = new JsonFileCacheStorage(logger, Options.Create(options));
 
-                var logger = new NullLogger<JsonFileCacheStorage>();
-                var options = new JsonFileCacheStorageOptions
-                {
-                    StorageDirectory = directory
-                };
-                var storage = new JsonFileCacheStorage(logger, Options.Create(options));
+            var error = await Assert.ThrowsAsync<JsonFileCacheStorageException>(() => storage.ClearAsync(key))
+                .ConfigureAwait(false);
 
-                var error = await Assert.ThrowsAsync<JsonFileCacheStorageException>(() => storage.ClearAsync(key))
-                    .ConfigureAwait(false);
+            Assert.Equal(key, error.Key);
+            Assert.Equal(path, error.Path);
+            Assert.IsType<IOException>(error.InnerException);
 
-                Assert.Equal(key, error.Key);
-                Assert.Equal(path, error.Path);
-                Assert.IsType<IOException>(error.InnerException);
-            }
+            file.Dispose();
         }
 
         [Theory]
