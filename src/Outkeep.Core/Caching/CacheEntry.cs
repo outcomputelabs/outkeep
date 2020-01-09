@@ -1,4 +1,5 @@
-﻿using Outkeep.Core.Properties;
+﻿using Orleans;
+using Outkeep.Core.Properties;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -95,20 +96,8 @@ namespace Outkeep.Core.Caching
         /// </summary>
         internal void ScheduleEvictionCallback()
         {
-            // swap the registration to ensure we only ever call it once and release its resources early
-            var registration = Interlocked.Exchange(ref _postEvictionCallbackRegistration, null);
-
-            // no-op if no registration to invoke
-            if (registration == null) return;
-
-            // schedule the callback to run on the same scheduler where the entry was created
-            // this will normally be an orleans grain activation task scheduler
-            Task.Factory.StartNew(
-                registration.Callback,
-                registration.State,
-                CancellationToken.None,
-                TaskCreationOptions.DenyChildAttach,
-                registration.TaskScheduler);
+            // swap the registration to avoid multiple calls
+            Interlocked.Exchange(ref _postEvictionCallbackRegistration, null)?.InvokeAsync().Ignore();
         }
 
         /// <summary>
