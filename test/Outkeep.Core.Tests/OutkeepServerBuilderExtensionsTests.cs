@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Moq;
+using Orleans.Hosting;
 using System;
 using Xunit;
+using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
 namespace Outkeep.Core.Tests
 {
@@ -33,6 +34,33 @@ namespace Outkeep.Core.Tests
             action?.Invoke(null!, services);
             Assert.NotNull(input);
             Assert.Same(services, input);
+        }
+
+        [Fact]
+        public void ConfigureSiloWithSiloOnly()
+        {
+            // arrange
+            var builder = Mock.Of<IOutkeepServerBuilder>();
+            var silo = Mock.Of<ISiloBuilder>();
+            Action<HostBuilderContext, ISiloBuilder>? action = null;
+            Mock.Get(builder)
+                .Setup(x => x.ConfigureSilo(It.IsAny<Action<HostBuilderContext, ISiloBuilder>>()))
+                .Callback((Action<HostBuilderContext, ISiloBuilder> a) => { action = a; })
+                .Returns(builder);
+
+            // act
+            ISiloBuilder? input = null;
+            var result = builder.ConfigureSilo(silo =>
+            {
+                input = silo;
+            });
+
+            // assert
+            Assert.Same(builder, result);
+            Assert.NotNull(action);
+            action?.Invoke(null!, silo);
+            Assert.NotNull(input);
+            Assert.Same(silo, input);
         }
     }
 }
