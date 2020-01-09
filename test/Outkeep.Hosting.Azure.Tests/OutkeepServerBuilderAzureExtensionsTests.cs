@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Outkeep.Hosting.Azure.Tests.Fakes;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Outkeep.Hosting.Azure.Tests
@@ -9,13 +11,14 @@ namespace Outkeep.Hosting.Azure.Tests
         public void UseAzure()
         {
             // arrange
-            var builder = new HostBuilder();
+            var builder = new FakeOutkeepServerBuilder();
+            var properties = new Dictionary<object, object>();
+            var context = new HostBuilderContext(properties);
+            var silo = new FakeSiloBuilder();
 
             // act
-            builder.UseOutkeepServer(outkeep =>
-            {
-                outkeep.UseAzure();
-            });
+            builder.UseAzure();
+            builder.BuildServiceProvider(context, silo);
 
             // assert
             Assert.True(true);
