@@ -129,13 +129,15 @@ namespace Outkeep.Core.Caching
         }
 
         /// <inheritdoc />
-        public void Commit()
+        public ICacheEntry Commit()
         {
             EnsureUncommitted();
 
             _committed = true;
 
             _context.OnEntryCommitted(this);
+
+            return this;
         }
 
         /// <inheritdoc />

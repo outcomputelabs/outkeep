@@ -61,7 +61,8 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Commits this cache entry to the owning <see cref="ICacheDirector{TKey}"/> instance.
         /// </summary>
-        void Commit();
+        /// <returns>The cache entry itself to allow chaining.</returns>
+        ICacheEntry Commit();
 
         /// <summary>
         /// Expires the entry immediately.
