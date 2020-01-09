@@ -37,5 +37,35 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Throws<ArgumentNullException>(nameof(builder), action);
         }
+
+        [Fact]
+        public void AddNullCacheStorageConfiguresServices()
+        {
+            // arrange
+            var builder = new FakeOutkeepServerBuilder();
+
+            // act
+            var result = builder.AddNullCacheStorage();
+
+            // assert
+            Assert.Same(builder, result);
+
+            var provider = builder.BuildServiceProvider(null!, null!);
+            var service = provider.GetRequiredService<ICacheStorage>();
+            Assert.IsType<NullCacheStorage>(service);
+        }
+
+        [Fact]
+        public void AddNullCacheStorageThrowsOnNullBuilder()
+        {
+            // arrange
+            IOutkeepServerBuilder? builder = null;
+
+            // act
+            void action() => builder!.AddNullCacheStorage();
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(builder), action);
+        }
     }
 }
