@@ -205,7 +205,7 @@ namespace Outkeep.Grains
         public Task<TaggedValue<Guid, byte[]?>> PollAsync(Guid etag)
         {
             // if the tags are the same then return the reactive promise
-            if (etag == _result.ETag)
+            if (etag == _result.Tag)
             {
                 return _reactiveTask.Task.WithDefaultOnTimeout(EmptyResult, _options.ReactivePollGracefulTimeout);
             }
