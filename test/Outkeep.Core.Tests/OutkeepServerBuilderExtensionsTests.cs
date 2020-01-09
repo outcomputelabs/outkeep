@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Outkeep.Core.Tests
 {
-    public class OutkeepServerBuilderMemoryCacheStorageExtensionsTests
+    public class OutkeepServerBuilderExtensionsTests
     {
         [Fact]
         public void AddMemoryCacheStorageConfiguresServices()
@@ -30,6 +30,19 @@ namespace Outkeep.Core.Tests
 
             var provider = services.BuildServiceProvider();
             Assert.IsType<MemoryCacheStorage>(provider.GetService<ICacheStorage>());
+        }
+
+        [Fact]
+        public void AddMemoryCacheStorageThrowsOnNullBuilder()
+        {
+            // arrange
+            IOutkeepServerBuilder? builder = null;
+
+            // act
+            void action() => builder!.AddMemoryCacheStorage();
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(builder), action);
         }
     }
 }
