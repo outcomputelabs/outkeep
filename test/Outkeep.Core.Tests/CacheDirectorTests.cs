@@ -102,5 +102,29 @@ namespace Outkeep.Core.Tests
             // act
             Assert.Throws<ArgumentOutOfRangeException>(nameof(size), () => director.CreateEntry(key, size));
         }
+
+        [Fact]
+        public void DoesNotCreateEntriesAboveTargetCapacity()
+        {
+            // arrange
+            var options = new CacheDirectorOptions
+            {
+                AutomaticOvercapacityCompaction = true,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
+                MaxCapacity = 10000,
+                TargetCapacity = 8000
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var key = "SomeKey";
+            var size = 9000;
+
+            // act
+            Assert.Throws<ArgumentOutOfRangeException>(nameof(size), () => director.CreateEntry(key, size));
+        }
     }
 }
