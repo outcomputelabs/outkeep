@@ -2,7 +2,7 @@
 
 namespace Outkeep.Hosting.Azure
 {
-    public static class OutkeepServiceCollectionAzureExtensions
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddOutkeepAzureClustering(this IServiceCollection services)
         {
