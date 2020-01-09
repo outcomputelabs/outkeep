@@ -231,5 +231,31 @@ namespace Outkeep.Core.Tests
             Assert.True(entry3.IsExpired);
             Assert.True(entry4.IsExpired);
         }
+
+        [Fact]
+        public void CreateEntryThrowsOnNullKey()
+        {
+            // arrange
+            var options = new CacheDirectorOptions
+            {
+                AutomaticOvercapacityCompaction = true,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
+                MaxCapacity = 10000,
+                TargetCapacity = 8000
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            string? key = null;
+
+            // act
+            void action() { director.CreateEntry(key!, 1000); }
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(key), action);
+        }
     }
 }
