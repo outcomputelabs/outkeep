@@ -14,7 +14,7 @@ namespace Outkeep.Core.Tests
             var builder = new HostBuilder();
             builder.ConfigureServices(services =>
             {
-                services.AddSingleton<ISystemClock>(NullClock.Instance);
+                services.AddSingleton<ISystemClock>(NullClock.Default);
             });
 
             // act
