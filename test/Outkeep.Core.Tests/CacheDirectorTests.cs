@@ -78,5 +78,29 @@ namespace Outkeep.Core.Tests
             Assert.Equal(0, director.Count);
             Assert.Equal(0, director.Size);
         }
+
+        [Fact]
+        public void DoesNotCreateEntriesUnderUnitSize()
+        {
+            // arrange
+            var options = new CacheDirectorOptions
+            {
+                AutomaticOvercapacityCompaction = true,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
+                MaxCapacity = 10000,
+                TargetCapacity = 8000
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var key = "SomeKey";
+            var size = 0;
+
+            // act
+            Assert.Throws<ArgumentOutOfRangeException>(nameof(size), () => director.CreateEntry(key, size));
+        }
     }
 }
