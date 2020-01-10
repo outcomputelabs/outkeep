@@ -362,5 +362,43 @@ namespace Outkeep.Core.Tests
             Assert.True(notified2);
             Assert.True(notified1);
         }
+
+        [Fact]
+        public async Task EarlyExpiresNewEntry()
+        {
+            // arrange
+            var options = new CacheDirectorOptions
+            {
+                AutomaticOvercapacityCompaction = true,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
+                MaxCapacity = 10000,
+                TargetCapacity = 8000
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var key = "SomeKey";
+            var size1 = 6000;
+
+            // act
+            var notified = false;
+            var entry = director
+                .CreateEntry(key, size1)
+                .SetPostEvictionCallback(_ => notified = true, null, TaskScheduler.Default, out var _)
+                .SetAbsoluteExpiration(clock.UtcNow.AddMinutes(-1))
+                .Commit();
+
+            // assert
+            Assert.Equal(0, director.Count);
+            Assert.Equal(0, director.Size);
+            Assert.Equal(EvictionCause.Expired, entry.EvictionCause);
+            Assert.True(entry.IsExpired);
+
+            await Task.Delay(100).ConfigureAwait(false);
+            Assert.True(notified);
+        }
     }
 }
