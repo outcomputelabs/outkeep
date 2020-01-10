@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Outkeep.Core.Caching;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -399,6 +400,43 @@ namespace Outkeep.Core.Tests
 
             await Task.Delay(100).ConfigureAwait(false);
             Assert.True(notified);
+        }
+
+        [Fact]
+        public async Task ExpiresConcurrentEntryOnConflict()
+        {
+            // arrange
+            var options = new CacheDirectorOptions
+            {
+                AutomaticOvercapacityCompaction = true,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
+                MaxCapacity = 10000,
+                TargetCapacity = 8000
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var key = "SomeKey";
+            var size = 10;
+
+            var notified = 0;
+            Parallel.For(0, 100000, _ =>
+            {
+                director
+                    .CreateEntry(key, size)
+                    .SetPostEvictionCallback(_ => Interlocked.Increment(ref notified), null, TaskScheduler.Default, out var _)
+                    .Commit();
+            });
+
+            // assert
+            Assert.Equal(1, director.Count);
+            Assert.Equal(size, director.Size);
+
+            await Task.Delay(100).ConfigureAwait(false);
+            Assert.Equal(99999, notified);
         }
     }
 }
