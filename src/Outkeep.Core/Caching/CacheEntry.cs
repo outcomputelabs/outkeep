@@ -110,22 +110,21 @@ namespace Outkeep.Core.Caching
         }
 
         /// <inheritdoc />
-        public IDisposable SetPostEvictionCallback(Action<object?> callback, object? state, TaskScheduler taskScheduler)
+        public ICacheEntry SetPostEvictionCallback(Action<object?> callback, object? state, TaskScheduler taskScheduler, out IDisposable registration)
         {
             EnsureUncommitted();
 
             if (callback == null) throw new ArgumentNullException(nameof(callback));
 
             // create a new registration
-            var registration = new PostEvictionCallbackRegistration(callback, state, taskScheduler, this);
+            var reg = new PostEvictionCallbackRegistration(callback, state, taskScheduler, this);
 
             // swap with any existing registration and early dispose it
-            Interlocked.Exchange(ref _postEvictionCallbackRegistration, registration)?.Dispose();
+            Interlocked.Exchange(ref _postEvictionCallbackRegistration, reg)?.Dispose();
 
-            // return the registration created by this thread
-            // a race condition is possible here if a concurrent thread disposes the current registration before this one returns it
-            // this is okay as registration disposal is reentrant and thread-safe
-            return registration;
+            // return this instance to allow build chaining
+            registration = reg;
+            return this;
         }
 
         /// <inheritdoc />

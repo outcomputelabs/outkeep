@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Outkeep.Core.Caching;
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Outkeep.Core.Tests
@@ -301,6 +302,65 @@ namespace Outkeep.Core.Tests
             Assert.False(entry2.IsExpired);
             Assert.Equal(1, director.Count);
             Assert.Equal(size2, director.Size);
+        }
+
+        [Fact]
+        public async Task ExpiresPreviousEntryOnCapacityFailure()
+        {
+            // arrange
+            var options = new CacheDirectorOptions
+            {
+                AutomaticOvercapacityCompaction = true,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
+                MaxCapacity = 10000,
+                TargetCapacity = 8000
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var key = "SomeKey";
+            var size1 = 6000;
+            var size2 = 6000;
+
+            // act
+            var notified1 = false;
+            var entry1 = director
+                .CreateEntry(key, size1)
+                .SetPostEvictionCallback(_ => notified1 = true, null, TaskScheduler.Default, out var _)
+                .Commit();
+
+            // assert
+            Assert.Equal(1, director.Count);
+            Assert.Equal(size1, director.Size);
+            Assert.NotNull(entry1);
+            Assert.Equal(EvictionCause.None, entry1.EvictionCause);
+            Assert.False(entry1.IsExpired);
+            Assert.False(notified1);
+
+            // act
+            var notified2 = false;
+            var entry2 = director
+                .CreateEntry(key, size2)
+                .SetPostEvictionCallback(_ => notified2 = true, null, TaskScheduler.Default, out var _)
+                .Commit();
+
+            // assert
+            Assert.Equal(0, director.Count);
+            Assert.Equal(0, director.Size);
+
+            Assert.True(entry1.IsExpired);
+            Assert.Equal(EvictionCause.Replaced, entry1.EvictionCause);
+
+            Assert.True(entry2.IsExpired);
+            Assert.Equal(EvictionCause.Capacity, entry2.EvictionCause);
+
+            // allow for scheduled callbacks to hit
+            await Task.Delay(100).ConfigureAwait(false);
+            Assert.True(notified2);
+            Assert.True(notified1);
         }
     }
 }
