@@ -257,5 +257,50 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Throws<ArgumentNullException>(nameof(key), action);
         }
+
+        [Fact]
+        public void ReplacesExistingEntry()
+        {
+            // arrange
+            var options = new CacheDirectorOptions
+            {
+                AutomaticOvercapacityCompaction = true,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
+                MaxCapacity = 10000,
+                TargetCapacity = 8000
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var key = "SomeKey";
+            var size1 = 1000;
+            var size2 = 2000;
+
+            // act
+            var entry1 = director.CreateEntry(key, size1).Commit();
+
+            // assert
+            Assert.NotNull(entry1);
+            Assert.Equal(EvictionCause.None, entry1.EvictionCause);
+            Assert.False(entry1.IsExpired);
+            Assert.Equal(1, director.Count);
+            Assert.Equal(size1, director.Size);
+
+            // act
+            var entry2 = director.CreateEntry(key, size2).Commit();
+
+            // assert
+            Assert.Equal(EvictionCause.Replaced, entry1.EvictionCause);
+            Assert.True(entry1.IsExpired);
+
+            Assert.NotNull(entry2);
+            Assert.Equal(EvictionCause.None, entry2.EvictionCause);
+            Assert.False(entry2.IsExpired);
+            Assert.Equal(1, director.Count);
+            Assert.Equal(size2, director.Size);
+        }
     }
 }
