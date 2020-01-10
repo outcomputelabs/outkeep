@@ -438,5 +438,48 @@ namespace Outkeep.Core.Tests
             await Task.Delay(100).ConfigureAwait(false);
             Assert.Equal(99999, notified);
         }
+
+        [Fact]
+        public void CompactRemovesExpiredEntriesFirst()
+        {
+            // arrange
+            var options = new CacheDirectorOptions
+            {
+                AutomaticOvercapacityCompaction = true,
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
+                MaxCapacity = 10000,
+                TargetCapacity = 5000
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+
+            // act
+            var entry1 = director.CreateEntry("Key1", 2000).SetPriority(CachePriority.Low).Commit();
+            var entry2 = director.CreateEntry("Key2", 2000).SetPriority(CachePriority.Normal).Commit();
+            var entry3 = director.CreateEntry("Key3", 2000).SetPriority(CachePriority.High).Commit();
+
+            // assert
+            Assert.Equal(3, director.Count);
+            Assert.Equal(entry1.Size + entry2.Size + entry3.Size, director.Size);
+
+            // act
+            entry3.AbsoluteExpiration = clock.UtcNow.AddMinutes(-1);
+
+            // assert
+            Assert.Equal(3, director.Count);
+            Assert.Equal(entry1.Size + entry2.Size + entry3.Size, director.Size);
+
+            // act
+            director.Compact();
+
+            // assert
+            Assert.Equal(2, director.Count);
+            Assert.Equal(entry1.Size + entry2.Size, director.Size);
+            Assert.True(entry3.IsExpired);
+        }
     }
 }
