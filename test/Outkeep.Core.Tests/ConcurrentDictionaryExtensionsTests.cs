@@ -45,5 +45,18 @@ namespace Outkeep.Core.Tests
             Assert.True(dictionary.ContainsKey(first));
             Assert.True(dictionary.ContainsKey(second));
         }
+
+        [Fact]
+        public void TryRemoveThrowsOnNullDictionary()
+        {
+            // arrange
+            ConcurrentDictionary<Guid, Guid>? dictionary = null;
+
+            // act
+            void action() { dictionary!.TryRemove(new KeyValuePair<Guid, Guid>(Guid.Empty, Guid.Empty)); }
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(dictionary), action);
+        }
     }
 }
