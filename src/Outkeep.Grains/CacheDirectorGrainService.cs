@@ -18,10 +18,10 @@ namespace Outkeep.Grains
     public class CacheDirectorGrainService : GrainService, ICacheDirectorGrainService
     {
         private readonly ILogger _logger;
-        private readonly CacheDirectorOptions _options;
+        private readonly CacheOptions _options;
         private readonly TimerArgs _timerArgs;
 
-        public CacheDirectorGrainService(IGrainIdentity identity, Silo silo, ILoggerFactory loggerFactory, ILogger<CacheDirectorGrainService> logger, IOptions<CacheDirectorOptions> options, ICacheDirector director)
+        public CacheDirectorGrainService(IGrainIdentity identity, Silo silo, ILoggerFactory loggerFactory, ILogger<CacheDirectorGrainService> logger, IOptions<CacheOptions> options, ICacheDirector director)
             : base(identity, silo, loggerFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -31,28 +31,16 @@ namespace Outkeep.Grains
             _timerArgs = new TimerArgs(this, director, _logger);
         }
 
-        private IDisposable? _removeExpiredTimer;
-        private IDisposable? _overcapacityCompactionTimer;
+        private IDisposable? _evictionTimer;
 
         public override Task Start()
         {
             // schedule removal of expired items
-            _removeExpiredTimer = RegisterTimer(
-                TickRemoveExpired,
+            _evictionTimer = RegisterTimer(
+                TickEvictExpired,
                 _timerArgs,
                 _options.ExpirationScanFrequency,
                 _options.ExpirationScanFrequency);
-
-            // schedule automatic compaction on overcapacity
-            if (_options.AutomaticOvercapacityCompaction)
-            {
-                // schedule the automatic compaction task itself
-                _overcapacityCompactionTimer = RegisterTimer(
-                    TickOvercapacityCompaction,
-                    _timerArgs,
-                    _options.OvercapacityCompactionFrequency,
-                    _options.OvercapacityCompactionFrequency);
-            }
 
             Log.CacheDirectorGrainServiceStarted(_logger);
 
@@ -61,42 +49,20 @@ namespace Outkeep.Grains
 
         public override Task Stop()
         {
-            _removeExpiredTimer?.Dispose();
-            _overcapacityCompactionTimer?.Dispose();
+            _evictionTimer?.Dispose();
 
             Log.CacheDirectorGrainServiceStopped(_logger);
 
             return base.Stop();
         }
 
-        private static Task TickRemoveExpired(object state)
+        private static Task TickEvictExpired(object state)
         {
             var args = (TimerArgs)state;
 
             try
             {
-                args.Director.EvictExpiredEntries();
-            }
-            catch (Exception ex)
-            {
-                Log.CacheDirectorGrainServiceError(args.Logger, ex);
-                throw;
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private static Task TickOvercapacityCompaction(object state)
-        {
-            var args = (TimerArgs)state;
-
-            // no-op if not at overcapacity
-            if (args.Director.Size <= args.Director.TargetCapacity) return Task.CompletedTask;
-
-            // the cache director is at overcapacity
-            try
-            {
-                args.Director.Compact();
+                args.Director.EvictExpired();
             }
             catch (Exception ex)
             {

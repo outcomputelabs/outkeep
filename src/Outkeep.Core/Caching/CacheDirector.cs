@@ -9,18 +9,24 @@ using System.Threading;
 
 namespace Outkeep.Core.Caching
 {
-    [DebuggerDisplay("Count = {Count}, Size = {Size}, TargetCapacity = {TargetCapacity}, MaxCapacity = {MaxCapacity}")]
+    [DebuggerDisplay("Count = {Count}, Size = {Size}, Capacity = {Capacity}")]
     internal sealed class CacheDirector : ICacheDirector, ICacheContext
     {
         private readonly ILogger<CacheDirector> _logger;
-        private readonly CacheDirectorOptions _options;
+        private readonly CacheOptions _options;
         private readonly ISystemClock _clock;
 
-        public CacheDirector(IOptions<CacheDirectorOptions> options, ILogger<CacheDirector> logger, ISystemClock clock)
+        public CacheDirector(IOptions<CacheOptions> options, ILogger<CacheDirector> logger, ISystemClock clock)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
+
+            _buckets = new ConcurrentDictionary<CacheEntry, bool>[3];
+            for (var i = 0; i < 3; ++i)
+            {
+                _buckets[i] = new ConcurrentDictionary<CacheEntry, bool>();
+            }
         }
 
         /// <summary>
@@ -31,6 +37,8 @@ namespace Outkeep.Core.Caching
         /// The cache participants that create the entries are responsible for that.
         /// </remarks>
         private readonly ConcurrentDictionary<string, CacheEntry> _entries = new ConcurrentDictionary<string, CacheEntry>();
+
+        private readonly ConcurrentDictionary<CacheEntry, bool>[] _buckets;
 
         /// <summary>
         /// Used "space" in the cache.
@@ -44,19 +52,14 @@ namespace Outkeep.Core.Caching
         public long Size => Interlocked.Read(ref _size);
 
         /// <inheritdoc />
-        public long TargetCapacity => _options.TargetCapacity;
-
-        /// <inheritdoc />
-        public long MaxCapacity => _options.MaxCapacity;
+        public long Capacity => _options.Capacity;
 
         /// <inheritdoc />
         public ICacheEntry CreateEntry(string key, long size)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
             if (size < 1) throw new ArgumentOutOfRangeException(nameof(size), Resources.Exception_CacheEntryFor_X_MustHaveSizeGreaterThanZero.Format(key));
-
-            // entries with size above the target capacity would just get removed by auto compaction
-            if (size > _options.TargetCapacity) throw new ArgumentOutOfRangeException(nameof(size), Resources.Exception_CacheEntryFor_X_MustHaveSizeLesserThanOrEqualCapacityOf_X.Format(key, _options.TargetCapacity));
+            if (size > _options.Capacity) throw new ArgumentOutOfRangeException(nameof(size), Resources.Exception_CacheEntryFor_X_MustHaveSizeLesserThanOrEqualCapacityOf_X.Format(key, _options.Capacity));
 
             return new CacheEntry(key, size, this);
         }
@@ -162,7 +165,22 @@ namespace Outkeep.Core.Caching
             }
 
             // check if we succeeded in adding the entry to the dictionary
-            if (!added)
+            if (added)
+            {
+                // add the entry to the appropriate compaction bucket for future reference
+                TryBucket(entry);
+
+                // make a last check to see if the entry has expired in the meantime
+                // a different thread could have expired it before this thread could bucket it and therefore failed to remove it from the bucket
+                // if that happens then we will hold the entry for longer than necessary until the next expiration scan hits
+                // to release memory earlier we clawback the entry from the bucket right now so garbage collection can reclaim it
+                if (entry.IsExpired)
+                {
+                    // early clawback due to early expired entry
+                    TryUnbucket(entry);
+                }
+            }
+            else
             {
                 // we were not successful
                 // a concurrent thread either added or replaced the same entry in a way that this thread could not handle in a graceful way
@@ -178,6 +196,20 @@ namespace Outkeep.Core.Caching
                 // rollback the space claim so other entries can claim it
                 Interlocked.Add(ref _size, -entry.Size);
             }
+        }
+
+        private void TryBucket(CacheEntry entry)
+        {
+            if (entry.Priority >= CachePriority.NeverRemove) return;
+
+            _buckets[(int)entry.Priority].TryAdd(entry, true);
+        }
+
+        private void TryUnbucket(CacheEntry entry)
+        {
+            if (entry.Priority >= CachePriority.NeverRemove) return;
+
+            _buckets[(int)entry.Priority].TryRemove(entry, out _);
         }
 
         /// <summary>
@@ -202,10 +234,24 @@ namespace Outkeep.Core.Caching
                     // this can overflow
                     var newSize = currentSize + entry.Size;
 
-                    // check for compute overflow or capacity overflow
-                    if (newSize < 0 || newSize > _options.MaxCapacity)
+                    // check if it overflowed
+                    if (newSize < 0)
                     {
-                        // we went overboard either way
+                        // nothing we can do here
+                        return false;
+                    }
+
+                    // it did not overflow but we are still overboard
+                    if (newSize > _options.Capacity)
+                    {
+                        // attempt to evict enough entries to allow this one in
+                        if (TryCompact(_options.Capacity - newSize, entry.Priority))
+                        {
+                            // we released enough space so let the loop run again
+                            continue;
+                        }
+
+                        // otherwise nothing we can do here
                         return false;
                     }
 
@@ -241,6 +287,9 @@ namespace Outkeep.Core.Caching
                 // free up the space used by this entry
                 Interlocked.Add(ref _size, -entry.Size);
 
+                // remove it from its compaction bucket
+                TryUnbucket(entry);
+
                 // expire the entry if not expired yet
                 entry.SetExpired(EvictionCause.Removed);
 
@@ -262,7 +311,7 @@ namespace Outkeep.Core.Caching
         }
 
         /// <inheritdoc />
-        public void EvictExpiredEntries()
+        public void EvictExpired()
         {
             var now = _clock.UtcNow;
 
@@ -276,103 +325,60 @@ namespace Outkeep.Core.Caching
             }
         }
 
-        private readonly List<CacheEntry> _compactLowPriorityEntries = new List<CacheEntry>();
-        private readonly List<CacheEntry> _compactNormalPriorityEntries = new List<CacheEntry>();
-        private readonly List<CacheEntry> _compactHighPriorityEntries = new List<CacheEntry>();
-
-        public void Compact()
+        /// <summary>
+        /// Evicts enough entries to make room for the given quota and priority level.
+        /// Eviction happens in this order:
+        ///     1. Enough already expired entries.
+        ///     2. If the priority demand is at least <see cref="CachePriority.Low"/>, enough entries from the low priority bucket.
+        ///     3. If the priority demand is at least <see cref="CachePriority.Normal"/>, enough entries from the normal priority bucket.
+        ///     4. If the priority demand is at least <see cref="CachePriority.High"/>, enough entries from the high priority bucket.
+        /// </summary>
+        /// <param name="quota">The size demand to meet.</param>
+        /// <param name="priority">The priority demand to meet.</param>
+        /// <returns>Returns <see cref="true"/> if enough entries were evicted to meet demand, otherwise <see cref="false"/>.</returns>
+        /// <remarks>
+        /// This method will not evict more than the minimum necessary to meet the demand.
+        /// This method will not remove entries with a priority of <see cref="CachePriority.NeverRemove"/> even if the demand priority is also <see cref="CachePriority.NeverRemove"/>.
+        /// </remarks>
+        private bool TryCompact(long quota, CachePriority priority)
         {
-            // get the current size without tearing
-            var size = Interlocked.Read(ref _size);
+            var now = _clock.UtcNow;
 
-            // see how much we need to compact
-            var quota = size - _options.TargetCapacity;
-
-            // no-op if we are under target capacity
-            if (quota <= 0) return;
-
-            // go through all the entries in a thread-safe fashion
-            try
+            // evict expired entries from all buckets first
+            // we enumerate the buckets as opposed to the main dictionary
+            // to help remove possible orphans created due to early expiration during commit
+            for (var i = 0; i < _buckets.Length; ++i)
             {
-                var now = _clock.UtcNow;
-                foreach (var item in _entries)
+                foreach (var item in _buckets[i])
                 {
-                    var entry = item.Value;
-
-                    // check if the entry has expired
-                    if (entry.TrySetExpiredOnTimeout(now))
+                    var entry = item.Key;
+                    if (entry.TrySetExpiredOnTimeout(now) && TryEvictEntry(entry) && (quota -= entry.Size) <= 0)
                     {
-                        // attempt to remove the entry right away
-                        if (TryEvictEntry(entry))
-                        {
-                            quota -= entry.Size;
-
-                            // check if that was enough
-                            if (quota <= 0) return;
-                        }
-                    }
-                    else
-                    {
-                        // put the entry into a priority bucket
-                        switch (entry.Priority)
-                        {
-                            case CachePriority.Low:
-                                _compactLowPriorityEntries.Add(entry);
-                                break;
-
-                            case CachePriority.Normal:
-                                _compactNormalPriorityEntries.Add(entry);
-                                break;
-
-                            case CachePriority.High:
-                                _compactHighPriorityEntries.Add(entry);
-                                break;
-
-                            case CachePriority.NeverRemove:
-                                break;
-
-                            default:
-                                throw new NotSupportedException(Resources.Exception_ConditionForType_X_WithValue_X_IsNotSupported.Format(nameof(CachePriority), entry.Priority));
-                        }
+                        return true;
                     }
                 }
-
-                // evict each bucket
-                EvictQuota(ref quota, _compactLowPriorityEntries);
-                EvictQuota(ref quota, _compactNormalPriorityEntries);
-                EvictQuota(ref quota, _compactHighPriorityEntries);
-                LogIfNotEnough(quota);
             }
-            finally
-            {
-                // clear the buckets so we dont hold on to the entries
-                _compactLowPriorityEntries.Clear();
-                _compactNormalPriorityEntries.Clear();
-                _compactHighPriorityEntries.Clear();
-            }
-        }
 
-        private void EvictQuota(ref long quota, List<CacheEntry> entries)
-        {
-            if (quota <= 0) return;
-
-            for (var i = 0; i < entries.Count; ++i)
+            // if evicting expired entries was not enough
+            // then we must early evict enough entries to meet the quota
+            // we only evict entries in buckets of up the priority of the new entry
+            var max = (int)(priority == CachePriority.NeverRemove ? CachePriority.High : priority);
+            for (var i = 0; i <= max; ++i)
             {
-                var entry = entries[i];
-                if (TryEvictEntry(entry))
+                foreach (var item in _buckets[i])
                 {
-                    quota -= entry.Size;
-                    if (quota <= 0) return;
+                    var entry = item.Key;
+                    if (TryEvictEntry(entry) && (quota -= entry.Size) <= 0)
+                    {
+                        return true;
+                    }
                 }
             }
-        }
 
-        private void LogIfNotEnough(long quota)
-        {
-            if (quota > 0)
-            {
-                Log.CacheDirectorCannotCompactToTargetSize(_logger, _options.TargetCapacity);
-            }
+            // if we got here then we were not able to evict enough entries
+            // the cache is maxed out and the user should do something about it
+            Log.CacheDirectorCannotCompactToTargetSize(_logger, _options.Capacity);
+            return false;
         }
 
         private static class Log

@@ -9,7 +9,7 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Adds the <see cref="CacheDirector"/> to the <see cref="IHostBuilder"/> as an <see cref="ICacheDirector"/>.
         /// </summary>
-        public static IHostBuilder UseCacheDirector(this IHostBuilder builder, Action<HostBuilderContext, CacheDirectorOptions> configure)
+        public static IHostBuilder UseCacheDirector(this IHostBuilder builder, Action<HostBuilderContext, CacheOptions> configure)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
@@ -17,7 +17,7 @@ namespace Outkeep.Core.Caching
             {
                 services
                     .AddCacheDirector()
-                    .Configure<CacheDirectorOptions>(options => configure(context, options));
+                    .Configure<CacheOptions>(options => configure(context, options));
             });
         }
     }

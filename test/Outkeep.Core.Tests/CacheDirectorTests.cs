@@ -14,13 +14,10 @@ namespace Outkeep.Core.Tests
         public void Initializes()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
 
             // act
@@ -29,21 +26,17 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(0, director.Count);
             Assert.Equal(0, director.Size);
-            Assert.Equal(options.MaxCapacity, director.MaxCapacity);
-            Assert.Equal(options.TargetCapacity, director.TargetCapacity);
+            Assert.Equal(options.Capacity, director.Capacity);
         }
 
         [Fact]
         public void EntryLifecycle()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
             var clock = new NullClock
             {
@@ -85,13 +78,10 @@ namespace Outkeep.Core.Tests
         public void DoesNotCreateEntriesUnderUnitSize()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
             var clock = new NullClock
             {
@@ -106,40 +96,13 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public void DoesNotCreateEntriesAboveTargetCapacity()
-        {
-            // arrange
-            var options = new CacheDirectorOptions
-            {
-                AutomaticOvercapacityCompaction = true,
-                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
-            };
-            var clock = new NullClock
-            {
-                UtcNow = DateTimeOffset.UtcNow
-            };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
-            var key = "SomeKey";
-            var size = 9000;
-
-            // act
-            Assert.Throws<ArgumentOutOfRangeException>(nameof(size), () => director.CreateEntry(key, size));
-        }
-
-        [Fact]
         public void EvictExpiredEntries()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
             var clock = new NullClock
             {
@@ -162,7 +125,7 @@ namespace Outkeep.Core.Tests
             Assert.False(entry4.IsExpired);
 
             // act
-            director.EvictExpiredEntries();
+            director.EvictExpired();
 
             // assert
             Assert.Equal(4, director.Count);
@@ -174,7 +137,7 @@ namespace Outkeep.Core.Tests
 
             // act
             clock.UtcNow = clock.UtcNow.AddMinutes(2);
-            director.EvictExpiredEntries();
+            director.EvictExpired();
 
             // assert
             Assert.Equal(3, director.Count);
@@ -186,7 +149,7 @@ namespace Outkeep.Core.Tests
 
             // act
             clock.UtcNow = clock.UtcNow.AddMinutes(2);
-            director.EvictExpiredEntries();
+            director.EvictExpired();
 
             // assert
             Assert.Equal(2, director.Count);
@@ -198,7 +161,7 @@ namespace Outkeep.Core.Tests
 
             // act
             clock.UtcNow = clock.UtcNow.AddMinutes(2);
-            director.EvictExpiredEntries();
+            director.EvictExpired();
 
             // assert
             Assert.Equal(1, director.Count);
@@ -211,7 +174,7 @@ namespace Outkeep.Core.Tests
             // act
             clock.UtcNow = clock.UtcNow.AddMinutes(2);
             entry4.UtcLastAccessed = clock.UtcNow.AddMinutes(1);
-            director.EvictExpiredEntries();
+            director.EvictExpired();
 
             // assert
             Assert.Equal(1, director.Count);
@@ -223,7 +186,7 @@ namespace Outkeep.Core.Tests
 
             // act
             clock.UtcNow = entry4.UtcLastAccessed.Add(entry4.SlidingExpiration.GetValueOrDefault()).AddMinutes(1);
-            director.EvictExpiredEntries();
+            director.EvictExpired();
 
             // assert
             Assert.Equal(0, director.Count);
@@ -238,13 +201,10 @@ namespace Outkeep.Core.Tests
         public void CreateEntryThrowsOnNullKey()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
             var clock = new NullClock
             {
@@ -264,13 +224,10 @@ namespace Outkeep.Core.Tests
         public void ReplacesExistingEntry()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
             var clock = new NullClock
             {
@@ -306,16 +263,13 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public async Task ExpiresPreviousEntryOnCapacityFailure()
+        public void ExpiresPreviousEntryOnCapacityFailure()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
             var clock = new NullClock
             {
@@ -323,30 +277,17 @@ namespace Outkeep.Core.Tests
             };
             var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
             var key = "SomeKey";
-            var size1 = 6000;
-            var size2 = 6000;
 
             // act
-            var notified1 = false;
-            var entry1 = director
-                .CreateEntry(key, size1)
-                .SetPostEvictionCallback(_ => notified1 = true, null, TaskScheduler.Default, out var _)
-                .Commit();
+            var entry1 = director.CreateEntry(key, 10000).SetPriority(CachePriority.NeverRemove).Commit();
 
             // assert
             Assert.Equal(1, director.Count);
-            Assert.Equal(size1, director.Size);
-            Assert.NotNull(entry1);
-            Assert.Equal(EvictionCause.None, entry1.EvictionCause);
+            Assert.Equal(entry1.Size, director.Size);
             Assert.False(entry1.IsExpired);
-            Assert.False(notified1);
 
             // act
-            var notified2 = false;
-            var entry2 = director
-                .CreateEntry(key, size2)
-                .SetPostEvictionCallback(_ => notified2 = true, null, TaskScheduler.Default, out var _)
-                .Commit();
+            var entry2 = director.CreateEntry(key, 10000).SetPriority(CachePriority.NeverRemove).Commit();
 
             // assert
             Assert.Equal(0, director.Count);
@@ -357,24 +298,16 @@ namespace Outkeep.Core.Tests
 
             Assert.True(entry2.IsExpired);
             Assert.Equal(EvictionCause.Capacity, entry2.EvictionCause);
-
-            // allow for scheduled callbacks to hit
-            await Task.Delay(100).ConfigureAwait(false);
-            Assert.True(notified2);
-            Assert.True(notified1);
         }
 
         [Fact]
         public async Task EarlyExpiresNewEntry()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
             var clock = new NullClock
             {
@@ -406,13 +339,10 @@ namespace Outkeep.Core.Tests
         public async Task ExpiresConcurrentEntryOnConflict()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 8000
+                Capacity = 10000,
             };
             var clock = new NullClock
             {
@@ -443,13 +373,10 @@ namespace Outkeep.Core.Tests
         public void CompactRemovesExpiredEntriesFirst()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 5000
+                Capacity = 14000,
             };
             var clock = new NullClock
             {
@@ -474,25 +401,25 @@ namespace Outkeep.Core.Tests
             Assert.Equal(entry1.Size + entry2.Size + entry3.Size, director.Size);
 
             // act
-            director.Compact();
+            var entry4 = director.CreateEntry("Key4", 8000).SetPriority(CachePriority.Low).Commit();
 
             // assert
-            Assert.Equal(2, director.Count);
-            Assert.Equal(entry1.Size + entry2.Size, director.Size);
+            Assert.Equal(3, director.Count);
+            Assert.Equal(entry1.Size + entry2.Size + entry4.Size, director.Size);
+            Assert.False(entry1.IsExpired);
+            Assert.False(entry2.IsExpired);
             Assert.True(entry3.IsExpired);
+            Assert.False(entry4.IsExpired);
         }
 
         [Fact]
         public void CompactRemovesLowPriorityEntriesFirst()
         {
             // arrange
-            var options = new CacheDirectorOptions
+            var options = new CacheOptions
             {
-                AutomaticOvercapacityCompaction = true,
                 ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                OvercapacityCompactionFrequency = TimeSpan.FromMinutes(1),
-                MaxCapacity = 10000,
-                TargetCapacity = 6000
+                Capacity = 14000,
             };
             var clock = new NullClock
             {
@@ -510,12 +437,87 @@ namespace Outkeep.Core.Tests
             Assert.Equal(entry1.Size + entry2.Size + entry3.Size, director.Size);
 
             // act
-            director.Compact();
+            var entry4 = director.CreateEntry("Key4", 8000).SetPriority(CachePriority.High).Commit();
+
+            // assert
+            Assert.Equal(3, director.Count);
+            Assert.Equal(entry2.Size + entry3.Size + entry4.Size, director.Size);
+            Assert.True(entry1.IsExpired);
+            Assert.False(entry2.IsExpired);
+            Assert.False(entry3.IsExpired);
+            Assert.False(entry4.IsExpired);
+        }
+
+        [Fact]
+        public void CompactRemovesNormalPriorityEntriesNext()
+        {
+            // arrange
+            var options = new CacheOptions
+            {
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                Capacity = 13000,
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+
+            // act
+            var entry1 = director.CreateEntry("Key1", 1000).SetPriority(CachePriority.Low).Commit();
+            var entry2 = director.CreateEntry("Key2", 2000).SetPriority(CachePriority.Normal).Commit();
+            var entry3 = director.CreateEntry("Key3", 4000).SetPriority(CachePriority.High).Commit();
+
+            // assert
+            Assert.Equal(3, director.Count);
+            Assert.Equal(entry1.Size + entry2.Size + entry3.Size, director.Size);
+
+            // act
+            var entry4 = director.CreateEntry("Key4", 8000).SetPriority(CachePriority.Normal).Commit();
 
             // assert
             Assert.Equal(2, director.Count);
-            Assert.Equal(entry2.Size + entry3.Size, director.Size);
+            Assert.Equal(entry3.Size + entry4.Size, director.Size);
             Assert.True(entry1.IsExpired);
+            Assert.True(entry2.IsExpired);
+            Assert.False(entry3.IsExpired);
+            Assert.False(entry4.IsExpired);
+        }
+
+        [Fact]
+        public void CompactRemovesHighPriorityEntriesNext()
+        {
+            // arrange
+            var options = new CacheOptions
+            {
+                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+                Capacity = 10000,
+            };
+            var clock = new NullClock
+            {
+                UtcNow = DateTimeOffset.UtcNow
+            };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+
+            // act
+            var entry1 = director.CreateEntry("Key1", 1000).SetPriority(CachePriority.Low).Commit();
+            var entry2 = director.CreateEntry("Key2", 2000).SetPriority(CachePriority.Normal).Commit();
+            var entry3 = director.CreateEntry("Key3", 4000).SetPriority(CachePriority.High).Commit();
+
+            // assert
+            Assert.Equal(3, director.Count);
+            Assert.Equal(entry1.Size + entry2.Size + entry3.Size, director.Size);
+
+            // act
+            var entry4 = director.CreateEntry("Key4", 8000).SetPriority(CachePriority.High).Commit();
+
+            // assert
+            Assert.Equal(1, director.Count);
+            Assert.Equal(entry4.Size, director.Size);
+            Assert.True(entry1.IsExpired);
+            Assert.True(entry2.IsExpired);
+            Assert.True(entry3.IsExpired);
+            Assert.False(entry4.IsExpired);
         }
     }
 }

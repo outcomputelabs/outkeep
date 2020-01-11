@@ -18,11 +18,11 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Adds a <see cref="CacheDirector"/> to the <see cref="IServiceCollection"/> as an <see cref="ICacheDirector"/>.
         /// </summary>
-        public static IServiceCollection AddCacheDirector(this IServiceCollection services, Action<CacheDirectorOptions> configure)
+        public static IServiceCollection AddCacheDirector(this IServiceCollection services, Action<CacheOptions> configure)
         {
             return services
                 .AddSingleton<ICacheDirector, CacheDirector>()
-                .AddOptions<CacheDirectorOptions>()
+                .AddOptions<CacheOptions>()
                 .Configure(configure)
                 .ValidateDataAnnotations()
                 .Services;

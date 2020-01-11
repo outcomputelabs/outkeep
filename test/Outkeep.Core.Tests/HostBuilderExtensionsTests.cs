@@ -20,16 +20,14 @@ namespace Outkeep.Core.Tests
             // act
             builder.UseCacheDirector((context, options) =>
             {
-                options.MaxCapacity = 10000;
-                options.TargetCapacity = 8000;
+                options.Capacity = 10000;
             });
 
             // assert
             var services = builder.Build().Services;
             var director = services.GetRequiredService<ICacheDirector>();
             Assert.NotNull(director);
-            Assert.Equal(10000, director.MaxCapacity);
-            Assert.Equal(8000, director.TargetCapacity);
+            Assert.Equal(10000, director.Capacity);
         }
     }
 }

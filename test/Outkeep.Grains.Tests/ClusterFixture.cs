@@ -46,8 +46,7 @@ namespace Outkeep.Grains.Tests
                         services
                             .AddCacheDirector(options =>
                             {
-                                options.MaxCapacity = 100;
-                                options.TargetCapacity = 80;
+                                options.Capacity = 100;
                             })
                             .AddSystemClock();
                     })

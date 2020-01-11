@@ -25,24 +25,14 @@
         long Size { get; }
 
         /// <summary>
-        /// Gets the target capacity managed by this cache director.
+        /// Get the capacity managed by this cache director.
         /// </summary>
-        long TargetCapacity { get; }
-
-        /// <summary>
-        /// Get the maximum capacity managed by this cache director.
-        /// </summary>
-        long MaxCapacity { get; }
+        long Capacity { get; }
 
         /// <summary>
         /// Scans the cache for expired entries and removes them as appropriate, scheduling callback invocation.
         /// Does not compact the cache.
         /// </summary>
-        void EvictExpiredEntries();
-
-        /// <summary>
-        /// Expires enough entries to keep the cache at or below <see cref="TargetCapacity"/>.
-        /// </summary>
-        void Compact();
+        void EvictExpired();
     }
 }
