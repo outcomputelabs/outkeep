@@ -27,5 +27,18 @@ namespace Outkeep.Client.Tests
             Assert.True(registered);
             Mock.Get(builder).VerifyAll();
         }
+
+        [Fact]
+        public void ConfigureServicesThrowsOnNullBuilder()
+        {
+            // arrange
+            IOutkeepClientBuilder builder = null!;
+
+            // act
+            void action() { builder.ConfigureServices(services => { }); }
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(builder), action);
+        }
     }
 }
