@@ -34,7 +34,7 @@ steps:
   inputs:
     command: 'custom'
     custom: 'sonarscanner'
-    arguments: 'begin /k:"$(SonarQubeProjectKey)" /o:"$(SonarQubeOrganization)" /d:sonar.host.url="$(SonarQubeHostUrl)" /d:sonar.login="$(SonarQubeToken)" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"'
+    arguments: 'begin /k:"$(SonarQubeProjectKey)" /o:"$(SonarQubeOrganization)" /d:sonar.host.url="$(SonarQubeHostUrl)" /d:sonar.login="$(SonarQubeToken)" /d:sonar.branch.name="$(Build.SourceBranch)" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"'
 
 - task: DotNetCoreCLI@2
   displayName: "Build"
