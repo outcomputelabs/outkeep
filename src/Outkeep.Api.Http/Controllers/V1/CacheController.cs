@@ -46,12 +46,12 @@ namespace Outkeep.Api.Http.Controllers.V1
                 .GetAsync()
                 .ConfigureAwait(false);
 
-            if (reply.Value == null)
+            if (reply.Value.Value == null)
             {
                 return NoContent();
             }
 
-            return Ok(reply.Value);
+            return Ok(reply.Value.Value);
         }
 
         /// <summary>

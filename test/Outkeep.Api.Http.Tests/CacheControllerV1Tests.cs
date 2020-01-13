@@ -19,8 +19,7 @@ namespace Outkeep.Api.Http.Tests
         public async Task GettingNonExistingKeyReturnsNoContent()
         {
             var key = Guid.NewGuid().ToString();
-            byte[]? value = null;
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]?>>(new Immutable<byte[]?>(value)));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(CachePulse.None));
             var controller = new CacheController(factory);
 
             var result = await controller.GetAsync(key).ConfigureAwait(false);
@@ -32,13 +31,16 @@ namespace Outkeep.Api.Http.Tests
         [Fact]
         public async Task GettingExistingKeyReturnsOk()
         {
+            // arrange
             var key = Guid.NewGuid().ToString();
             byte[]? value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]?>>(new Immutable<byte[]?>(value)));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(Guid.NewGuid(), new Immutable<byte[]?>(value))));
             var controller = new CacheController(factory);
 
+            // act
             var result = await controller.GetAsync(key).ConfigureAwait(false);
 
+            // assert
             Mock.Get(factory).VerifyAll();
             var ok = Assert.IsType<OkObjectResult>(result.Result);
             var content = Assert.IsType<byte[]>(ok.Value);

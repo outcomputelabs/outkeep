@@ -49,7 +49,7 @@ namespace Outkeep.Application.Standalone
                 {
                     outkeep.Configure<CacheGrainOptions>(options =>
                     {
-                        options.ExpirationPolicyEvaluationPeriod = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCache:ExpirationPolicyEvaluationPeriod");
+                        options.ReactivePollingTimeout = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCaching:ReactivePollingTimeout");
                     });
 
                     outkeep.UseStandaloneClustering();

@@ -16,8 +16,9 @@ namespace Outkeep.Client.Tests
         public async Task GetAsyncCallsGrain()
         {
             var key = Guid.NewGuid().ToString();
+            var tag = Guid.NewGuid();
             var value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]?>>(new Immutable<byte[]?>(value)));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(tag, new Immutable<byte[]?>(value))));
             var clock = NullClock.Default;
             var cache = new OutkeepDistributedCache(factory, clock);
 
@@ -32,7 +33,7 @@ namespace Outkeep.Client.Tests
         {
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<Immutable<byte[]?>>(new Immutable<byte[]?>(value)));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(Guid.NewGuid(), new Immutable<byte[]?>(value))));
             var clock = NullClock.Default;
             var cache = new OutkeepDistributedCache(factory, clock);
 

@@ -13,7 +13,7 @@ namespace Outkeep.Interfaces
         /// <summary>
         /// Gets the cached value.
         /// </summary>
-        ValueTask<Immutable<byte[]?>> GetAsync();
+        ValueTask<CachePulse> GetAsync();
 
         /// <summary>
         /// Clear the content from storage and release it from memory.
@@ -33,6 +33,6 @@ namespace Outkeep.Interfaces
         /// <summary>
         /// Long polls the grain for changes to the cache item.
         /// </summary>
-        Task<TaggedValue<Guid, byte[]?>> PollAsync(Guid etag);
+        Task<CachePulse> PollAsync(Guid tag);
     }
 }

@@ -68,5 +68,10 @@ namespace Outkeep.Core.Caching
         /// Expires the entry immediately.
         /// </summary>
         void Expire();
+
+        /// <summary>
+        /// Marks the entry as expired if it has reached expiration time thresholds.
+        /// </summary>
+        bool TryExpire(DateTimeOffset now);
     }
 }

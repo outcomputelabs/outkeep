@@ -1,20 +1,35 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Outkeep.Core.Caching
 {
     /// <summary>
     /// Quality-of-life extensions for <see cref="ICacheEntry"/>.
     /// </summary>
-    internal static class CacheEntryExtensions
+    public static class CacheEntryExtensions
     {
+        /// <summary>
+        /// Sets the <see cref="ICacheEntry.UtcLastAccessed"/> time for this cache entry.
+        /// </summary>
+        /// <param name="entry">The cache entry.</param>
+        /// <param name="utcLastAccessed">The value for the <see cref="ICacheEntry.UtcLastAccessed"/> property.</param>
+        /// <returns>The same cache entry instance to allow chaining.</returns>
+        public static ICacheEntry SetUtcLastAccessed(this ICacheEntry entry, DateTimeOffset utcLastAccessed)
+        {
+            if (entry is null) throw new ArgumentNullException(nameof(entry));
+
+            entry.UtcLastAccessed = utcLastAccessed;
+
+            return entry;
+        }
+
         /// <summary>
         /// Sets the absolute expiration for this cache entry.
         /// </summary>
-        /// <typeparam name="TKey">The type of key of this cache entry.</typeparam>
         /// <param name="entry">The cache entry instance upon which to set the absolute expiration.</param>
         /// <param name="absoluteExpiration">The absolute expiration to set upon the cache entry.</param>
         /// <returns>The same cache entry instance to allow chaining.</returns>
-        public static ICacheEntry SetAbsoluteExpiration(this ICacheEntry entry, DateTimeOffset absoluteExpiration)
+        public static ICacheEntry SetAbsoluteExpiration(this ICacheEntry entry, DateTimeOffset? absoluteExpiration)
         {
             if (entry == null) throw new ArgumentNullException(nameof(entry));
 
@@ -29,7 +44,7 @@ namespace Outkeep.Core.Caching
         /// <param name="entry">The cache entry instance upon which to set the sliding expiration.</param>
         /// <param name="slidingExpiration">The sliding expiration to set upon the cache entry.</param>
         /// <returns>The same cache entry instance to allow chaining.</returns>
-        public static ICacheEntry SetSlidingExpiration(this ICacheEntry entry, TimeSpan slidingExpiration)
+        public static ICacheEntry SetSlidingExpiration(this ICacheEntry entry, TimeSpan? slidingExpiration)
         {
             if (entry == null) throw new ArgumentNullException(nameof(entry));
 
@@ -51,6 +66,14 @@ namespace Outkeep.Core.Caching
             entry.Priority = priority;
 
             return entry;
+        }
+
+        /// <inheritdoc cref="ICacheEntry.SetPostEvictionCallback(Func{ICacheEntry, object?, Task}, object, TaskScheduler, out IDisposable)"/>
+        public static ICacheEntry SetPostEvictionCallback(this ICacheEntry entry, Action<object?> callback, object? state, TaskScheduler taskScheduler)
+        {
+            if (entry is null) throw new ArgumentNullException(nameof(entry));
+
+            return entry.SetPostEvictionCallback(callback, state, taskScheduler, out _);
         }
     }
 }

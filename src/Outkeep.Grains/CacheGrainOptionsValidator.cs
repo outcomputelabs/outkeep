@@ -11,11 +11,8 @@ namespace Outkeep.Grains
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            if (options.ExpirationPolicyEvaluationPeriod <= TimeSpan.Zero)
-                return ValidateOptionsResult.Fail(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ExpirationPolicyEvaluationPeriod), nameof(TimeSpan)));
-
-            if (options.ReactivePollGracefulTimeout <= TimeSpan.Zero)
-                return ValidateOptionsResult.Fail(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ReactivePollGracefulTimeout), nameof(TimeSpan)));
+            if (options.ReactivePollingTimeout <= TimeSpan.Zero)
+                return ValidateOptionsResult.Fail(Resources.Exception_XMustBeAPositiveX.Format(nameof(options.ReactivePollingTimeout), nameof(TimeSpan)));
 
             return ValidateOptionsResult.Success;
         }

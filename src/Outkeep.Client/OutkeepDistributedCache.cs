@@ -28,7 +28,7 @@ namespace Outkeep.Client
         public async Task<byte[]?> GetAsync(string key, CancellationToken token = default)
         {
             var result = await factory.GetCacheGrain(key).GetAsync().ConfigureAwait(false);
-            return result.Value;
+            return result.Value.Value;
         }
 
         public void Refresh(string key)

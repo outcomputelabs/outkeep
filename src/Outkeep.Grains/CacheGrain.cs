@@ -5,6 +5,7 @@ using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Timers;
 using Outkeep.Core;
+using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using Outkeep.Grains.Properties;
 using Outkeep.Interfaces;
@@ -16,121 +17,172 @@ namespace Outkeep.Grains
     [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
-        private static readonly TaggedValue<Guid, byte[]?> EmptyResult = new TaggedValue<Guid, byte[]?>(Guid.Empty, null);
-
         private readonly CacheGrainOptions _options;
         private readonly ILogger<CacheGrain> _logger;
-        private readonly ITimerRegistry _timerRegistry;
         private readonly ICacheStorage _storage;
         private readonly ISystemClock _clock;
         private readonly IGrainIdentity _identity;
+        private readonly ICacheDirector _director;
+        private readonly ITimerRegistry _timers;
 
-        public CacheGrain(IOptions<CacheGrainOptions> options, ILogger<CacheGrain> logger, ITimerRegistry timerRegistry, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity)
+        public CacheGrain(IOptions<CacheGrainOptions> options, ILogger<CacheGrain> logger, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _timerRegistry = timerRegistry ?? throw new ArgumentNullException(nameof(timerRegistry));
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
+            _director = director ?? throw new ArgumentNullException(nameof(director));
+            _timers = timers ?? throw new ArgumentNullException(nameof(timers));
         }
 
-        private TaggedValue<Guid, byte[]?> _result = new TaggedValue<Guid, byte[]?>(Guid.NewGuid(), null);
-        private DateTimeOffset? _absoluteExpiration;
-        private TimeSpan? _slidingExpiration;
-        private DateTimeOffset _accessed;
-
+        private CachePulse _pulse = CachePulse.None;
+        private TaskCompletionSource<CachePulse> _promise = new TaskCompletionSource<CachePulse>(CachePulse.None);
         private Task? _outstandingStorageOperation = null;
-
-        private TaskCompletionSource<TaggedValue<Guid, byte[]?>> _reactiveTask = new TaskCompletionSource<TaggedValue<Guid, byte[]?>>();
+        private ICacheEntry? _entry;
 
         public override async Task OnActivateAsync()
         {
-            // start an expiry policy evaluation timer
-            _timerRegistry.RegisterTimer(this, TickExpirationPolicy, null, _options.ExpirationPolicyEvaluationPeriod, _options.ExpirationPolicyEvaluationPeriod);
+            _timers.RegisterTimer(this, _ =>
+            {
+                if (_entry != null && _entry.TryExpire(_clock.UtcNow))
+                {
+                    _entry = null;
+                    SetPulse(CachePulse.None);
+                }
+
+                return Task.CompletedTask;
+            }, this, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 
             // attempt to load from storage
             var item = await _storage.ReadAsync(_identity.PrimaryKeyString).ConfigureAwait(true);
-            if (item.HasValue)
+            if (!item.HasValue)
             {
-                _result = new TaggedValue<Guid, byte[]?>(Guid.NewGuid(), item.Value.Value);
-                _absoluteExpiration = item.Value.AbsoluteExpiration;
-                _slidingExpiration = item.Value.SlidingExpiration;
+                SetPulse(CachePulse.None);
+                return;
             }
-            _accessed = _clock.UtcNow;
+
+            // attempt to claim space in the current box
+            _entry = _director
+                .CreateEntry(_identity.PrimaryKeyString, item.Value.Value.Length + IntPtr.Size)
+                .SetAbsoluteExpiration(item.Value.AbsoluteExpiration)
+                .SetSlidingExpiration(item.Value.SlidingExpiration)
+                .SetPriority(CachePriority.Normal)
+                .SetUtcLastAccessed(_clock.UtcNow)
+                .Commit();
+
+            // see if we were successful and if not then release the content now
+            if (_entry.TryExpire(_clock.UtcNow))
+            {
+                _entry = null;
+                SetPulse(CachePulse.None);
+                return;
+            }
+
+            // otherwise keep the content
+            SetPulse(new CachePulse(Guid.NewGuid(), item.Value.Value));
         }
 
-        private Task TickExpirationPolicy(object state)
+        public override Task OnDeactivateAsync()
         {
-            // quick path for nothing to remove
-            if (_result.Value == null) return Task.CompletedTask;
+            ClearEntry();
 
-            // quick-ish path for item not yet expired
-            if (!IsExpired()) return Task.CompletedTask;
-
-            // slow path for removing the item
-            return RemoveAsync();
+            return Task.CompletedTask;
         }
 
-        private void SetReactivePromise()
+        private void SetPulse(CachePulse pulse)
         {
-            // fulfill the pending reactive promise
-            _reactiveTask.SetResult(_result);
+            if (pulse == _pulse) return;
 
-            // create a new pending reactive promise
-            _reactiveTask = new TaskCompletionSource<TaggedValue<Guid, byte[]?>>();
+            _pulse = pulse;
+            _promise.TrySetResult(pulse);
+            _promise = new TaskCompletionSource<CachePulse>();
         }
 
-        /// <summary>
-        /// Returns <see cref="true"/> if the item has expired, otherwise <see cref="false"/>.
-        /// </summary>
-        private bool IsExpired()
+        private void ClearEntry()
         {
-            var now = _clock.UtcNow;
-
-            return
-                (_absoluteExpiration.HasValue && _absoluteExpiration.Value <= now) ||
-                (_slidingExpiration.HasValue && _accessed.Add(_slidingExpiration.Value) <= now);
+            if (_entry != null)
+            {
+                _entry.Expire();
+                _entry = null;
+            }
         }
 
         /// <inheritdoc />
-        public ValueTask<Immutable<byte[]?>> GetAsync()
+        public ValueTask<CachePulse> GetAsync()
         {
-            _accessed = _clock.UtcNow;
+            // check if we have an entry at all
+            if (_entry == null) return new ValueTask<CachePulse>(CachePulse.None);
 
-            return new ValueTask<Immutable<byte[]?>>(_result.Value.AsImmutable());
+            // check if the entry has expired
+            var now = _clock.UtcNow;
+            if (_entry.TryExpire(now))
+            {
+                _entry = null;
+                SetPulse(new CachePulse(Guid.NewGuid(), new Immutable<byte[]?>(null)));
+                return new ValueTask<CachePulse>(_pulse);
+            }
+
+            // update the accessed time to keep the entry from expiring
+            _entry.UtcLastAccessed = now;
+
+            // the entry has not yet expired so we can return the last pulse
+            return new ValueTask<CachePulse>(_pulse);
         }
 
         /// <inheritdoc />
         public Task RemoveAsync()
         {
-            _result = new TaggedValue<Guid, byte[]?>(Guid.NewGuid(), null);
-            _absoluteExpiration = null;
-            _slidingExpiration = null;
-            _accessed = _clock.UtcNow;
+            // check if we have any entry active
+            if (_entry == null)
+            {
+                // this grain has no entry so there is nothing to do
+                return Task.CompletedTask;
+            }
 
-            SetReactivePromise();
+            // unconditionally expire and release the entry for gc
+            _entry.Expire();
+            _entry = null;
 
-            return StorageOperationAsync(StorageOperationType.Clear);
+            // fulfill any pending requests
+            SetPulse(CachePulse.None);
+
+            // remove the entry from storage
+            return PersistAsync();
         }
 
         /// <inheritdoc />
         public Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
-            _result = new TaggedValue<Guid, byte[]?>(Guid.NewGuid(), value.Value);
-            _absoluteExpiration = absoluteExpiration;
-            _slidingExpiration = slidingExpiration;
-            _accessed = _clock.UtcNow;
+            // clear any previous entry
+            ClearEntry();
 
-            SetReactivePromise();
+            // check if there is anything to set at all
+            if (value.Value is null)
+            {
+                // storing a null value is equivalent to a clear
+                SetPulse(CachePulse.None);
+                return PersistAsync();
+            }
 
-            return StorageOperationAsync(StorageOperationType.Write);
+            // claim space in the current box
+            _entry = _director
+                .CreateEntry(_identity.PrimaryKeyString, value.Value.Length + IntPtr.Size)
+                .SetAbsoluteExpiration(absoluteExpiration)
+                .SetSlidingExpiration(slidingExpiration)
+                .SetPriority(CachePriority.Normal)
+                .SetUtcLastAccessed(_clock.UtcNow)
+                .Commit();
+
+            // update subs and lazy save
+            SetPulse(new CachePulse(Guid.NewGuid(), value));
+            return PersistAsync();
         }
 
         /// <summary>
         /// Executes storage operations in a reentrancy-safe way.
         /// </summary>
-        private async Task StorageOperationAsync(StorageOperationType type)
+        private async Task PersistAsync()
         {
             // check if there is an outstanding storage operation
             // if there is one it will not include the values we have just staged
@@ -163,12 +215,16 @@ namespace Outkeep.Grains
             {
                 // this means this is (probably) the first continuation to get to this point
                 // therefore this continuation gets to start the next storage operation
-                _outstandingStorageOperation = type switch
+
+                if (_entry is null || _pulse.Value.Value == null)
                 {
-                    StorageOperationType.Write => _storage.WriteAsync(_identity.PrimaryKeyString, new CacheItem(_result.Value, _absoluteExpiration, _slidingExpiration)),
-                    StorageOperationType.Clear => _storage.ClearAsync(_identity.PrimaryKeyString),
-                    _ => throw new NotSupportedException(),
-                };
+                    _outstandingStorageOperation = _storage.ClearAsync(_identity.PrimaryKeyString);
+                }
+                else
+                {
+                    _outstandingStorageOperation = _storage.WriteAsync(_identity.PrimaryKeyString, new CacheItem(_pulse.Value.Value, _entry.AbsoluteExpiration, _entry.SlidingExpiration));
+                }
+
                 thisTask = _outstandingStorageOperation;
             }
             else
@@ -197,21 +253,44 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task RefreshAsync()
         {
-            _accessed = _clock.UtcNow;
+            if (_entry != null)
+            {
+                _entry.UtcLastAccessed = _clock.UtcNow;
+            }
+
             return Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public Task<TaggedValue<Guid, byte[]?>> PollAsync(Guid etag)
+        public Task<CachePulse> PollAsync(Guid tag)
         {
-            // if the tags are the same then return the reactive promise
-            if (etag == _result.Tag)
+            // if there is no entry yet then return a promise
+            if (_entry == null)
             {
-                return _reactiveTask.Task.WithDefaultOnTimeout(EmptyResult, _options.ReactivePollGracefulTimeout);
+                return _promise.Task.WithDefaultOnTimeout(CachePulse.None, _options.ReactivePollingTimeout);
             }
 
-            // if the tags are different then return the current value
-            return Task.FromResult(_result);
+            // if the current entry has expired then release it and return a clear pulse
+            var now = _clock.UtcNow;
+            if (_entry.TryExpire(now))
+            {
+                _entry = null;
+                SetPulse(CachePulse.None);
+                return Task.FromResult(CachePulse.None);
+            }
+
+            // if the entry has not expired then decide based on the input tag
+            _entry.UtcLastAccessed = now;
+            if (tag == _pulse.Tag)
+            {
+                // the caller already has the same data so return a promise
+                return _promise.Task.WithDefaultOnTimeout(CachePulse.None, _options.ReactivePollingTimeout);
+            }
+            else
+            {
+                // the caller has a different version of data so return the current one now
+                return Task.FromResult(_pulse);
+            }
         }
 
         public async Task Invoke(IIncomingGrainCallContext context)
@@ -237,12 +316,6 @@ namespace Outkeep.Grains
 
             public static void Failed(ILogger logger, string key, Exception exception) =>
                 _failed(logger, key, exception);
-        }
-
-        private enum StorageOperationType
-        {
-            Write,
-            Clear
         }
     }
 }

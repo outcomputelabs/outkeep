@@ -4,7 +4,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Orleans.Concurrency;
 using Orleans.Core;
+using Orleans.Timers;
 using Outkeep.Core;
+using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using System;
 using System.Threading.Tasks;
@@ -15,50 +17,25 @@ namespace Outkeep.Grains.Tests
     public class CacheGrainTests
     {
         [Fact]
-        public async Task RegistersTimerOnActivation()
-        {
-            var options = Options.Create(new CacheGrainOptions { });
-            var logger = Mock.Of<ILogger<CacheGrain>>();
-            var timers = new NullTimerRegistry();
-            var storage = Mock.Of<ICacheStorage>();
-            var clock = Mock.Of<ISystemClock>();
-            var identity = Mock.Of<IGrainIdentity>();
-            var grain = new CacheGrain(options, logger, timers, storage, clock, identity);
-
-            await grain.OnActivateAsync().ConfigureAwait(false);
-
-            Assert.Single(timers.GetEntries(grain), x =>
-                x.AsyncCallback != null &&
-                x.State == null &&
-                x.DueTime == options.Value.ExpirationPolicyEvaluationPeriod &&
-                x.Period == options.Value.ExpirationPolicyEvaluationPeriod);
-        }
-
-        [Fact]
         public async Task GetReturnsNullValueFromStorage()
         {
             // arrange
             var key = "SomeKey";
             var options = Options.Create(new CacheGrainOptions { });
             var logger = Mock.Of<ILogger<CacheGrain>>();
-            var timers = new NullTimerRegistry();
-
-            var storage = Mock.Of<ICacheStorage>(x =>
-                x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(null));
-
+            var storage = Mock.Of<ICacheStorage>(x => x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(null));
             var clock = Mock.Of<ISystemClock>();
-
-            var identity = Mock.Of<IGrainIdentity>(x =>
-                x.PrimaryKeyString == key);
-
-            var grain = new CacheGrain(options, logger, timers, storage, clock, identity);
+            var identity = Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key);
+            var director = Mock.Of<ICacheDirector>();
+            var timers = Mock.Of<ITimerRegistry>();
+            var grain = new CacheGrain(options, logger, storage, clock, identity, director, timers);
             await grain.OnActivateAsync().ConfigureAwait(false);
 
             // act
             var result = await grain.GetAsync().ConfigureAwait(false);
 
             // assert
-            Assert.Null(result.Value);
+            Assert.Null(result.Value.Value);
             Mock.Get(storage).VerifyAll();
         }
 
@@ -69,26 +46,26 @@ namespace Outkeep.Grains.Tests
             var key = "SomeKey";
             var options = Options.Create(new CacheGrainOptions { });
             var logger = Mock.Of<ILogger<CacheGrain>>();
-            var timers = new NullTimerRegistry();
-
             var value = Guid.NewGuid().ToByteArray();
-            var storage = Mock.Of<ICacheStorage>(x =>
-                x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(new CacheItem(value, null, null)));
-
+            var storage = Mock.Of<ICacheStorage>(x => x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(new CacheItem(value, null, null)));
             var clock = Mock.Of<ISystemClock>();
+            var identity = Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key);
 
-            var identity = Mock.Of<IGrainIdentity>(x =>
-                x.PrimaryKeyString == key);
+            var entry = Mock.Of<ICacheEntry>();
+            Mock.Get(entry).Setup(x => x.Commit()).Returns(entry);
 
-            var grain = new CacheGrain(options, logger, timers, storage, clock, identity);
+            var director = Mock.Of<ICacheDirector>(x => x.CreateEntry(key, value.Length + IntPtr.Size) == entry);
+            var timers = Mock.Of<ITimerRegistry>();
+
+            var grain = new CacheGrain(options, logger, storage, clock, identity, director, timers);
             await grain.OnActivateAsync().ConfigureAwait(false);
 
             // act
             var result = await grain.GetAsync().ConfigureAwait(false);
 
             // assert
-            Assert.NotNull(result.Value);
-            Assert.Same(value, result.Value);
+            Assert.NotNull(result.Value.Value);
+            Assert.Same(value, result.Value.Value);
             Mock.Get(storage).VerifyAll();
         }
 
@@ -102,20 +79,27 @@ namespace Outkeep.Grains.Tests
             var storage = Mock.Of<ICacheStorage>();
             Mock.Get(storage).Setup(x => x.ReadAsync(key, default)).Returns(Task.FromResult<CacheItem?>(new CacheItem(value, null, null)));
 
+            var entry = Mock.Of<ICacheEntry>();
+            Mock.Get(entry).Setup(x => x.Commit()).Returns(entry);
+
+            var director = Mock.Of<ICacheDirector>(x => x.CreateEntry(key, value.Length + IntPtr.Size) == entry);
+            var timers = Mock.Of<ITimerRegistry>();
+
             var grain = new CacheGrain(
                 Options.Create(new CacheGrainOptions { }),
                 new NullLogger<CacheGrain>(),
-                new NullTimerRegistry(),
                 storage,
                 Mock.Of<ISystemClock>(),
-                Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key));
+                Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key),
+                director,
+                timers);
 
             // act - this will load the value from storage
             await grain.OnActivateAsync().ConfigureAwait(false);
             var result = await grain.GetAsync().ConfigureAwait(false);
 
             // assert
-            Assert.Same(value, result.Value);
+            Assert.Same(value, result.Value.Value);
 
             // arrange - clear storage
             Mock.Get(storage).Setup(x => x.ReadAsync(key, default)).Returns(Task.FromResult<CacheItem?>(null));
@@ -124,7 +108,7 @@ namespace Outkeep.Grains.Tests
             result = await grain.GetAsync().ConfigureAwait(false);
 
             // assert
-            Assert.Same(value, result.Value);
+            Assert.Same(value, result.Value.Value);
         }
 
         [Fact]
@@ -132,16 +116,21 @@ namespace Outkeep.Grains.Tests
         {
             // arrange
             var key = "SomeKey";
+            var value = Guid.NewGuid().ToByteArray();
             var options = Options.Create(new CacheGrainOptions { });
             var logger = new NullLogger<CacheGrain>();
-            var timers = new NullTimerRegistry();
             var storage = new MemoryCacheStorage();
             var clock = Mock.Of<ISystemClock>();
             var identity = Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key);
-            var grain = new CacheGrain(options, logger, timers, storage, clock, identity);
+
+            var entry = Mock.Of<ICacheEntry>();
+            Mock.Get(entry).Setup(x => x.Commit()).Returns(entry);
+            var director = Mock.Of<ICacheDirector>(x => x.CreateEntry(key, value.Length + IntPtr.Size) == entry);
+
+            var timers = Mock.Of<ITimerRegistry>();
+            var grain = new CacheGrain(options, logger, storage, clock, identity, director, timers);
 
             // act - set the value
-            var value = Guid.NewGuid().ToByteArray();
             var absolute = DateTimeOffset.UtcNow;
             var sliding = TimeSpan.MaxValue;
             await grain.OnActivateAsync().ConfigureAwait(false);
@@ -155,7 +144,7 @@ namespace Outkeep.Grains.Tests
 
             // assert value is set in memory
             var result = await grain.GetAsync().ConfigureAwait(false);
-            Assert.Same(value, result.Value);
+            Assert.Same(value, result.Value.Value);
 
             // act - clear the value
             await grain.RemoveAsync().ConfigureAwait(false);
@@ -168,7 +157,7 @@ namespace Outkeep.Grains.Tests
 
             // assert value is cleared from memory and not reloaded
             result = await grain.GetAsync().ConfigureAwait(false);
-            Assert.Null(result.Value);
+            Assert.Null(result.Value.Value);
         }
     }
 }

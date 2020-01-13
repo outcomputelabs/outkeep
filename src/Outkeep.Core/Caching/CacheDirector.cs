@@ -115,7 +115,7 @@ namespace Outkeep.Core.Caching
             }
 
             // attempt to early expire the entry to account for this thread suspending or early timeouts
-            if (entry.TrySetExpiredOnTimeout(now))
+            if (entry.TryExpire(now))
             {
                 // early invoke any user registered eviction callbacks
                 entry.ScheduleEvictionCallback();
@@ -168,17 +168,10 @@ namespace Outkeep.Core.Caching
             if (added)
             {
                 // add the entry to the appropriate compaction bucket for future reference
+                // it is possible that a concurrent thread evicts this entry and attempts to unbucket it
+                // before this thread has a chance to bucket it - thereby leaving an orphan in the bucket
+                // these rare orphans will eventually be collected up by the expiration scan
                 TryBucket(entry);
-
-                // make a last check to see if the entry has expired in the meantime
-                // a different thread could have expired it before this thread could bucket it and therefore failed to remove it from the bucket
-                // if that happens then we will hold the entry for longer than necessary until the next expiration scan hits
-                // to release memory earlier we clawback the entry from the bucket right now so garbage collection can reclaim it
-                if (entry.IsExpired)
-                {
-                    // early clawback due to early expired entry
-                    TryUnbucket(entry);
-                }
             }
             else
             {
@@ -318,7 +311,7 @@ namespace Outkeep.Core.Caching
             foreach (var pair in _entries)
             {
                 var entry = pair.Value;
-                if (entry.TrySetExpiredOnTimeout(now))
+                if (entry.TryExpire(now))
                 {
                     TryEvictEntry(entry);
                 }
@@ -352,7 +345,7 @@ namespace Outkeep.Core.Caching
                 foreach (var item in _buckets[i])
                 {
                     var entry = item.Key;
-                    if (entry.TrySetExpiredOnTimeout(now) && TryEvictEntry(entry) && (quota -= entry.Size) <= 0)
+                    if (entry.TryExpire(now) && TryEvictEntry(entry) && (quota -= entry.Size) <= 0)
                     {
                         return true;
                     }

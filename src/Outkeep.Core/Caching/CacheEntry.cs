@@ -64,10 +64,8 @@ namespace Outkeep.Core.Caching
         /// <inheritdoc />
         public bool IsExpired => _evictionCause != EvictionCause.None;
 
-        /// <summary>
-        /// Marks the entry as expired if it has reached expiration time thresholds.
-        /// </summary>
-        internal bool TrySetExpiredOnTimeout(DateTimeOffset now)
+        /// <inheritdoc />
+        public bool TryExpire(DateTimeOffset now)
         {
             // no-op if the entry is already expired
             if (IsExpired) return true;
