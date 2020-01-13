@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans.Hosting;
-using Outkeep.Core;
 using System;
 
-namespace Outkeep.Hosting
+namespace Outkeep.Core
 {
     public static class OutkeepServerBuilderExtensions
     {
