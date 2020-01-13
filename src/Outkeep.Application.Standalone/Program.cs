@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Outkeep.Api.Http;
 using Outkeep.Core;
 using Outkeep.Grains;
-using Outkeep.Hosting;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;

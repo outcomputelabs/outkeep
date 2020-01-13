@@ -1,9 +1,9 @@
 ﻿using Orleans.Hosting;
-using Outkeep.Core;
+using Outkeep.Hosting;
 using System;
 using System.Net;
 
-namespace Outkeep.Hosting
+namespace Outkeep.Core
 {
     public static class OutkeepHostingExtensions
     {
