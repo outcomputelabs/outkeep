@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Concurrency;
 using Orleans.Hosting;
 using Orleans.TestingHost;
 using Outkeep.Core;
-using Outkeep.Core.Caching;
 using Outkeep.Interfaces;
 using System;
 using System.Threading.Tasks;
