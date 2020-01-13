@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Orleans;
-using Outkeep.Hosting;
+using Outkeep.Core;
 using System;
 using Xunit;
 

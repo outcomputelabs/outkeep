@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Moq;
 using Orleans.Hosting;
+using Outkeep.Core;
 using System;
 using Xunit;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;

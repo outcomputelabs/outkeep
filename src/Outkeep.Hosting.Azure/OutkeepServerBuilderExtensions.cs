@@ -1,4 +1,6 @@
-﻿namespace Outkeep.Hosting
+﻿using Outkeep.Core;
+
+namespace Outkeep.Hosting
 {
     public static class OutkeepServerBuilderExtensions
     {
