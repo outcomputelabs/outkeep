@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Outkeep.Core;
 using Xunit;
 
 namespace Outkeep.Hosting.Tests

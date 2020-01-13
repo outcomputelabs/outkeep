@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Outkeep.Core;
 using Outkeep.Hosting.Azure.Tests.Fakes;
 using System.Collections.Generic;
 using Xunit;

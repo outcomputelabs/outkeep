@@ -1,7 +1,7 @@
-﻿using Orleans;
+﻿using Outkeep.Interfaces;
 using System;
 
-namespace Outkeep.Interfaces
+namespace Orleans
 {
     /// <summary>
     /// Quality-of-life extension methods for <see cref="IGrainFactory"/>.

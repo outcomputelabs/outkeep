@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Outkeep.Core;
 using Outkeep.Grains;
-using Outkeep.Hosting;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;

@@ -2,7 +2,7 @@
 using Orleans.Hosting;
 using System;
 
-namespace Outkeep.Hosting
+namespace Outkeep.Core
 {
     public static class OutkeepServerBuilderExtensions
     {

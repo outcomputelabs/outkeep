@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Outkeep.Api.Http;
 
-namespace Outkeep.Api.Http
+namespace Microsoft.AspNetCore.Builder
 {
     /// <summary>
     /// Extension methods for adding an <see cref="OrleansActivityMiddleware"/> to an <see cref="IApplicationBuilder"/> pipeline.

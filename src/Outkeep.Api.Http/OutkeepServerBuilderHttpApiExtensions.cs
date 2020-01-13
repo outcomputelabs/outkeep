@@ -2,7 +2,7 @@
 using Outkeep.Api.Http;
 using System;
 
-namespace Outkeep.Hosting
+namespace Outkeep.Core
 {
     /// <summary>
     /// Extension methods for adding an <see cref="OutkeepHttpApiHostedService"/> to an <see cref="IOutkeepServerBuilder"/>.

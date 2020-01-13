@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Outkeep.Core.Caching;
 using System;
 
-namespace Outkeep.Core.Caching
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Extensions for adding <see cref="CacheDirector"/> to <see cref="IServiceCollection"/>.
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public static class ServiceCollectionStorageExtensions
     {
         public static IServiceCollection AddCacheDirector(this IServiceCollection services)
         {

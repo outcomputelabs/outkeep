@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Orleans.Hosting;
+using Outkeep.Grains;
 using Outkeep.Interfaces;
 
-namespace Outkeep.Grains
+namespace Orleans.Hosting
 {
     public static class SiloHostBuilderExtensions
     {

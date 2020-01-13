@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Outkeep.Core
+namespace System.Collections.Concurrent
 {
     /// <summary>
     /// Quality-of-life extensions for <see cref="ConcurrentDictionary{TKey, TValue}"/>.
