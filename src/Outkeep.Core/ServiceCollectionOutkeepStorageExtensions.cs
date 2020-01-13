@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Outkeep.Core;
 
-namespace Outkeep.Core
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceCollectionExtensions
+    public static class ServiceCollectionOutkeepStorageExtensions
     {
         public static IServiceCollection AddSystemClock(this IServiceCollection services)
         {
