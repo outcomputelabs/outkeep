@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Outkeep.Core.Caching
 {
@@ -21,6 +22,11 @@ namespace Outkeep.Core.Caching
         /// Indicates whether this entry has expired.
         /// </summary>
         bool IsExpired { get; }
+
+        /// <summary>
+        /// Returns a task that completes when this entry is evicted.
+        /// </summary>
+        Task Evicted { get; }
 
         /// <summary>
         /// Gets or sets the fixed time at which the entry will expire.

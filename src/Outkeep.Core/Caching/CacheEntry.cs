@@ -2,6 +2,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Outkeep.Core.Caching
 {
@@ -15,12 +16,19 @@ namespace Outkeep.Core.Caching
         /// </summary>
         private readonly ICacheContext _context;
 
+        /// <summary>
+        /// Allows users to schedule continuations when the task completes.
+        /// </summary>
+        private readonly TaskCompletionSource<bool> _evicted;
+
         public CacheEntry(string key, long size, ICacheContext context)
         {
             Key = key ?? throw new ArgumentNullException(nameof(key));
             Size = size < 1 ? throw new ArgumentOutOfRangeException(nameof(size)) : size;
 
             _context = context ?? throw new ArgumentNullException(nameof(context));
+
+            _evicted = new TaskCompletionSource<bool>();
         }
 
         /// <summary>
@@ -56,6 +64,17 @@ namespace Outkeep.Core.Caching
 
         /// <inheritdoc />
         public bool IsExpired => _evictionCause != EvictionCause.None;
+
+        /// <inheritdoc />
+        public Task Evicted => _evicted.Task;
+
+        /// <summary>
+        /// Signals users that the parent director has evicted this entry.
+        /// </summary>
+        public void SetEvicted()
+        {
+            _evicted.TrySetResult(true);
+        }
 
         /// <inheritdoc />
         public bool TryExpire(DateTimeOffset now)
