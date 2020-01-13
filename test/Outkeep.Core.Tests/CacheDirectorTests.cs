@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Outkeep.Core.Caching;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -301,7 +300,7 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public async Task EarlyExpiresNewEntry()
+        public void EarlyExpiresNewEntry()
         {
             // arrange
             var options = new CacheOptions
@@ -318,10 +317,8 @@ namespace Outkeep.Core.Tests
             var size1 = 6000;
 
             // act
-            var notified = false;
             var entry = director
                 .CreateEntry(key, size1)
-                .SetPostEvictionCallback(_ => notified = true, null, TaskScheduler.Default, out var _)
                 .SetAbsoluteExpiration(clock.UtcNow.AddMinutes(-1))
                 .Commit();
 
@@ -330,13 +327,10 @@ namespace Outkeep.Core.Tests
             Assert.Equal(0, director.Size);
             Assert.Equal(EvictionCause.Expired, entry.EvictionCause);
             Assert.True(entry.IsExpired);
-
-            await Task.Delay(100).ConfigureAwait(false);
-            Assert.True(notified);
         }
 
         [Fact]
-        public async Task ExpiresConcurrentEntryOnConflict()
+        public void ExpiresConcurrentEntryOnConflict()
         {
             // arrange
             var options = new CacheOptions
@@ -352,21 +346,16 @@ namespace Outkeep.Core.Tests
             var key = "SomeKey";
             var size = 10;
 
-            var notified = 0;
             Parallel.For(0, 100000, _ =>
             {
                 director
                     .CreateEntry(key, size)
-                    .SetPostEvictionCallback(_ => Interlocked.Increment(ref notified), null, TaskScheduler.Default, out var _)
                     .Commit();
             });
 
             // assert
             Assert.Equal(1, director.Count);
             Assert.Equal(size, director.Size);
-
-            await Task.Delay(100).ConfigureAwait(false);
-            Assert.Equal(99999, notified);
         }
 
         [Fact]

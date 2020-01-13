@@ -1,26 +1,19 @@
-﻿using Orleans;
-using Outkeep.Core.Properties;
+﻿using Outkeep.Core.Properties;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Outkeep.Core.Caching
 {
     /// <summary>
     /// Implements a cache entry as used by <see cref="CacheDirector"/>.
     /// </summary>
-    internal sealed class CacheEntry : ICacheEntry, ICacheEntryContext, IDisposable
+    internal sealed class CacheEntry : ICacheEntry, IDisposable
     {
         /// <summary>
         /// The cache context to use for raising notifications.
         /// </summary>
         private readonly ICacheContext _context;
-
-        /// <summary>
-        /// The user expiry callback registration to invoke upon expiry.
-        /// </summary>
-        private PostEvictionCallbackRegistration? _postEvictionCallbackRegistration;
 
         public CacheEntry(string key, long size, ICacheContext context)
         {
@@ -89,40 +82,12 @@ namespace Outkeep.Core.Caching
         }
 
         /// <summary>
-        /// Schedules the user supplied eviction callback for execution.
-        /// This method is for use by the parent director upon actual eviction from the cache.
-        /// </summary>
-        internal void ScheduleEvictionCallback()
-        {
-            // swap the registration to avoid multiple calls
-            Interlocked.Exchange(ref _postEvictionCallbackRegistration, null)?.InvokeAsync().Ignore();
-        }
-
-        /// <summary>
         /// Marks the entry as expired for the given reason, making it ellegible for removal.
         /// </summary>
         internal void SetExpired(EvictionCause reason)
         {
             // the first thread to set an eviction cause wins
             Interlocked.CompareExchange(ref Unsafe.As<EvictionCause, int>(ref _evictionCause), (int)reason, (int)EvictionCause.None);
-        }
-
-        /// <inheritdoc />
-        public ICacheEntry SetPostEvictionCallback(Action<object?> callback, object? state, TaskScheduler taskScheduler, out IDisposable registration)
-        {
-            EnsureUncommitted();
-
-            if (callback == null) throw new ArgumentNullException(nameof(callback));
-
-            // create a new registration
-            var reg = new PostEvictionCallbackRegistration(callback, state, taskScheduler, this);
-
-            // swap with any existing registration and early dispose it
-            Interlocked.Exchange(ref _postEvictionCallbackRegistration, reg)?.Dispose();
-
-            // return this instance to allow build chaining
-            registration = reg;
-            return this;
         }
 
         /// <inheritdoc />
@@ -169,17 +134,6 @@ namespace Outkeep.Core.Caching
             if (_committed) return;
 
             throw new InvalidOperationException(Resources.Exception_CacheEntryFor_X_IsUncommittedAndDoesNotAllowThisOperation.Format(Key));
-        }
-
-        /// <summary>
-        /// Called by the post eviction callback registration upon disposal.
-        /// </summary>
-        /// <param name="registration">The registration that was disposed.</param>
-        public void OnPostEvictionCallbackRegistrationDisposed(PostEvictionCallbackRegistration registration)
-        {
-            // remove the registration if it is the current one
-            // otherwise it was already removed
-            Interlocked.CompareExchange(ref _postEvictionCallbackRegistration, null, registration);
         }
 
         #region Disposable

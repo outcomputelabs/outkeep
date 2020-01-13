@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Outkeep.Core.Caching
 {
@@ -50,13 +49,6 @@ namespace Outkeep.Core.Caching
         /// Gets the eviction cause for this cache entry.
         /// </summary>
         EvictionCause EvictionCause { get; }
-
-        /// <summary>
-        /// Sets a delegate to call upon entry eviction.
-        /// The entry only supports a single delegate registered at a time.
-        /// Calling this method multiple times will result in the entry keeping the last delegate and discarding earlier ones.
-        /// </summary>
-        ICacheEntry SetPostEvictionCallback(Action<object?> callback, object? state, TaskScheduler taskScheduler, out IDisposable registration);
 
         /// <summary>
         /// Commits this cache entry to the owning <see cref="ICacheDirector{TKey}"/> instance.

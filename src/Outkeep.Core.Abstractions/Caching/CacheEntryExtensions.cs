@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Outkeep.Core.Caching
 {
@@ -66,14 +65,6 @@ namespace Outkeep.Core.Caching
             entry.Priority = priority;
 
             return entry;
-        }
-
-        /// <inheritdoc cref="ICacheEntry.SetPostEvictionCallback(Func{ICacheEntry, object?, Task}, object, TaskScheduler, out IDisposable)"/>
-        public static ICacheEntry SetPostEvictionCallback(this ICacheEntry entry, Action<object?> callback, object? state, TaskScheduler taskScheduler)
-        {
-            if (entry is null) throw new ArgumentNullException(nameof(entry));
-
-            return entry.SetPostEvictionCallback(callback, state, taskScheduler, out _);
         }
     }
 }

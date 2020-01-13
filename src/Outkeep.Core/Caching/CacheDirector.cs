@@ -103,8 +103,7 @@ namespace Outkeep.Core.Caching
                 // early expire this entry in case it is not already
                 entry.SetExpired(EvictionCause.Capacity);
 
-                // early invoke any user registered eviction callbacks
-                entry.ScheduleEvictionCallback();
+                // todo: signal the future expired task here
 
                 // if we found a previous entry then evict it as well
                 // an attempt to add an entry must remove any old entry to avoid keeping stale data
@@ -117,8 +116,7 @@ namespace Outkeep.Core.Caching
             // attempt to early expire the entry to account for this thread suspending or early timeouts
             if (entry.TryExpire(now))
             {
-                // early invoke any user registered eviction callbacks
-                entry.ScheduleEvictionCallback();
+                // todo: signal the future expired task here
 
                 // ensure eviction of previous entry regardless
                 if (previous != null) TryEvictEntry(previous);
@@ -153,7 +151,7 @@ namespace Outkeep.Core.Caching
                     Interlocked.Add(ref _size, -previous.Size);
 
                     // notify subscribers that the previous entry was evicted
-                    previous.ScheduleEvictionCallback();
+                    // todo: signal the future expired task here for the previous entry
                 }
                 else
                 {
@@ -184,7 +182,7 @@ namespace Outkeep.Core.Caching
                 entry.SetExpired(EvictionCause.Replaced);
 
                 // early notify the user
-                entry.ScheduleEvictionCallback();
+                // todo: signal the future expired task here for the current entry
 
                 // rollback the space claim so other entries can claim it
                 Interlocked.Add(ref _size, -entry.Size);
@@ -287,7 +285,7 @@ namespace Outkeep.Core.Caching
                 entry.SetExpired(EvictionCause.Removed);
 
                 // notify the user of eviction
-                entry.ScheduleEvictionCallback();
+                // todo: signal the future expired task here for the current entry
 
                 return true;
             }
