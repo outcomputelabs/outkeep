@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Outkeep.Core.Storage;
 using System;
 
-namespace Outkeep.Core.Storage
+namespace Outkeep.Core
 {
     /// <summary>
     /// Quality-of-life extensions for <see cref="IOutkeepServerBuilder"/>.
