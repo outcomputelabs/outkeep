@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Outkeep.Core
+﻿namespace System.Threading.Tasks
 {
     public static class TaskExtensions
     {
