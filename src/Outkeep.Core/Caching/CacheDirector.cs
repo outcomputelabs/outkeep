@@ -102,8 +102,7 @@ namespace Outkeep.Core.Caching
             {
                 // early expire this entry in case it is not already
                 entry.SetExpired(EvictionCause.Capacity);
-
-                // todo: signal the future expired task here
+                entry.SetEvicted();
 
                 // if we found a previous entry then evict it as well
                 // an attempt to add an entry must remove any old entry to avoid keeping stale data
@@ -116,7 +115,7 @@ namespace Outkeep.Core.Caching
             // attempt to early expire the entry to account for this thread suspending or early timeouts
             if (entry.TryExpire(now))
             {
-                // todo: signal the future expired task here
+                entry.SetEvicted();
 
                 // ensure eviction of previous entry regardless
                 if (previous != null) TryEvictEntry(previous);
@@ -151,7 +150,7 @@ namespace Outkeep.Core.Caching
                     Interlocked.Add(ref _size, -previous.Size);
 
                     // notify subscribers that the previous entry was evicted
-                    // todo: signal the future expired task here for the previous entry
+                    previous.SetEvicted();
                 }
                 else
                 {
@@ -182,7 +181,7 @@ namespace Outkeep.Core.Caching
                 entry.SetExpired(EvictionCause.Replaced);
 
                 // early notify the user
-                // todo: signal the future expired task here for the current entry
+                entry.SetEvicted();
 
                 // rollback the space claim so other entries can claim it
                 Interlocked.Add(ref _size, -entry.Size);
@@ -285,7 +284,7 @@ namespace Outkeep.Core.Caching
                 entry.SetExpired(EvictionCause.Removed);
 
                 // notify the user of eviction
-                // todo: signal the future expired task here for the current entry
+                entry.SetEvicted();
 
                 return true;
             }
