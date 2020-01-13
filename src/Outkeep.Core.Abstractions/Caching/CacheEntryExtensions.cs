@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Outkeep.Core.Caching
 {
@@ -63,6 +65,30 @@ namespace Outkeep.Core.Caching
             if (entry == null) throw new ArgumentNullException(nameof(entry));
 
             entry.Priority = priority;
+
+            return entry;
+        }
+
+        /// <summary>
+        /// Convenience method to schedule a continuation on the <see cref="ICacheEntry.Evicted"/> property using the current task scheduler.
+        /// </summary>
+        public static ICacheEntry ContinueWithOnEvicted(this ICacheEntry entry, Action<Task<CacheEvictionArgs>, object?> action, object? state, CancellationToken cancellationToken = default)
+        {
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
+
+            entry.Evicted.ContinueWith(action, state, cancellationToken, TaskContinuationOptions.DenyChildAttach, TaskScheduler.Current);
+
+            return entry;
+        }
+
+        /// <summary>
+        /// Convenience method to schedule a continuation on the <see cref="ICacheEntry.Evicted"/> property using the current task scheduler.
+        /// </summary>
+        public static ICacheEntry ContinueWithOnEvicted(this ICacheEntry entry, Action<Task<CacheEvictionArgs>> action, CancellationToken cancellationToken = default)
+        {
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
+
+            entry.Evicted.ContinueWith(action, cancellationToken, TaskContinuationOptions.DenyChildAttach, TaskScheduler.Current);
 
             return entry;
         }

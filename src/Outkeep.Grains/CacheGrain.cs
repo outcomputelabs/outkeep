@@ -18,7 +18,7 @@ namespace Outkeep.Grains
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
         private readonly CacheGrainOptions _options;
-        private readonly ILogger<CacheGrain> _logger;
+        private readonly ILogger _logger;
         private readonly ICacheStorage _storage;
         private readonly ISystemClock _clock;
         private readonly IGrainIdentity _identity;

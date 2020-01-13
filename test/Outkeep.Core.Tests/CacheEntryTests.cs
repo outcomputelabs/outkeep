@@ -49,11 +49,19 @@ namespace Outkeep.Core.Tests
             Assert.Equal(TaskStatus.WaitingForActivation, entry.Evicted.Status);
 
             // act
+            entry.SetExpired(EvictionCause.Replaced);
+
+            // assert
+            Assert.Equal(TaskStatus.WaitingForActivation, entry.Evicted.Status);
+
+            // act
             entry.SetEvicted();
 
             // assert
-            await entry.Evicted.ConfigureAwait(false);
+            var result = await entry.Evicted.ConfigureAwait(false);
             Assert.Equal(TaskStatus.RanToCompletion, entry.Evicted.Status);
+            Assert.Same(entry, result.CacheEntry);
+            Assert.Equal(EvictionCause.Replaced, result.EvictionCause);
         }
     }
 }

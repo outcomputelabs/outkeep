@@ -19,7 +19,7 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Allows users to schedule continuations when the task completes.
         /// </summary>
-        private readonly TaskCompletionSource<bool> _evicted;
+        private readonly TaskCompletionSource<CacheEvictionArgs> _evicted;
 
         public CacheEntry(string key, long size, ICacheContext context)
         {
@@ -28,7 +28,7 @@ namespace Outkeep.Core.Caching
 
             _context = context ?? throw new ArgumentNullException(nameof(context));
 
-            _evicted = new TaskCompletionSource<bool>();
+            _evicted = new TaskCompletionSource<CacheEvictionArgs>();
         }
 
         /// <summary>
@@ -66,14 +66,14 @@ namespace Outkeep.Core.Caching
         public bool IsExpired => _evictionCause != EvictionCause.None;
 
         /// <inheritdoc />
-        public Task Evicted => _evicted.Task;
+        public Task<CacheEvictionArgs> Evicted => _evicted.Task;
 
         /// <summary>
         /// Signals users that the parent director has evicted this entry.
         /// </summary>
         public void SetEvicted()
         {
-            _evicted.TrySetResult(true);
+            _evicted.TrySetResult(new CacheEvictionArgs(this, EvictionCause));
         }
 
         /// <inheritdoc />

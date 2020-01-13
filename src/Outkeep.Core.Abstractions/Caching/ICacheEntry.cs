@@ -26,7 +26,7 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Returns a task that completes when this entry is evicted.
         /// </summary>
-        Task Evicted { get; }
+        Task<CacheEvictionArgs> Evicted { get; }
 
         /// <summary>
         /// Gets or sets the fixed time at which the entry will expire.
