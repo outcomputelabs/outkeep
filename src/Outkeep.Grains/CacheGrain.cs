@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Concurrency;
 using Orleans.Core;
@@ -18,17 +17,15 @@ namespace Outkeep.Grains
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
         private readonly ICacheGrainContext _context;
-        private readonly CacheGrainOptions _options;
         private readonly ICacheStorage _storage;
         private readonly ISystemClock _clock;
         private readonly IGrainIdentity _identity;
         private readonly ICacheDirector _director;
         private readonly ITimerRegistry _timers;
 
-        public CacheGrain(ICacheGrainContext context, IOptions<CacheGrainOptions> options, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
+        public CacheGrain(ICacheGrainContext context, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
@@ -278,7 +275,7 @@ namespace Outkeep.Grains
             // if there is no entry yet then return a promise
             if (_entry == null)
             {
-                return _promise.Task.WithDefaultOnTimeout(CachePulse.None, _options.ReactivePollingTimeout);
+                return _promise.Task.WithDefaultOnTimeout(CachePulse.None, _context.Options.ReactivePollingTimeout);
             }
 
             // if the current entry has expired then release it and return a clear pulse
@@ -295,7 +292,7 @@ namespace Outkeep.Grains
             if (tag == _pulse.Tag)
             {
                 // the caller already has the same data so return a promise
-                return _promise.Task.WithDefaultOnTimeout(CachePulse.None, _options.ReactivePollingTimeout);
+                return _promise.Task.WithDefaultOnTimeout(CachePulse.None, _context.Options.ReactivePollingTimeout);
             }
             else
             {

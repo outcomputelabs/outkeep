@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 
 namespace Outkeep.Grains
@@ -8,11 +9,14 @@ namespace Outkeep.Grains
     /// </summary>
     internal class CacheGrainContext : ICacheGrainContext
     {
-        public CacheGrainContext(ILogger<CacheGrain> logger)
+        public CacheGrainContext(ILogger<CacheGrain> logger, IOptions<CacheGrainOptions> options)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            Options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
         public ILogger Logger { get; }
+
+        public CacheGrainOptions Options { get; }
     }
 }

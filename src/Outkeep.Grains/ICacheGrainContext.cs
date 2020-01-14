@@ -5,5 +5,6 @@ namespace Outkeep.Grains
     internal interface ICacheGrainContext
     {
         ILogger Logger { get; }
+        CacheGrainOptions Options { get; }
     }
 }
