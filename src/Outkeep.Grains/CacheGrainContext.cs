@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Outkeep.Core;
+using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using System;
 
@@ -11,12 +12,13 @@ namespace Outkeep.Grains
     /// </summary>
     internal class CacheGrainContext : ICacheGrainContext
     {
-        public CacheGrainContext(ILogger<CacheGrain> logger, IOptions<CacheGrainOptions> options, ICacheStorage storage, ISystemClock clock)
+        public CacheGrainContext(ILogger<CacheGrain> logger, IOptions<CacheGrainOptions> options, ICacheStorage storage, ISystemClock clock, ICacheDirector director)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             Storage = storage ?? throw new ArgumentNullException(nameof(storage));
             Clock = clock ?? throw new ArgumentNullException(nameof(clock));
+            Director = director ?? throw new ArgumentNullException(nameof(director));
         }
 
         public ILogger Logger { get; }
@@ -26,5 +28,7 @@ namespace Outkeep.Grains
         public ICacheStorage Storage { get; }
 
         public ISystemClock Clock { get; }
+
+        public ICacheDirector Director { get; }
     }
 }

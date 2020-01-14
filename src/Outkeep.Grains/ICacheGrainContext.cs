@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Outkeep.Core;
+using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 
 namespace Outkeep.Grains
@@ -10,5 +11,6 @@ namespace Outkeep.Grains
         CacheGrainOptions Options { get; }
         ICacheStorage Storage { get; }
         ISystemClock Clock { get; }
+        ICacheDirector Director { get; }
     }
 }

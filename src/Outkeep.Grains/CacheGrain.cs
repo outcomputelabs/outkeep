@@ -17,14 +17,12 @@ namespace Outkeep.Grains
     {
         private readonly ICacheGrainContext _context;
         private readonly IGrainIdentity _identity;
-        private readonly ICacheDirector _director;
         private readonly ITimerRegistry _timers;
 
-        public CacheGrain(ICacheGrainContext context, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
+        public CacheGrain(ICacheGrainContext context, IGrainIdentity identity, ITimerRegistry timers)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
-            _director = director ?? throw new ArgumentNullException(nameof(director));
             _timers = timers ?? throw new ArgumentNullException(nameof(timers));
         }
 
@@ -55,7 +53,7 @@ namespace Outkeep.Grains
             }
 
             // attempt to claim space in the current box
-            _entry = _director
+            _entry = _context.Director
                 .CreateEntry(_identity.PrimaryKeyString, item.Value.Value.Length + IntPtr.Size)
                 .SetAbsoluteExpiration(item.Value.AbsoluteExpiration)
                 .SetSlidingExpiration(item.Value.SlidingExpiration)
@@ -168,7 +166,7 @@ namespace Outkeep.Grains
             }
 
             // claim space in the current box
-            _entry = _director
+            _entry = _context.Director
                 .CreateEntry(_identity.PrimaryKeyString, value.Value.Length + IntPtr.Size)
                 .SetAbsoluteExpiration(absoluteExpiration)
                 .SetSlidingExpiration(slidingExpiration)
