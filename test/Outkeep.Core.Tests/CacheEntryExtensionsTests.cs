@@ -53,6 +53,19 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        public void SetSlidingExpirationThrowsOnNullEntry()
+        {
+            // arrange
+            ICacheEntry entry = null!;
+
+            // act
+            void action() => entry.SetSlidingExpiration(TimeSpan.Zero);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(entry), action);
+        }
+
+        [Fact]
         public void SetPriority()
         {
             // arrange
