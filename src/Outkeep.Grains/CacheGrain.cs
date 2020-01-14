@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Concurrency;
-using Orleans.Core;
 using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using Outkeep.Grains.Properties;
@@ -15,18 +14,18 @@ namespace Outkeep.Grains
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
         private readonly ICacheGrainContext _context;
-        private readonly IGrainIdentity _identity;
 
-        public CacheGrain(ICacheGrainContext context, IGrainIdentity identity)
+        public CacheGrain(ICacheGrainContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _identity = identity ?? throw new ArgumentNullException(nameof(identity));
         }
 
         private CachePulse _pulse = CachePulse.None;
         private TaskCompletionSource<CachePulse> _promise = new TaskCompletionSource<CachePulse>(CachePulse.None);
         private Task? _outstandingStorageOperation = null;
         private ICacheEntry? _entry;
+
+        private string PrimaryKey => this.GetPrimaryKeyString();
 
         public override async Task OnActivateAsync()
         {
@@ -42,7 +41,7 @@ namespace Outkeep.Grains
             }, this, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 
             // attempt to load from storage
-            var item = await _context.Storage.ReadAsync(_identity.PrimaryKeyString).ConfigureAwait(true);
+            var item = await _context.Storage.ReadAsync(PrimaryKey).ConfigureAwait(true);
             if (!item.HasValue)
             {
                 SetPulse(CachePulse.None);
@@ -51,7 +50,7 @@ namespace Outkeep.Grains
 
             // attempt to claim space in the current box
             _entry = _context.Director
-                .CreateEntry(_identity.PrimaryKeyString, item.Value.Value.Length + IntPtr.Size)
+                .CreateEntry(PrimaryKey, item.Value.Value.Length + IntPtr.Size)
                 .SetAbsoluteExpiration(item.Value.AbsoluteExpiration)
                 .SetSlidingExpiration(item.Value.SlidingExpiration)
                 .SetPriority(CachePriority.Normal)
@@ -164,7 +163,7 @@ namespace Outkeep.Grains
 
             // claim space in the current box
             _entry = _context.Director
-                .CreateEntry(_identity.PrimaryKeyString, value.Value.Length + IntPtr.Size)
+                .CreateEntry(PrimaryKey, value.Value.Length + IntPtr.Size)
                 .SetAbsoluteExpiration(absoluteExpiration)
                 .SetSlidingExpiration(slidingExpiration)
                 .SetPriority(CachePriority.Normal)
@@ -195,7 +194,7 @@ namespace Outkeep.Grains
                 {
                     // while we do not want to observe past exceptions
                     // we do want to stop execution early if the outstanding operation failed
-                    throw new InvalidOperationException(Resources.Exception_CacheGrainForKey_X_CannotExecuteStorageOperationBecauseThePriorOperationFailed.Format(_identity.PrimaryKeyString), ex);
+                    throw new InvalidOperationException(Resources.Exception_CacheGrainForKey_X_CannotExecuteStorageOperationBecauseThePriorOperationFailed.Format(PrimaryKey), ex);
                 }
                 finally
                 {
@@ -216,11 +215,11 @@ namespace Outkeep.Grains
 
                 if (_entry is null || _pulse.Value.Value == null)
                 {
-                    _outstandingStorageOperation = _context.Storage.ClearAsync(_identity.PrimaryKeyString);
+                    _outstandingStorageOperation = _context.Storage.ClearAsync(PrimaryKey);
                 }
                 else
                 {
-                    _outstandingStorageOperation = _context.Storage.WriteAsync(_identity.PrimaryKeyString, new CacheItem(_pulse.Value.Value, _entry.AbsoluteExpiration, _entry.SlidingExpiration));
+                    _outstandingStorageOperation = _context.Storage.WriteAsync(PrimaryKey, new CacheItem(_pulse.Value.Value, _entry.AbsoluteExpiration, _entry.SlidingExpiration));
                 }
 
                 thisTask = _outstandingStorageOperation;
@@ -302,7 +301,7 @@ namespace Outkeep.Grains
             catch (Exception ex)
             {
                 DeactivateOnIdle();
-                Log.Failed(_context.Logger, _identity.PrimaryKeyString, ex);
+                Log.Failed(_context.Logger, PrimaryKey, ex);
                 throw;
             }
         }
