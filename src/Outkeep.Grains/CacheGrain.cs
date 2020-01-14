@@ -17,18 +17,18 @@ namespace Outkeep.Grains
     [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
+        private readonly ICacheGrainContext _context;
         private readonly CacheGrainOptions _options;
-        private readonly ILogger _logger;
         private readonly ICacheStorage _storage;
         private readonly ISystemClock _clock;
         private readonly IGrainIdentity _identity;
         private readonly ICacheDirector _director;
         private readonly ITimerRegistry _timers;
 
-        public CacheGrain(IOptions<CacheGrainOptions> options, ILogger<CacheGrain> logger, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
+        public CacheGrain(ICacheGrainContext context, IOptions<CacheGrainOptions> options, ILogger<CacheGrain> logger, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
         {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _storage = storage ?? throw new ArgumentNullException(nameof(storage));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
@@ -315,7 +315,7 @@ namespace Outkeep.Grains
             catch (Exception ex)
             {
                 DeactivateOnIdle();
-                Log.Failed(_logger, _identity.PrimaryKeyString, ex);
+                Log.Failed(_context.Logger, _identity.PrimaryKeyString, ex);
                 throw;
             }
         }
