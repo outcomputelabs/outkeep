@@ -60,11 +60,15 @@ namespace Outkeep.Core.Tests
             var result1 = Equals(args1, args2);
             var result2 = Equals(args1, args3);
             var result3 = Equals(args1, args4);
+            var result4 = Equals(args1, null);
+            var result5 = Equals(args1, new object());
 
             // assert
             Assert.True(result1);
             Assert.False(result2);
             Assert.False(result3);
+            Assert.False(result4);
+            Assert.False(result5);
         }
 
         [Fact]
