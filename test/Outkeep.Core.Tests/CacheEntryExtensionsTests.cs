@@ -81,6 +81,19 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        public void SetPriorityThrowsOnNullEntry()
+        {
+            // arrange
+            ICacheEntry entry = null!;
+
+            // act
+            void action() => entry.SetPriority(CachePriority.Normal);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(entry), action);
+        }
+
+        [Fact]
         public async Task ContinueWithOnEvicted()
         {
             // arrange
