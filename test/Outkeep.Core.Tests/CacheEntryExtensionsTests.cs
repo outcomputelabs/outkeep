@@ -25,6 +25,19 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        public void SetAbsoluteExpirationThrowsOnNullEntry()
+        {
+            // arrange
+            ICacheEntry entry = null!;
+
+            // act
+            void action() => entry.SetAbsoluteExpiration(DateTimeOffset.UtcNow);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(entry), action);
+        }
+
+        [Fact]
         public void SetSlidingExpiration()
         {
             // arrange
