@@ -111,6 +111,19 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        public void ContinueWithOnEvictedThrowsOnNullEntry()
+        {
+            // arrange
+            ICacheEntry entry = null!;
+
+            // act
+            void action() => entry.ContinueWithOnEvicted(t => { });
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(entry), action);
+        }
+
+        [Fact]
         public async Task ContinueWithOnEvictedWithState()
         {
             // arrange
