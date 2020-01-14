@@ -25,7 +25,7 @@ namespace Outkeep.Grains
         private readonly ICacheDirector _director;
         private readonly ITimerRegistry _timers;
 
-        public CacheGrain(ICacheGrainContext context, IOptions<CacheGrainOptions> options, ILogger<CacheGrain> logger, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
+        public CacheGrain(ICacheGrainContext context, IOptions<CacheGrainOptions> options, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
