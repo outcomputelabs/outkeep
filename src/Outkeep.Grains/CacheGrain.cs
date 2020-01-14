@@ -17,16 +17,14 @@ namespace Outkeep.Grains
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
         private readonly ICacheGrainContext _context;
-        private readonly ICacheStorage _storage;
         private readonly ISystemClock _clock;
         private readonly IGrainIdentity _identity;
         private readonly ICacheDirector _director;
         private readonly ITimerRegistry _timers;
 
-        public CacheGrain(ICacheGrainContext context, ICacheStorage storage, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
+        public CacheGrain(ICacheGrainContext context, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _storage = storage ?? throw new ArgumentNullException(nameof(storage));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _director = director ?? throw new ArgumentNullException(nameof(director));
@@ -52,7 +50,7 @@ namespace Outkeep.Grains
             }, this, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 
             // attempt to load from storage
-            var item = await _storage.ReadAsync(_identity.PrimaryKeyString).ConfigureAwait(true);
+            var item = await _context.Storage.ReadAsync(_identity.PrimaryKeyString).ConfigureAwait(true);
             if (!item.HasValue)
             {
                 SetPulse(CachePulse.None);
@@ -226,11 +224,11 @@ namespace Outkeep.Grains
 
                 if (_entry is null || _pulse.Value.Value == null)
                 {
-                    _outstandingStorageOperation = _storage.ClearAsync(_identity.PrimaryKeyString);
+                    _outstandingStorageOperation = _context.Storage.ClearAsync(_identity.PrimaryKeyString);
                 }
                 else
                 {
-                    _outstandingStorageOperation = _storage.WriteAsync(_identity.PrimaryKeyString, new CacheItem(_pulse.Value.Value, _entry.AbsoluteExpiration, _entry.SlidingExpiration));
+                    _outstandingStorageOperation = _context.Storage.WriteAsync(_identity.PrimaryKeyString, new CacheItem(_pulse.Value.Value, _entry.AbsoluteExpiration, _entry.SlidingExpiration));
                 }
 
                 thisTask = _outstandingStorageOperation;
