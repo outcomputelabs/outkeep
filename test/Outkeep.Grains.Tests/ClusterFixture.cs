@@ -1,26 +1,33 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Concurrency;
+using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.TestingHost;
 using Outkeep.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace Outkeep.Grains.Tests
 {
     public sealed class ClusterFixture : IDisposable
     {
+        private readonly string _clusterId = TestClusterBuilder.CreateClusterId();
+
         public TestCluster Cluster { get; }
 
         public ClusterFixture()
         {
-            Cluster = new TestClusterBuilder()
+            var builder = new TestClusterBuilder(1)
                 .AddSiloBuilderConfigurator<SiloBuilderConfigurator>()
-                .AddClientBuilderConfigurator<ClientBuilderConfigurator>()
-                .Build();
+                .AddClientBuilderConfigurator<ClientBuilderConfigurator>();
 
+            builder.Options.ClusterId = _clusterId;
+
+            Cluster = builder.Build();
             Cluster.Deploy();
         }
 
@@ -29,6 +36,9 @@ namespace Outkeep.Grains.Tests
             Cluster.StopAllSilos();
             Cluster.Dispose();
         }
+
+        private static readonly ConcurrentDictionary<string, IServiceProvider> _siloServiceProvider =
+            new ConcurrentDictionary<string, IServiceProvider>();
 
         private class SiloBuilderConfigurator : ISiloBuilderConfigurator
         {
@@ -43,13 +53,24 @@ namespace Outkeep.Grains.Tests
                     .ConfigureServices((context, services) =>
                     {
                         services
+                            .AddMemoryCacheStorage()
                             .AddCacheDirector(options =>
                             {
-                                options.Capacity = 100;
+                                options.Capacity = 1000;
                             })
-                            .AddSystemClock();
+                            .AddSystemClock()
+                            .AddCacheGrainContext();
                     })
-                    .AddCacheDirectorGrainService();
+                    .AddCacheDirectorGrainService()
+                    .UseServiceProviderFactory(services =>
+                    {
+                        var provider = services.BuildServiceProvider();
+                        var clusterId = provider.GetRequiredService<IOptions<ClusterOptions>>().Value.ClusterId;
+
+                        _siloServiceProvider.TryAdd(clusterId, provider);
+
+                        return provider;
+                    });
             }
         }
 
@@ -58,6 +79,18 @@ namespace Outkeep.Grains.Tests
             public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
             {
                 // placeholder
+            }
+        }
+
+        public IServiceProvider PrimarySiloServiceProvider
+        {
+            get
+            {
+                if (_siloServiceProvider.TryGetValue(_clusterId, out var provider))
+                {
+                    return provider;
+                }
+                throw new InvalidOperationException();
             }
         }
     }

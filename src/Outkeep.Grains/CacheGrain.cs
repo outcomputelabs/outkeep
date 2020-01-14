@@ -67,7 +67,7 @@ namespace Outkeep.Grains
             }
 
             // otherwise keep the content
-            SetPulse(new CachePulse(Guid.NewGuid(), item.Value.Value));
+            SetPulse(new CachePulse(Guid.NewGuid(), new Immutable<byte[]?>(item.Value.Value)));
         }
 
         public override Task OnDeactivateAsync()

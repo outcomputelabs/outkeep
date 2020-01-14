@@ -7,7 +7,7 @@ namespace Outkeep.Core
     /// <summary>
     /// Quality-of-life extensions for <see cref="IOutkeepServerBuilder"/>.
     /// </summary>
-    public static class OutkeepServerBuilderExtensions
+    public static class MemoryCacheStorageOutkeepServerBuilderExtensions
     {
         /// <summary>
         /// Adds a singleton <see cref="MemoryCacheStorage"/> to the <see cref="IOutkeepServerBuilder"/>.
@@ -19,19 +19,6 @@ namespace Outkeep.Core
             return builder.ConfigureServices((context, services) =>
             {
                 services.AddSingleton<ICacheStorage, MemoryCacheStorage>();
-            });
-        }
-
-        /// <summary>
-        /// Adds a singleton <see cref="NullCacheStorage"/> to the <see cref="IOutkeepServerBuilder"/>.
-        /// </summary>
-        public static IOutkeepServerBuilder AddNullCacheStorage(this IOutkeepServerBuilder builder)
-        {
-            if (builder is null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.ConfigureServices((context, services) =>
-            {
-                services.AddSingleton<ICacheStorage, NullCacheStorage>();
             });
         }
     }
