@@ -21,9 +21,7 @@ namespace Outkeep.Core.Caching
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
-            if (obj is CacheEvictionArgs other) return Equals(other);
-            return false;
+            return obj is CacheEvictionArgs other && Equals(other);
         }
 
         public override int GetHashCode()
