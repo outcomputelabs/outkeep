@@ -18,7 +18,7 @@ namespace Outkeep.Grains
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
         private readonly CacheGrainOptions _options;
-        private readonly ILogger<CacheGrain> _logger;
+        private readonly ILogger _logger;
         private readonly ICacheStorage _storage;
         private readonly ISystemClock _clock;
         private readonly IGrainIdentity _identity;
@@ -69,6 +69,7 @@ namespace Outkeep.Grains
                 .SetSlidingExpiration(item.Value.SlidingExpiration)
                 .SetPriority(CachePriority.Normal)
                 .SetUtcLastAccessed(_clock.UtcNow)
+                .ContinueWithOnEvicted(HandleEvicted)
                 .Commit();
 
             // see if we were successful and if not then release the content now
@@ -88,6 +89,15 @@ namespace Outkeep.Grains
             ClearEntry();
 
             return Task.CompletedTask;
+        }
+
+        private void HandleEvicted(Task<CacheEvictionArgs> args)
+        {
+            if (args.Result.CacheEntry == _entry)
+            {
+                ClearEntry();
+                SetPulse(CachePulse.None);
+            }
         }
 
         private void SetPulse(CachePulse pulse)
@@ -172,6 +182,7 @@ namespace Outkeep.Grains
                 .SetSlidingExpiration(slidingExpiration)
                 .SetPriority(CachePriority.Normal)
                 .SetUtcLastAccessed(_clock.UtcNow)
+                .ContinueWithOnEvicted(HandleEvicted)
                 .Commit();
 
             // update subs and lazy save
