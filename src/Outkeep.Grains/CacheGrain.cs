@@ -29,17 +29,6 @@ namespace Outkeep.Grains
 
         public override async Task OnActivateAsync()
         {
-            _context.TimerRegistry.RegisterTimer(this, _ =>
-            {
-                if (_entry != null && _entry.TryExpire(_context.Clock.UtcNow))
-                {
-                    _entry = null;
-                    SetPulse(CachePulse.None);
-                }
-
-                return Task.CompletedTask;
-            }, this, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
-
             // attempt to load from storage
             var item = await _context.Storage.ReadAsync(PrimaryKey).ConfigureAwait(true);
             if (!item.HasValue)
