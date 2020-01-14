@@ -117,7 +117,7 @@ namespace Outkeep.Core.Tests
             ICacheEntry entry = null!;
 
             // act
-            void action() => entry.ContinueWithOnEvicted(t => { });
+            void action() => entry.ContinueWithOnEvicted(t => { }, CancellationToken.None);
 
             // assert
             Assert.Throws<ArgumentNullException>(nameof(entry), action);
@@ -141,6 +141,19 @@ namespace Outkeep.Core.Tests
             await Task.Delay(100).ConfigureAwait(false);
             Assert.True(completed);
             Assert.Same(input, output);
+        }
+
+        [Fact]
+        public void ContinueWithOnEvictedWithStateThrowsOnNullEntry()
+        {
+            // arrange
+            ICacheEntry entry = null!;
+
+            // act
+            void action() => entry.ContinueWithOnEvicted((t, s) => { }, null, CancellationToken.None);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(entry), action);
         }
 
         [Fact]
