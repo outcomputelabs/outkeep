@@ -2,7 +2,6 @@
 using Orleans;
 using Orleans.Concurrency;
 using Orleans.Core;
-using Orleans.Timers;
 using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using Outkeep.Grains.Properties;
@@ -17,13 +16,11 @@ namespace Outkeep.Grains
     {
         private readonly ICacheGrainContext _context;
         private readonly IGrainIdentity _identity;
-        private readonly ITimerRegistry _timers;
 
-        public CacheGrain(ICacheGrainContext context, IGrainIdentity identity, ITimerRegistry timers)
+        public CacheGrain(ICacheGrainContext context, IGrainIdentity identity)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
-            _timers = timers ?? throw new ArgumentNullException(nameof(timers));
         }
 
         private CachePulse _pulse = CachePulse.None;
@@ -33,7 +30,7 @@ namespace Outkeep.Grains
 
         public override async Task OnActivateAsync()
         {
-            _timers.RegisterTimer(this, _ =>
+            _context.TimerRegistry.RegisterTimer(this, _ =>
             {
                 if (_entry != null && _entry.TryExpire(_context.Clock.UtcNow))
                 {

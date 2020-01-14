@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Orleans.Timers;
 using Outkeep.Core;
 using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
@@ -12,5 +13,6 @@ namespace Outkeep.Grains
         ICacheStorage Storage { get; }
         ISystemClock Clock { get; }
         ICacheDirector Director { get; }
+        ITimerRegistry TimerRegistry { get; }
     }
 }
