@@ -90,5 +90,18 @@ namespace Outkeep.Core.Tests
             Assert.True(completed);
             Assert.Same(input, output);
         }
+
+        [Fact]
+        public void SetUtcLastAccessedThrowsOnNullEntry()
+        {
+            // arrange
+            ICacheEntry entry = null!;
+
+            // act
+            void action() => entry.SetUtcLastAccessed(DateTimeOffset.UtcNow);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(entry), action);
+        }
     }
 }
