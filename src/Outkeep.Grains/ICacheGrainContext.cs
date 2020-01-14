@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Outkeep.Core;
 using Outkeep.Core.Storage;
 
 namespace Outkeep.Grains
@@ -8,5 +9,6 @@ namespace Outkeep.Grains
         ILogger Logger { get; }
         CacheGrainOptions Options { get; }
         ICacheStorage Storage { get; }
+        ISystemClock Clock { get; }
     }
 }

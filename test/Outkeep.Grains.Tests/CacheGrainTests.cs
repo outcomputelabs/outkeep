@@ -2,7 +2,6 @@
 using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Timers;
-using Outkeep.Core;
 using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using System;
@@ -19,13 +18,12 @@ namespace Outkeep.Grains.Tests
             // arrange
             var key = "SomeKey";
             var storage = Mock.Of<ICacheStorage>(x => x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(null));
-            var clock = Mock.Of<ISystemClock>();
             var identity = Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key);
             var director = Mock.Of<ICacheDirector>();
             var timers = Mock.Of<ITimerRegistry>();
             var context = Mock.Of<ICacheGrainContext>(x =>
                 x.Storage == storage);
-            var grain = new CacheGrain(context, clock, identity, director, timers);
+            var grain = new CacheGrain(context, identity, director, timers);
             await grain.OnActivateAsync().ConfigureAwait(false);
 
             // act
@@ -43,7 +41,6 @@ namespace Outkeep.Grains.Tests
             var key = "SomeKey";
             var value = Guid.NewGuid().ToByteArray();
             var storage = Mock.Of<ICacheStorage>(x => x.ReadAsync(key, default) == Task.FromResult<CacheItem?>(new CacheItem(value, null, null)));
-            var clock = Mock.Of<ISystemClock>();
             var identity = Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key);
 
             var entry = Mock.Of<ICacheEntry>();
@@ -52,9 +49,10 @@ namespace Outkeep.Grains.Tests
             var director = Mock.Of<ICacheDirector>(x => x.CreateEntry(key, value.Length + IntPtr.Size) == entry);
             var timers = Mock.Of<ITimerRegistry>();
             var context = Mock.Of<ICacheGrainContext>(x =>
-                x.Storage == storage);
+                x.Storage == storage &&
+                x.Clock.UtcNow == DateTimeOffset.UtcNow);
 
-            var grain = new CacheGrain(context, clock, identity, director, timers);
+            var grain = new CacheGrain(context, identity, director, timers);
             await grain.OnActivateAsync().ConfigureAwait(false);
 
             // act
@@ -82,11 +80,11 @@ namespace Outkeep.Grains.Tests
             var director = Mock.Of<ICacheDirector>(x => x.CreateEntry(key, value.Length + IntPtr.Size) == entry);
             var timers = Mock.Of<ITimerRegistry>();
             var context = Mock.Of<ICacheGrainContext>(x =>
-                x.Storage == storage);
+                x.Storage == storage &&
+                x.Clock.UtcNow == DateTimeOffset.UtcNow);
 
             var grain = new CacheGrain(
                 context,
-                Mock.Of<ISystemClock>(),
                 Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key),
                 director,
                 timers);
@@ -115,7 +113,6 @@ namespace Outkeep.Grains.Tests
             var key = "SomeKey";
             var value = Guid.NewGuid().ToByteArray();
             var storage = new MemoryCacheStorage();
-            var clock = Mock.Of<ISystemClock>();
             var identity = Mock.Of<IGrainIdentity>(x => x.PrimaryKeyString == key);
 
             var entry = Mock.Of<ICacheEntry>();
@@ -124,9 +121,10 @@ namespace Outkeep.Grains.Tests
 
             var timers = Mock.Of<ITimerRegistry>();
             var context = Mock.Of<ICacheGrainContext>(x =>
-                x.Storage == storage);
+                x.Storage == storage &&
+                x.Clock.UtcNow == DateTimeOffset.UtcNow);
 
-            var grain = new CacheGrain(context, clock, identity, director, timers);
+            var grain = new CacheGrain(context, identity, director, timers);
 
             // act - set the value
             var absolute = DateTimeOffset.UtcNow;

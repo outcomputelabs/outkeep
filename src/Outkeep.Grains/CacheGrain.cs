@@ -3,7 +3,6 @@ using Orleans;
 using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Timers;
-using Outkeep.Core;
 using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using Outkeep.Grains.Properties;
@@ -17,15 +16,13 @@ namespace Outkeep.Grains
     internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
     {
         private readonly ICacheGrainContext _context;
-        private readonly ISystemClock _clock;
         private readonly IGrainIdentity _identity;
         private readonly ICacheDirector _director;
         private readonly ITimerRegistry _timers;
 
-        public CacheGrain(ICacheGrainContext context, ISystemClock clock, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
+        public CacheGrain(ICacheGrainContext context, IGrainIdentity identity, ICacheDirector director, ITimerRegistry timers)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _clock = clock ?? throw new ArgumentNullException(nameof(clock));
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             _director = director ?? throw new ArgumentNullException(nameof(director));
             _timers = timers ?? throw new ArgumentNullException(nameof(timers));
@@ -40,7 +37,7 @@ namespace Outkeep.Grains
         {
             _timers.RegisterTimer(this, _ =>
             {
-                if (_entry != null && _entry.TryExpire(_clock.UtcNow))
+                if (_entry != null && _entry.TryExpire(_context.Clock.UtcNow))
                 {
                     _entry = null;
                     SetPulse(CachePulse.None);
@@ -63,12 +60,12 @@ namespace Outkeep.Grains
                 .SetAbsoluteExpiration(item.Value.AbsoluteExpiration)
                 .SetSlidingExpiration(item.Value.SlidingExpiration)
                 .SetPriority(CachePriority.Normal)
-                .SetUtcLastAccessed(_clock.UtcNow)
+                .SetUtcLastAccessed(_context.Clock.UtcNow)
                 .ContinueWithOnEvicted(HandleEvicted)
                 .Commit();
 
             // see if we were successful and if not then release the content now
-            if (_entry.TryExpire(_clock.UtcNow))
+            if (_entry.TryExpire(_context.Clock.UtcNow))
             {
                 _entry = null;
                 SetPulse(CachePulse.None);
@@ -120,7 +117,7 @@ namespace Outkeep.Grains
             if (_entry == null) return new ValueTask<CachePulse>(CachePulse.None);
 
             // check if the entry has expired
-            var now = _clock.UtcNow;
+            var now = _context.Clock.UtcNow;
             if (_entry.TryExpire(now))
             {
                 _entry = null;
@@ -176,7 +173,7 @@ namespace Outkeep.Grains
                 .SetAbsoluteExpiration(absoluteExpiration)
                 .SetSlidingExpiration(slidingExpiration)
                 .SetPriority(CachePriority.Normal)
-                .SetUtcLastAccessed(_clock.UtcNow)
+                .SetUtcLastAccessed(_context.Clock.UtcNow)
                 .ContinueWithOnEvicted(HandleEvicted)
                 .Commit();
 
@@ -261,7 +258,7 @@ namespace Outkeep.Grains
         {
             if (_entry != null)
             {
-                _entry.UtcLastAccessed = _clock.UtcNow;
+                _entry.UtcLastAccessed = _context.Clock.UtcNow;
             }
 
             return Task.CompletedTask;
@@ -277,7 +274,7 @@ namespace Outkeep.Grains
             }
 
             // if the current entry has expired then release it and return a clear pulse
-            var now = _clock.UtcNow;
+            var now = _context.Clock.UtcNow;
             if (_entry.TryExpire(now))
             {
                 _entry = null;
