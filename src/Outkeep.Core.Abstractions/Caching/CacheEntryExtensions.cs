@@ -76,7 +76,7 @@ namespace Outkeep.Core.Caching
         {
             if (entry == null) throw new ArgumentNullException(nameof(entry));
 
-            entry.Evicted.ContinueWith(action, state, cancellationToken, TaskContinuationOptions.DenyChildAttach, TaskScheduler.Current);
+            entry.Evicted.ContinueWith(action, state, cancellationToken, TaskContinuationOptions.DenyChildAttach | TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
 
             return entry;
         }
