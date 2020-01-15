@@ -15,6 +15,13 @@
         ICacheEntry CreateEntry(string key, long size);
 
         /// <summary>
+        /// Attempts to get the entry with the specified key.
+        /// </summary>
+        /// <param name="key">The cache entry key.</param>
+        /// <returns>The cache entry with the specified key if found, otherwise <see cref="null"/></returns>
+        bool TryGetEntry(string key, out ICacheEntry? entry);
+
+        /// <summary>
         /// Gets the number of entries managed by this cache director.
         /// </summary>
         int Count { get; }

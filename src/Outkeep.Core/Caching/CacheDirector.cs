@@ -64,6 +64,21 @@ namespace Outkeep.Core.Caching
             return new CacheEntry(key, size, this);
         }
 
+        /// <inheritdoc />
+        public bool TryGetEntry(string key, out ICacheEntry? entry)
+        {
+            if (key == null) throw new ArgumentNullException(nameof(key));
+
+            if (_entries.TryGetValue(key, out var value))
+            {
+                entry = value;
+                return true;
+            }
+
+            entry = null;
+            return false;
+        }
+
         /// <summary>
         /// Attempts to find and expire the item with the given key.
         /// </summary>

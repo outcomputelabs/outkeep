@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Concurrency;
+using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using Outkeep.Interfaces;
 using System;
@@ -224,6 +225,28 @@ namespace Outkeep.Grains.Tests
             // assert
             var result = await storage.ReadAsync(key).ConfigureAwait(false);
             Assert.False(result.HasValue);
+        }
+
+        [Fact]
+        public async Task RefreshUpdatesLastAccessedTimestamp()
+        {
+            // arrange
+            var key = Guid.NewGuid().ToString();
+            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
+            var director = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector>();
+
+            // act
+            await grain.SetAsync(Guid.NewGuid().ToByteArray().AsNullableImmutable(), null, null).ConfigureAwait(false);
+
+            // assert
+            Assert.True(director.TryGetEntry(key, out var entry));
+            var accessed = entry?.UtcLastAccessed;
+
+            // act
+            await grain.RefreshAsync().ConfigureAwait(false);
+
+            // assert
+            Assert.True(entry?.UtcLastAccessed > accessed);
         }
     }
 }
