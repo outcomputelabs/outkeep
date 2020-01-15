@@ -158,5 +158,40 @@ namespace Outkeep.Grains.Tests
             Assert.Equal(Guid.Empty, result.Tag);
             Assert.Null(result.Value.Value);
         }
+
+        [Fact]
+        public async Task HandlesExpiration()
+        {
+            // arrange
+            var key = Guid.NewGuid().ToString();
+            var value = Guid.NewGuid().ToByteArray();
+            var absoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(1);
+
+            // act
+            await _fixture.Cluster.GrainFactory
+                .GetCacheGrain(key)
+                .SetAsync(new Immutable<byte[]?>(value), absoluteExpiration, null)
+                .ConfigureAwait(false);
+
+            var result = await _fixture.Cluster.GrainFactory
+                .GetCacheGrain(key)
+                .GetAsync();
+
+            // assert
+            Assert.Equal(value, result.Value.Value);
+            Assert.NotEqual(Guid.Empty, result.Tag);
+
+            // wait for the cache director to expire the entry and complete the expired task
+            await Task.Delay(2000).ConfigureAwait(false);
+
+            // act
+            result = await _fixture.Cluster.GrainFactory
+                .GetCacheGrain(key)
+                .GetAsync();
+
+            // assert
+            Assert.Null(result.Value.Value);
+            Assert.Equal(Guid.Empty, result.Tag);
+        }
     }
 }
