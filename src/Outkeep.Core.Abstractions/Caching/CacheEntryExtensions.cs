@@ -86,9 +86,17 @@ namespace Outkeep.Core.Caching
         /// </summary>
         public static ICacheEntry ContinueWithOnEvicted(this ICacheEntry entry, Action<Task<CacheEvictionArgs>> action, CancellationToken cancellationToken = default)
         {
+            return ContinueWithOnEvicted(entry, action, out _, cancellationToken);
+        }
+
+        /// <summary>
+        /// Convenience method to schedule a continuation on the <see cref="ICacheEntry.Evicted"/> property using the current task scheduler.
+        /// </summary>
+        public static ICacheEntry ContinueWithOnEvicted(this ICacheEntry entry, Action<Task<CacheEvictionArgs>> action, out Task continuation, CancellationToken cancellationToken = default)
+        {
             if (entry == null) throw new ArgumentNullException(nameof(entry));
 
-            entry.Evicted.ContinueWith(action, cancellationToken, TaskContinuationOptions.DenyChildAttach, TaskScheduler.Current);
+            continuation = entry.Evicted.ContinueWith(action, cancellationToken, TaskContinuationOptions.DenyChildAttach, TaskScheduler.Current);
 
             return entry;
         }

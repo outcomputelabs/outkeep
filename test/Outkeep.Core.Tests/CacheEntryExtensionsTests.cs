@@ -103,10 +103,12 @@ namespace Outkeep.Core.Tests
 
             // act
             var completed = false;
-            entry.ContinueWithOnEvicted(t => completed = true, CancellationToken.None);
+            var chain = entry.ContinueWithOnEvicted(t => completed = true, out var continuation, CancellationToken.None);
 
             // assert
-            await Task.Delay(200).ConfigureAwait(false);
+            Assert.Same(entry, chain);
+            Assert.NotNull(continuation);
+            await continuation.ConfigureAwait(false);
             Assert.True(completed);
         }
 
