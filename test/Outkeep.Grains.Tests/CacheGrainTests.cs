@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Orleans;
 using Orleans.Concurrency;
 using Outkeep.Core.Storage;
 using Outkeep.Interfaces;
@@ -133,6 +134,28 @@ namespace Outkeep.Grains.Tests
 
             // assert value is cleared from memory and not reloaded
             result = await grain.GetAsync().ConfigureAwait(false);
+            Assert.Null(result.Value.Value);
+        }
+
+        [Fact]
+        public async Task DoesNotLoadExpiredItemFromStorage()
+        {
+            // arrange
+            var key = Guid.NewGuid().ToString();
+            var value = Guid.NewGuid().ToByteArray();
+
+            await _fixture.PrimarySiloServiceProvider
+                .GetRequiredService<ICacheStorage>()
+                .WriteAsync(key, new CacheItem(value, DateTimeOffset.UtcNow.AddMinutes(-1), null))
+                .ConfigureAwait(false);
+
+            // act
+            var result = await _fixture.Cluster.GrainFactory
+                .GetCacheGrain(key)
+                .GetAsync();
+
+            // assert
+            Assert.Equal(Guid.Empty, result.Tag);
             Assert.Null(result.Value.Value);
         }
     }
