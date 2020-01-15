@@ -239,10 +239,16 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task<CachePulse> PollAsync(Guid tag)
         {
-            // if there is no entry yet then return a promise
+            // if the user tag is different than the current tag then return the last pulse
+            if (tag != _pulse.Tag)
+            {
+                return Task.FromResult(_pulse);
+            }
+
+            // otherwise if there is no entry yet then return a promise until we have one
             if (_entry == null)
             {
-                return _promise.Task.WithDefaultOnTimeout(CachePulse.None, _context.Options.ReactivePollingTimeout);
+                return _promise.Task.WithDefaultOnTimeout(_pulse, _context.Options.ReactivePollingTimeout);
             }
 
             // if the current entry has expired then release it and return a clear pulse

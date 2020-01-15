@@ -248,5 +248,21 @@ namespace Outkeep.Grains.Tests
             // assert
             Assert.True(entry?.UtcLastAccessed > accessed);
         }
+
+        [Fact]
+        public async Task PollAsyncReturnsEmptyPulseOnRandomTagWithNoEntry()
+        {
+            // arrange
+            var key = Guid.NewGuid().ToString();
+            var tag = Guid.NewGuid();
+            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
+
+            // act
+            var result = await grain.PollAsync(tag).ConfigureAwait(false);
+
+            // assert
+            Assert.Null(result.Value.Value);
+            Assert.Equal(Guid.Empty, result.Tag);
+        }
     }
 }

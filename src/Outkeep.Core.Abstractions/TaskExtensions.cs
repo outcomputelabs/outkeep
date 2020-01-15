@@ -21,8 +21,14 @@
             if (timeout == TimeSpan.Zero) return Task.FromResult(defaultValue);
 
             // slow path for regular completion
-            var delay = Task.Delay(timeout).ContinueWith((x, dv) => (T)dv, defaultValue, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+            var delay = Task.Delay(timeout, cancellationToken).ContinueWith(DelayAction, defaultValue, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
             return Task.WhenAny(task, delay).Unwrap();
+
+            // called upon delay completion
+            static T DelayAction(Task t, object dv)
+            {
+                return (T)dv;
+            }
         }
     }
 }
