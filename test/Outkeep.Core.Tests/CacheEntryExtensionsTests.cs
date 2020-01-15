@@ -106,7 +106,7 @@ namespace Outkeep.Core.Tests
             entry.ContinueWithOnEvicted(t => completed = true, CancellationToken.None);
 
             // assert
-            await Task.Delay(100).ConfigureAwait(false);
+            await Task.Delay(200).ConfigureAwait(false);
             Assert.True(completed);
         }
 
