@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Concurrency;
 using Outkeep.Core.Caching;
 using Outkeep.Core.Storage;
 using Outkeep.Interfaces;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -258,9 +260,32 @@ namespace Outkeep.Grains.Tests
             var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
 
             // act
+            var watch = Stopwatch.StartNew();
             var result = await grain.PollAsync(tag).ConfigureAwait(false);
+            watch.Stop();
 
             // assert
+            Assert.True(watch.Elapsed < TimeSpan.FromSeconds(1));
+            Assert.Null(result.Value.Value);
+            Assert.Equal(Guid.Empty, result.Tag);
+        }
+
+        [Fact]
+        public async Task PollAsyncReturnsDelayPulseOnRandomTagWithNoEntry()
+        {
+            // arrange
+            var key = Guid.NewGuid().ToString();
+            var tag = Guid.Empty;
+            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
+            var options = _fixture.PrimarySiloServiceProvider.GetRequiredService<IOptions<CacheGrainOptions>>().Value;
+
+            // act
+            var watch = Stopwatch.StartNew();
+            var result = await grain.PollAsync(tag).ConfigureAwait(false);
+            watch.Stop();
+
+            // assert
+            Assert.True(watch.Elapsed >= options.ReactivePollingTimeout);
             Assert.Null(result.Value.Value);
             Assert.Equal(Guid.Empty, result.Tag);
         }

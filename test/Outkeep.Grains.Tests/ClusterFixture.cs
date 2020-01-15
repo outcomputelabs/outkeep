@@ -59,7 +59,11 @@ namespace Outkeep.Grains.Tests
                                 options.Capacity = 1000;
                             })
                             .AddSystemClock()
-                            .AddCacheGrainContext();
+                            .AddCacheGrainContext()
+                            .Configure<CacheGrainOptions>(options =>
+                            {
+                                options.ReactivePollingTimeout = TimeSpan.FromSeconds(5);
+                            });
                     })
                     .AddCacheDirectorGrainService()
                     .UseServiceProviderFactory(services =>
