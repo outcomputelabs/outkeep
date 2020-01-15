@@ -158,8 +158,17 @@ namespace Outkeep.Grains.Tests
                 .GetAsync();
 
             // assert
-            Assert.Equal(Guid.Empty, result.Tag);
+            Assert.NotEqual(Guid.Empty, result.Tag);
             Assert.Null(result.Value.Value);
+
+            // act
+            var repeat = await _fixture.Cluster.GrainFactory
+                .GetCacheGrain(key)
+                .GetAsync();
+
+            // assert
+            Assert.Equal(result.Tag, repeat.Tag);
+            Assert.Equal(result.Value, repeat.Value);
         }
 
         [Fact]
@@ -194,7 +203,16 @@ namespace Outkeep.Grains.Tests
 
             // assert
             Assert.Null(result.Value.Value);
-            Assert.Equal(Guid.Empty, result.Tag);
+            Assert.NotEqual(Guid.Empty, result.Tag);
+
+            // act
+            var repeat = await _fixture.Cluster.GrainFactory
+                .GetCacheGrain(key)
+                .GetAsync();
+
+            // assert
+            Assert.Equal(result.Tag, repeat.Tag);
+            Assert.Equal(result.Value, repeat.Value);
         }
 
         [Fact]
@@ -252,42 +270,52 @@ namespace Outkeep.Grains.Tests
         }
 
         [Fact]
-        public async Task PollAsyncReturnsEmptyPulseOnRandomTagWithNoEntry()
+        public async Task PollAsyncLifecycle()
         {
             // arrange
             var key = Guid.NewGuid().ToString();
             var tag = Guid.NewGuid();
             var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
-
-            // act
-            var watch = Stopwatch.StartNew();
-            var result = await grain.PollAsync(tag).ConfigureAwait(false);
-            watch.Stop();
-
-            // assert
-            Assert.True(watch.Elapsed < TimeSpan.FromSeconds(1));
-            Assert.Null(result.Value.Value);
-            Assert.Equal(Guid.Empty, result.Tag);
-        }
-
-        [Fact]
-        public async Task PollAsyncReturnsDelayPulseOnRandomTagWithNoEntry()
-        {
-            // arrange
-            var key = Guid.NewGuid().ToString();
-            var tag = Guid.Empty;
-            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
             var options = _fixture.PrimarySiloServiceProvider.GetRequiredService<IOptions<CacheGrainOptions>>().Value;
 
-            // act
-            var watch = Stopwatch.StartNew();
-            var result = await grain.PollAsync(tag).ConfigureAwait(false);
-            watch.Stop();
+            // act - this returns the current pulse with no delay
+            var watch1 = Stopwatch.StartNew();
+            var result1 = await grain.PollAsync(tag).ConfigureAwait(false);
+            watch1.Stop();
 
             // assert
-            Assert.True(watch.Elapsed >= options.ReactivePollingTimeout);
-            Assert.Null(result.Value.Value);
-            Assert.Equal(Guid.Empty, result.Tag);
+            Assert.True(watch1.Elapsed < TimeSpan.FromSeconds(1));
+            Assert.NotEqual(Guid.Empty, result1.Tag);
+            Assert.Null(result1.Value.Value);
+
+            // act - this waits till timeout to return an empty pulse with the same tag as input
+            var watch2 = Stopwatch.StartNew();
+            var result2 = await grain.PollAsync(result1.Tag).ConfigureAwait(false);
+            watch2.Stop();
+
+            // assert
+            Assert.True(watch2.Elapsed > options.ReactivePollingTimeout);
+            Assert.Equal(result1.Tag, result2.Tag);
+            Assert.Null(result2.Value.Value);
+
+            // act - this issues another long-poll but does not wait
+            var watch3 = Stopwatch.StartNew();
+            var task3 = grain.PollAsync(result2.Tag);
+
+            // act - allow the long poll to start
+            await Task.Delay(100).ConfigureAwait(false);
+
+            // act - change the value to resolve the poll
+            var value3 = Guid.NewGuid().ToByteArray();
+            await grain.SetAsync(value3.AsNullableImmutable(), null, null).ConfigureAwait(false);
+
+            // assert
+            var result3 = await task3.ConfigureAwait(false);
+            watch3.Stop();
+            Assert.True(watch3.Elapsed < TimeSpan.FromSeconds(1));
+            Assert.NotEqual(Guid.Empty, result3.Tag);
+            Assert.NotEqual(result2.Tag, result3.Tag);
+            Assert.Equal(value3, result3.Value.Value);
         }
     }
 }

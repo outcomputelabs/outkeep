@@ -18,10 +18,13 @@ namespace Outkeep.Grains
         public CacheGrain(ICacheGrainContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+
+            _pulse = CachePulse.RandomNull();
+            _promise = new TaskCompletionSource<CachePulse>(_pulse);
         }
 
-        private CachePulse _pulse = CachePulse.None;
-        private TaskCompletionSource<CachePulse> _promise = new TaskCompletionSource<CachePulse>(CachePulse.None);
+        private CachePulse _pulse;
+        private TaskCompletionSource<CachePulse> _promise;
         private Task? _outstandingStorageOperation = null;
         private ICacheEntry? _entry;
 
@@ -33,7 +36,7 @@ namespace Outkeep.Grains
             var item = await _context.Storage.ReadAsync(PrimaryKey).ConfigureAwait(true);
             if (!item.HasValue)
             {
-                SetPulse(CachePulse.None);
+                SetPulse(CachePulse.RandomNull());
                 return;
             }
 
@@ -51,12 +54,12 @@ namespace Outkeep.Grains
             if (_entry.TryExpire(_context.Clock.UtcNow))
             {
                 _entry = null;
-                SetPulse(CachePulse.None);
+                SetPulse(CachePulse.RandomNull());
                 return;
             }
 
             // otherwise keep the content
-            SetPulse(new CachePulse(Guid.NewGuid(), new Immutable<byte[]?>(item.Value.Value)));
+            SetPulse(CachePulse.Random(item.Value.Value));
         }
 
         public override Task OnDeactivateAsync()
@@ -71,7 +74,7 @@ namespace Outkeep.Grains
             if (args.Result.CacheEntry == _entry)
             {
                 ClearEntry();
-                SetPulse(CachePulse.None);
+                SetPulse(CachePulse.RandomNull());
             }
         }
 
@@ -119,7 +122,7 @@ namespace Outkeep.Grains
             _entry = null;
 
             // fulfill any pending requests
-            SetPulse(CachePulse.None);
+            SetPulse(CachePulse.RandomNull());
 
             // remove the entry from storage
             return PersistAsync();
@@ -135,7 +138,7 @@ namespace Outkeep.Grains
             if (value.Value is null)
             {
                 // storing a null value is equivalent to a clear
-                SetPulse(CachePulse.None);
+                SetPulse(CachePulse.RandomNull());
                 return PersistAsync();
             }
 
@@ -150,7 +153,7 @@ namespace Outkeep.Grains
                 .Commit();
 
             // update subs and lazy save
-            SetPulse(new CachePulse(Guid.NewGuid(), value));
+            SetPulse(CachePulse.Random(value));
             return PersistAsync();
         }
 
@@ -239,39 +242,18 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task<CachePulse> PollAsync(Guid tag)
         {
-            // if the user tag is different than the current tag then return the last pulse
-            if (tag != _pulse.Tag)
+            // if we have an entry then update the last accessed date
+            if (_entry != null)
             {
-                return Task.FromResult(_pulse);
+                _entry.UtcLastAccessed = _context.Clock.UtcNow;
             }
 
-            // otherwise if there is no entry yet then return a promise until we have one
-            if (_entry == null)
+            if (tag == _pulse.Tag)
             {
                 return _promise.Task.WithDefaultOnTimeout(_pulse, _context.Options.ReactivePollingTimeout);
             }
 
-            // if the current entry has expired then release it and return a clear pulse
-            var now = _context.Clock.UtcNow;
-            if (_entry.TryExpire(now))
-            {
-                _entry = null;
-                SetPulse(CachePulse.None);
-                return Task.FromResult(CachePulse.None);
-            }
-
-            // if the entry has not expired then decide based on the input tag
-            _entry.UtcLastAccessed = now;
-            if (tag == _pulse.Tag)
-            {
-                // the caller already has the same data so return a promise
-                return _promise.Task.WithDefaultOnTimeout(CachePulse.None, _context.Options.ReactivePollingTimeout);
-            }
-            else
-            {
-                // the caller has a different version of data so return the current one now
-                return Task.FromResult(_pulse);
-            }
+            return Task.FromResult(_pulse);
         }
 
         public async Task Invoke(IIncomingGrainCallContext context)

@@ -50,8 +50,23 @@ namespace Outkeep.Interfaces
         }
 
         /// <summary>
-        /// Returns a cache pulse with an empty tag and default (null) value.
+        /// Returns a cache pulse with an empty tag and null value.
         /// </summary>
         public static CachePulse None { get; } = new CachePulse(Guid.Empty, new Immutable<byte[]?>(null));
+
+        /// <summary>
+        /// Creates a new cache pulse with a random tag and null value.
+        /// </summary>
+        public static CachePulse RandomNull() => new CachePulse(Guid.NewGuid(), null);
+
+        /// <summary>
+        /// Creates a new cache pulse with a random tag and the provided value.
+        /// </summary>
+        public static CachePulse Random(byte[]? value) => new CachePulse(Guid.NewGuid(), value);
+
+        /// <summary>
+        /// Creates a new cache pulse with a random tag and the provided value.
+        /// </summary>
+        public static CachePulse Random(Immutable<byte[]?> value) => new CachePulse(Guid.NewGuid(), value);
     }
 }
