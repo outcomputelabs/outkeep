@@ -193,5 +193,19 @@ namespace Outkeep.Grains.Tests
             Assert.Null(result.Value.Value);
             Assert.Equal(Guid.Empty, result.Tag);
         }
+
+        [Fact]
+        public async Task RemoveNoopsIfEmpty()
+        {
+            // arrange
+            var key = Guid.NewGuid().ToString();
+            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
+
+            // act
+            await grain.RemoveAsync().ConfigureAwait(false);
+
+            // assert
+            Assert.True(true);
+        }
     }
 }
