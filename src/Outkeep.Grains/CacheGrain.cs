@@ -96,22 +96,11 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public ValueTask<CachePulse> GetAsync()
         {
-            // check if we have an entry at all
-            if (_entry == null) return new ValueTask<CachePulse>(CachePulse.None);
-
-            // check if the entry has expired
-            var now = _context.Clock.UtcNow;
-            if (_entry.TryExpire(now))
+            if (_entry != null)
             {
-                _entry = null;
-                SetPulse(new CachePulse(Guid.NewGuid(), new Immutable<byte[]?>(null)));
-                return new ValueTask<CachePulse>(_pulse);
+                _entry.UtcLastAccessed = _context.Clock.UtcNow;
             }
 
-            // update the accessed time to keep the entry from expiring
-            _entry.UtcLastAccessed = now;
-
-            // the entry has not yet expired so we can return the last pulse
             return new ValueTask<CachePulse>(_pulse);
         }
 
