@@ -207,5 +207,23 @@ namespace Outkeep.Grains.Tests
             // assert
             Assert.True(true);
         }
+
+        [Fact]
+        public async Task SettingNullClearsStorage()
+        {
+            // arrange
+            var key = Guid.NewGuid().ToString();
+            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
+            var storage = _fixture.PrimarySiloServiceProvider.GetService<ICacheStorage>();
+
+            await storage.WriteAsync(key, new CacheItem(Guid.NewGuid().ToByteArray(), DateTimeOffset.UtcNow.AddDays(1), TimeSpan.MaxValue)).ConfigureAwait(false);
+
+            // act
+            await grain.SetAsync(new Immutable<byte[]?>(null), DateTimeOffset.UtcNow.AddMinutes(1), TimeSpan.MaxValue).ConfigureAwait(false);
+
+            // assert
+            var result = await storage.ReadAsync(key).ConfigureAwait(false);
+            Assert.False(result.HasValue);
+        }
     }
 }
