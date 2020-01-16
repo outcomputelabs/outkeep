@@ -80,8 +80,6 @@ namespace Outkeep.Grains
 
         private void SetPulse(CachePulse pulse)
         {
-            if (pulse == _pulse) return;
-
             _pulse = pulse;
             _promise.TrySetResult(pulse);
             _promise = new TaskCompletionSource<CachePulse>();
