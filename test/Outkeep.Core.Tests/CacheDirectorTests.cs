@@ -585,5 +585,33 @@ namespace Outkeep.Core.Tests
             Assert.False(entry.IsExpired);
             Assert.True(previous.IsExpired);
         }
+
+        [Fact]
+        public void ExpiresEntryOnOverflow()
+        {
+            // arrange
+            var options = new CacheOptions { Capacity = long.MaxValue };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var key = Guid.NewGuid().ToString();
+
+            // act
+            var filler = director
+                .CreateEntry(key, long.MaxValue - 100)
+                .Commit();
+
+            // assert
+            Assert.NotNull(filler);
+            Assert.False(filler.IsExpired);
+
+            // act
+            var entry = director
+                .CreateEntry(key, 1000)
+                .Commit();
+
+            // assert
+            Assert.NotNull(entry);
+            Assert.True(entry.IsExpired);
+            Assert.True(filler.IsExpired);
+        }
     }
 }
