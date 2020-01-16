@@ -2,7 +2,7 @@
 
 namespace Outkeep.Core.Caching
 {
-    public readonly struct CacheEvictionArgs<TKey> : IEquatable<CacheEvictionArgs<TKey>>
+    public readonly struct CacheEvictionArgs<TKey> : IEquatable<CacheEvictionArgs<TKey>> where TKey : notnull
     {
         public CacheEvictionArgs(ICacheEntry<TKey> cacheEntry, EvictionCause evictionCause)
         {
