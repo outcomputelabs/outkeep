@@ -12,11 +12,11 @@ namespace Outkeep.Core.Tests
         public void Properties()
         {
             // arrange
-            var entry = Mock.Of<ICacheEntry>();
+            var entry = Mock.Of<ICacheEntry<string>>();
             var cause = EvictionCause.Expired;
 
             // act
-            var args = new CacheEvictionArgs(entry, cause);
+            var args = new CacheEvictionArgs<string>(entry, cause);
 
             // assert
             Assert.Same(entry, args.CacheEntry);
@@ -27,17 +27,17 @@ namespace Outkeep.Core.Tests
         public void TypedEquals()
         {
             // arrange
-            var entry1 = Mock.Of<ICacheEntry>();
-            var entry2 = Mock.Of<ICacheEntry>();
-            var args1 = new CacheEvictionArgs(entry1, EvictionCause.Replaced);
-            var args2 = new CacheEvictionArgs(entry1, EvictionCause.Replaced);
-            var args3 = new CacheEvictionArgs(entry1, EvictionCause.Removed);
-            var args4 = new CacheEvictionArgs(entry2, EvictionCause.Replaced);
+            var entry1 = Mock.Of<ICacheEntry<string>>();
+            var entry2 = Mock.Of<ICacheEntry<string>>();
+            var args1 = new CacheEvictionArgs<string>(entry1, EvictionCause.Replaced);
+            var args2 = new CacheEvictionArgs<string>(entry1, EvictionCause.Replaced);
+            var args3 = new CacheEvictionArgs<string>(entry1, EvictionCause.Removed);
+            var args4 = new CacheEvictionArgs<string>(entry2, EvictionCause.Replaced);
 
             // act
-            var result1 = EqualityComparer<CacheEvictionArgs>.Default.Equals(args1, args2);
-            var result2 = EqualityComparer<CacheEvictionArgs>.Default.Equals(args1, args3);
-            var result3 = EqualityComparer<CacheEvictionArgs>.Default.Equals(args1, args4);
+            var result1 = EqualityComparer<CacheEvictionArgs<string>>.Default.Equals(args1, args2);
+            var result2 = EqualityComparer<CacheEvictionArgs<string>>.Default.Equals(args1, args3);
+            var result3 = EqualityComparer<CacheEvictionArgs<string>>.Default.Equals(args1, args4);
 
             // assert
             Assert.True(result1);
@@ -49,12 +49,12 @@ namespace Outkeep.Core.Tests
         public void ObjectEquals()
         {
             // arrange
-            var entry1 = Mock.Of<ICacheEntry>();
-            var entry2 = Mock.Of<ICacheEntry>();
-            var args1 = new CacheEvictionArgs(entry1, EvictionCause.Replaced);
-            var args2 = new CacheEvictionArgs(entry1, EvictionCause.Replaced);
-            var args3 = new CacheEvictionArgs(entry1, EvictionCause.Removed);
-            var args4 = new CacheEvictionArgs(entry2, EvictionCause.Replaced);
+            var entry1 = Mock.Of<ICacheEntry<string>>();
+            var entry2 = Mock.Of<ICacheEntry<string>>();
+            var args1 = new CacheEvictionArgs<string>(entry1, EvictionCause.Replaced);
+            var args2 = new CacheEvictionArgs<string>(entry1, EvictionCause.Replaced);
+            var args3 = new CacheEvictionArgs<string>(entry1, EvictionCause.Removed);
+            var args4 = new CacheEvictionArgs<string>(entry2, EvictionCause.Replaced);
 
             // act
             var result1 = Equals(args1, args2);
@@ -75,12 +75,12 @@ namespace Outkeep.Core.Tests
         public void OperatorEquals()
         {
             // arrange
-            var entry1 = Mock.Of<ICacheEntry>();
-            var entry2 = Mock.Of<ICacheEntry>();
-            var args1 = new CacheEvictionArgs(entry1, EvictionCause.Replaced);
-            var args2 = new CacheEvictionArgs(entry1, EvictionCause.Replaced);
-            var args3 = new CacheEvictionArgs(entry1, EvictionCause.Removed);
-            var args4 = new CacheEvictionArgs(entry2, EvictionCause.Replaced);
+            var entry1 = Mock.Of<ICacheEntry<string>>();
+            var entry2 = Mock.Of<ICacheEntry<string>>();
+            var args1 = new CacheEvictionArgs<string>(entry1, EvictionCause.Replaced);
+            var args2 = new CacheEvictionArgs<string>(entry1, EvictionCause.Replaced);
+            var args3 = new CacheEvictionArgs<string>(entry1, EvictionCause.Removed);
+            var args4 = new CacheEvictionArgs<string>(entry2, EvictionCause.Replaced);
 
             // act
             var result1 = args1 == args2;
@@ -97,12 +97,12 @@ namespace Outkeep.Core.Tests
         public void OperatorNotEquals()
         {
             // arrange
-            var entry1 = Mock.Of<ICacheEntry>();
-            var entry2 = Mock.Of<ICacheEntry>();
-            var args1 = new CacheEvictionArgs(entry1, EvictionCause.Replaced);
-            var args2 = new CacheEvictionArgs(entry1, EvictionCause.Replaced);
-            var args3 = new CacheEvictionArgs(entry1, EvictionCause.Removed);
-            var args4 = new CacheEvictionArgs(entry2, EvictionCause.Replaced);
+            var entry1 = Mock.Of<ICacheEntry<string>>();
+            var entry2 = Mock.Of<ICacheEntry<string>>();
+            var args1 = new CacheEvictionArgs<string>(entry1, EvictionCause.Replaced);
+            var args2 = new CacheEvictionArgs<string>(entry1, EvictionCause.Replaced);
+            var args3 = new CacheEvictionArgs<string>(entry1, EvictionCause.Removed);
+            var args4 = new CacheEvictionArgs<string>(entry2, EvictionCause.Replaced);
 
             // act
             var result1 = args1 != args2;
@@ -119,10 +119,10 @@ namespace Outkeep.Core.Tests
         public void GetsHashCode()
         {
             // arrange
-            var entry = Mock.Of<ICacheEntry>(x => x.GetHashCode() == 123);
+            var entry = Mock.Of<ICacheEntry<string>>(x => x.GetHashCode() == 123);
             var cause = EvictionCause.Replaced;
             var expected = HashCode.Combine(entry, cause);
-            var args = new CacheEvictionArgs(entry, cause);
+            var args = new CacheEvictionArgs<string>(entry, cause);
 
             // act
             var result = args.GetHashCode();

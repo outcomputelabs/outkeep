@@ -13,7 +13,7 @@ namespace Outkeep.Grains
     /// </summary>
     internal class CacheGrainContext : ICacheGrainContext
     {
-        public CacheGrainContext(ILogger<CacheGrain> logger, IOptions<CacheGrainOptions> options, ICacheStorage storage, ISystemClock clock, ICacheDirector director, ITimerRegistry timerRegistry)
+        public CacheGrainContext(ILogger<CacheGrain> logger, IOptions<CacheGrainOptions> options, ICacheStorage storage, ISystemClock clock, ICacheDirector<string> director, ITimerRegistry timerRegistry)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -31,7 +31,7 @@ namespace Outkeep.Grains
 
         public ISystemClock Clock { get; }
 
-        public ICacheDirector Director { get; }
+        public ICacheDirector<string> Director { get; }
 
         public ITimerRegistry TimerRegistry { get; }
     }

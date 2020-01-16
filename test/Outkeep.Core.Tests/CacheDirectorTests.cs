@@ -20,7 +20,7 @@ namespace Outkeep.Core.Tests
             };
 
             // act
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, NullClock.Default);
 
             // assert
             Assert.Equal(0, director.Count);
@@ -41,7 +41,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
             var key = "SomeKey";
             var size = 1000;
 
@@ -86,7 +86,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
             var key = "SomeKey";
             var size = 0;
 
@@ -107,7 +107,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
 
             // act
             var entry1 = director.CreateEntry("SomeKey1", 1).SetAbsoluteExpiration(clock.UtcNow.AddMinutes(1)).Commit();
@@ -209,7 +209,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
             string? key = null;
 
             // act
@@ -232,7 +232,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
             var key = "SomeKey";
             var size1 = 1000;
             var size2 = 2000;
@@ -274,7 +274,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
             var key = "SomeKey";
 
             // act
@@ -312,7 +312,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
             var key = "SomeKey";
             var size1 = 6000;
 
@@ -342,7 +342,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
             var key = "SomeKey";
             var size = 10;
 
@@ -371,7 +371,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
 
             // act
             var entry1 = director.CreateEntry("Key1", 1000).SetPriority(CachePriority.Low).Commit();
@@ -414,7 +414,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
 
             // act
             var entry1 = director.CreateEntry("Key1", 1000).SetPriority(CachePriority.Low).Commit();
@@ -450,7 +450,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
 
             // act
             var entry1 = director.CreateEntry("Key1", 1000).SetPriority(CachePriority.Low).Commit();
@@ -486,7 +486,7 @@ namespace Outkeep.Core.Tests
             {
                 UtcNow = DateTimeOffset.UtcNow
             };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, clock);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
 
             // act
             var entry1 = director.CreateEntry("Key1", 1000).SetPriority(CachePriority.Low).Commit();
@@ -514,7 +514,7 @@ namespace Outkeep.Core.Tests
         {
             // arrange
             var options = new CacheOptions { Capacity = 1000 };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, NullClock.Default);
             var key = Guid.NewGuid().ToString();
             var size = options.Capacity + 1;
 
@@ -530,7 +530,7 @@ namespace Outkeep.Core.Tests
         {
             // arrange
             var options = new CacheOptions();
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, NullClock.Default);
             string? key = null;
 
             // act
@@ -545,7 +545,7 @@ namespace Outkeep.Core.Tests
         {
             // arrange
             var options = new CacheOptions();
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, NullClock.Default);
             var key = Guid.NewGuid().ToString();
 
             // act
@@ -561,7 +561,7 @@ namespace Outkeep.Core.Tests
         {
             // arrange
             var options = new CacheOptions { Capacity = 1000 };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, NullClock.Default);
             var key = Guid.NewGuid().ToString();
 
             // act
@@ -591,7 +591,7 @@ namespace Outkeep.Core.Tests
         {
             // arrange
             var options = new CacheOptions { Capacity = long.MaxValue };
-            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, NullClock.Default);
             var key = Guid.NewGuid().ToString();
 
             // act

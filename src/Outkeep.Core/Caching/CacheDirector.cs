@@ -10,22 +10,22 @@ using System.Threading;
 namespace Outkeep.Core.Caching
 {
     [DebuggerDisplay("Count = {Count}, Size = {Size}, Capacity = {Capacity}")]
-    internal sealed class CacheDirector : ICacheDirector, ICacheContext
+    internal sealed class CacheDirector<TKey> : ICacheDirector<TKey>, ICacheContext<TKey> where TKey : notnull
     {
-        private readonly ILogger<CacheDirector> _logger;
+        private readonly ILogger _logger;
         private readonly CacheOptions _options;
         private readonly ISystemClock _clock;
 
-        public CacheDirector(IOptions<CacheOptions> options, ILogger<CacheDirector> logger, ISystemClock clock)
+        public CacheDirector(IOptions<CacheOptions> options, ILogger<CacheDirector<TKey>> logger, ISystemClock clock)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
 
-            _buckets = new ConcurrentDictionary<CacheEntry, bool>[3];
+            _buckets = new ConcurrentDictionary<CacheEntry<TKey>, bool>[3];
             for (var i = 0; i < 3; ++i)
             {
-                _buckets[i] = new ConcurrentDictionary<CacheEntry, bool>();
+                _buckets[i] = new ConcurrentDictionary<CacheEntry<TKey>, bool>();
             }
         }
 
@@ -36,9 +36,9 @@ namespace Outkeep.Core.Caching
         /// The entries do not hold the cached data themselves.
         /// The cache participants that create the entries are responsible for that.
         /// </remarks>
-        private readonly ConcurrentDictionary<string, CacheEntry> _entries = new ConcurrentDictionary<string, CacheEntry>();
+        private readonly ConcurrentDictionary<TKey, CacheEntry<TKey>> _entries = new ConcurrentDictionary<TKey, CacheEntry<TKey>>();
 
-        private readonly ConcurrentDictionary<CacheEntry, bool>[] _buckets;
+        private readonly ConcurrentDictionary<CacheEntry<TKey>, bool>[] _buckets;
 
         /// <summary>
         /// Used "space" in the cache.
@@ -55,17 +55,17 @@ namespace Outkeep.Core.Caching
         public long Capacity => _options.Capacity;
 
         /// <inheritdoc />
-        public ICacheEntry CreateEntry(string key, long size)
+        public ICacheEntry<TKey> CreateEntry(TKey key, long size)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
             if (size < 1) throw new ArgumentOutOfRangeException(nameof(size), Resources.Exception_CacheEntryFor_X_MustHaveSizeGreaterThanZero.Format(key));
             if (size > _options.Capacity) throw new ArgumentOutOfRangeException(nameof(size), Resources.Exception_CacheEntryFor_X_MustHaveSizeLesserThanOrEqualCapacityOf_X.Format(key, _options.Capacity));
 
-            return new CacheEntry(key, size, this);
+            return new CacheEntry<TKey>(key, size, this);
         }
 
         /// <inheritdoc />
-        public bool TryGetEntry(string key, out ICacheEntry? entry)
+        public bool TryGetEntry(TKey key, out ICacheEntry<TKey>? entry)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
 
@@ -82,7 +82,7 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Attempts to find and expire the item with the given key.
         /// </summary>
-        private CacheEntry TryExpire(string key)
+        private CacheEntry<TKey> TryExpire(TKey key)
         {
             if (_entries.TryGetValue(key, out var previous))
             {
@@ -97,7 +97,7 @@ namespace Outkeep.Core.Caching
         /// This is the critical performance path in the director.
         /// </summary>
         /// <param name="entry">The entry to accept.</param>
-        public void OnEntryCommitted(CacheEntry entry)
+        public void OnEntryCommitted(CacheEntry<TKey> entry)
         {
             // keep the current clock so evaluations are consistent
             var now = _clock.UtcNow;
@@ -203,14 +203,14 @@ namespace Outkeep.Core.Caching
             }
         }
 
-        private void TryBucket(CacheEntry entry)
+        private void TryBucket(CacheEntry<TKey> entry)
         {
             if (entry.Priority >= CachePriority.NeverRemove) return;
 
             _buckets[(int)entry.Priority].TryAdd(entry, true);
         }
 
-        private void TryUnbucket(CacheEntry entry)
+        private void TryUnbucket(CacheEntry<TKey> entry)
         {
             if (entry.Priority >= CachePriority.NeverRemove) return;
 
@@ -224,7 +224,7 @@ namespace Outkeep.Core.Caching
         /// Returns <see cref="true"/> if successful, otherwise <see cref="false"/>.
         /// </returns>
         /// <param name="entry">The entry for which to allocate space.</param>
-        private bool TryClaimSpace(CacheEntry entry)
+        private bool TryClaimSpace(CacheEntry<TKey> entry)
         {
             // run a few interlocked attempts to reserve entry size
             // we do this to avoid taking a lock on entire collection
@@ -285,9 +285,9 @@ namespace Outkeep.Core.Caching
         /// <returns>
         /// <see cref="true"/> if the specific entry was found and therefore removed, otherwise <see cref="false"/>.
         /// </returns>
-        private bool TryEvictEntry(CacheEntry entry)
+        private bool TryEvictEntry(CacheEntry<TKey> entry)
         {
-            if (_entries.TryRemove(new KeyValuePair<string, CacheEntry>(entry.Key, entry)))
+            if (_entries.TryRemove(new KeyValuePair<TKey, CacheEntry<TKey>>(entry.Key, entry)))
             {
                 // free up the space used by this entry
                 Interlocked.Add(ref _size, -entry.Size);
@@ -310,7 +310,7 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Called by each entry on self expiry.
         /// </summary>
-        public void OnEntryExpired(CacheEntry entry)
+        public void OnEntryExpired(CacheEntry<TKey> entry)
         {
             TryEvictEntry(entry);
         }

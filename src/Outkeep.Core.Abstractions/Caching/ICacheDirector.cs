@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a cache manager that does not hold the data itself and instead coordinates opt-in participants.
     /// </summary>
-    public interface ICacheDirector
+    public interface ICacheDirector<TKey> where TKey : notnull
     {
         /// <summary>
         /// Creates and returns a new uncomitted cache entry.
@@ -12,14 +12,14 @@
         /// <param name="key">The cache entry key.</param>
         /// <param name="size">The size required by the entry.</param>
         /// <returns>The new cache entry in an uncomitted state.</returns>
-        ICacheEntry CreateEntry(string key, long size);
+        ICacheEntry<TKey> CreateEntry(TKey key, long size);
 
         /// <summary>
         /// Attempts to get the entry with the specified key.
         /// </summary>
         /// <param name="key">The cache entry key.</param>
         /// <returns>The cache entry with the specified key if found, otherwise <see cref="null"/></returns>
-        bool TryGetEntry(string key, out ICacheEntry? entry);
+        bool TryGetEntry(TKey key, out ICacheEntry<TKey>? entry);
 
         /// <summary>
         /// Gets the number of entries managed by this cache director.

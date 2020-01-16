@@ -13,7 +13,7 @@ namespace Outkeep.Core.Tests
         public void SetAbsoluteExpiration()
         {
             // arrange
-            var entry = Mock.Of<ICacheEntry>();
+            var entry = Mock.Of<ICacheEntry<string>>();
             var absoluteExpiration = DateTimeOffset.UtcNow;
 
             // act
@@ -28,7 +28,7 @@ namespace Outkeep.Core.Tests
         public void SetAbsoluteExpirationThrowsOnNullEntry()
         {
             // arrange
-            ICacheEntry entry = null!;
+            ICacheEntry<string> entry = null!;
 
             // act
             void action() => entry.SetAbsoluteExpiration(DateTimeOffset.UtcNow);
@@ -41,7 +41,7 @@ namespace Outkeep.Core.Tests
         public void SetSlidingExpiration()
         {
             // arrange
-            var entry = Mock.Of<ICacheEntry>();
+            var entry = Mock.Of<ICacheEntry<string>>();
             var slidingExpiration = TimeSpan.FromMinutes(1);
 
             // act
@@ -56,7 +56,7 @@ namespace Outkeep.Core.Tests
         public void SetSlidingExpirationThrowsOnNullEntry()
         {
             // arrange
-            ICacheEntry entry = null!;
+            ICacheEntry<string> entry = null!;
 
             // act
             void action() => entry.SetSlidingExpiration(TimeSpan.Zero);
@@ -69,7 +69,7 @@ namespace Outkeep.Core.Tests
         public void SetPriority()
         {
             // arrange
-            var entry = Mock.Of<ICacheEntry>();
+            var entry = Mock.Of<ICacheEntry<string>>();
             var priority = CachePriority.Normal;
 
             // act
@@ -84,7 +84,7 @@ namespace Outkeep.Core.Tests
         public void SetPriorityThrowsOnNullEntry()
         {
             // arrange
-            ICacheEntry entry = null!;
+            ICacheEntry<string> entry = null!;
 
             // act
             void action() => entry.SetPriority(CachePriority.Normal);
@@ -97,8 +97,8 @@ namespace Outkeep.Core.Tests
         public async Task ContinueWithOnEvicted()
         {
             // arrange
-            var entry = Mock.Of<ICacheEntry>();
-            var result = Task.FromResult(new CacheEvictionArgs(entry, EvictionCause.Replaced));
+            var entry = Mock.Of<ICacheEntry<string>>();
+            var result = Task.FromResult(new CacheEvictionArgs<string>(entry, EvictionCause.Replaced));
             Mock.Get(entry).SetupGet(x => x.Evicted).Returns(result);
 
             // act
@@ -116,7 +116,7 @@ namespace Outkeep.Core.Tests
         public void ContinueWithOnEvictedThrowsOnNullEntry()
         {
             // arrange
-            ICacheEntry entry = null!;
+            ICacheEntry<string> entry = null!;
 
             // act
             void action() => entry.ContinueWithOnEvicted(t => { }, CancellationToken.None);
@@ -129,8 +129,8 @@ namespace Outkeep.Core.Tests
         public async Task ContinueWithOnEvictedWithState()
         {
             // arrange
-            var entry = Mock.Of<ICacheEntry>();
-            var result = Task.FromResult(new CacheEvictionArgs(entry, EvictionCause.Replaced));
+            var entry = Mock.Of<ICacheEntry<string>>();
+            var result = Task.FromResult(new CacheEvictionArgs<string>(entry, EvictionCause.Replaced));
             Mock.Get(entry).SetupGet(x => x.Evicted).Returns(result);
 
             // act
@@ -149,7 +149,7 @@ namespace Outkeep.Core.Tests
         public void ContinueWithOnEvictedWithStateThrowsOnNullEntry()
         {
             // arrange
-            ICacheEntry entry = null!;
+            ICacheEntry<string> entry = null!;
 
             // act
             void action() => entry.ContinueWithOnEvicted((t, s) => { }, null, CancellationToken.None);
@@ -162,7 +162,7 @@ namespace Outkeep.Core.Tests
         public void SetUtcLastAccessedThrowsOnNullEntry()
         {
             // arrange
-            ICacheEntry entry = null!;
+            ICacheEntry<string> entry = null!;
 
             // act
             void action() => entry.SetUtcLastAccessed(DateTimeOffset.UtcNow);

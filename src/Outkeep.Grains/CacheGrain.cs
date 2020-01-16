@@ -26,7 +26,7 @@ namespace Outkeep.Grains
         private CachePulse _pulse;
         private TaskCompletionSource<CachePulse> _promise;
         private Task? _outstandingStorageOperation = null;
-        private ICacheEntry? _entry;
+        private ICacheEntry<string>? _entry;
 
         private string PrimaryKey => this.GetPrimaryKeyString();
 
@@ -69,7 +69,7 @@ namespace Outkeep.Grains
             return Task.CompletedTask;
         }
 
-        private void HandleEvicted(Task<CacheEvictionArgs> args)
+        private void HandleEvicted(Task<CacheEvictionArgs<string>> args)
         {
             if (args.Result.CacheEntry == _entry)
             {

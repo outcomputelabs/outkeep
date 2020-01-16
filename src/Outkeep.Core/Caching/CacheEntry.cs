@@ -9,26 +9,26 @@ namespace Outkeep.Core.Caching
     /// <summary>
     /// Implements a cache entry as used by <see cref="CacheDirector"/>.
     /// </summary>
-    internal sealed class CacheEntry : ICacheEntry, IDisposable
+    internal sealed class CacheEntry<TKey> : ICacheEntry<TKey>, IDisposable where TKey : notnull
     {
         /// <summary>
         /// The cache context to use for raising notifications.
         /// </summary>
-        private readonly ICacheContext _context;
+        private readonly ICacheContext<TKey> _context;
 
         /// <summary>
         /// Allows users to schedule continuations when the task completes.
         /// </summary>
-        private readonly TaskCompletionSource<CacheEvictionArgs> _evicted;
+        private readonly TaskCompletionSource<CacheEvictionArgs<TKey>> _evicted;
 
-        public CacheEntry(string key, long size, ICacheContext context)
+        public CacheEntry(TKey key, long size, ICacheContext<TKey> context)
         {
             Key = key ?? throw new ArgumentNullException(nameof(key));
             Size = size < 1 ? throw new ArgumentOutOfRangeException(nameof(size)) : size;
 
             _context = context ?? throw new ArgumentNullException(nameof(context));
 
-            _evicted = new TaskCompletionSource<CacheEvictionArgs>();
+            _evicted = new TaskCompletionSource<CacheEvictionArgs<TKey>>();
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Outkeep.Core.Caching
         private EvictionCause _evictionCause = EvictionCause.None;
 
         /// <inheritdoc />
-        public string Key { get; }
+        public TKey Key { get; }
 
         /// <inheritdoc />
         public long Size { get; }
@@ -66,14 +66,14 @@ namespace Outkeep.Core.Caching
         public bool IsExpired => _evictionCause != EvictionCause.None;
 
         /// <inheritdoc />
-        public Task<CacheEvictionArgs> Evicted => _evicted.Task;
+        public Task<CacheEvictionArgs<TKey>> Evicted => _evicted.Task;
 
         /// <summary>
         /// Signals users that the parent director has evicted this entry.
         /// </summary>
         public void SetEvicted()
         {
-            _evicted.TrySetResult(new CacheEvictionArgs(this, EvictionCause));
+            _evicted.TrySetResult(new CacheEvictionArgs<TKey>(this, EvictionCause));
         }
 
         /// <inheritdoc />
@@ -110,7 +110,7 @@ namespace Outkeep.Core.Caching
         }
 
         /// <inheritdoc />
-        public ICacheEntry Commit()
+        public ICacheEntry<TKey> Commit()
         {
             EnsureUncommitted();
 

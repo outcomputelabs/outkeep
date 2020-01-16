@@ -6,12 +6,12 @@ namespace Outkeep.Core.Caching
     /// <summary>
     /// Represents an entry in a <see cref="ICacheDirector"/> instance.
     /// </summary>
-    public interface ICacheEntry
+    public interface ICacheEntry<TKey> where TKey : notnull
     {
         /// <summary>
         /// Gets the key of the entry.
         /// </summary>
-        string Key { get; }
+        TKey Key { get; }
 
         /// <summary>
         /// Gets the size required by this entry.
@@ -26,7 +26,7 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Returns a task that completes when this entry is evicted.
         /// </summary>
-        Task<CacheEvictionArgs> Evicted { get; }
+        Task<CacheEvictionArgs<TKey>> Evicted { get; }
 
         /// <summary>
         /// Gets or sets the fixed time at which the entry will expire.
@@ -60,7 +60,7 @@ namespace Outkeep.Core.Caching
         /// Commits this cache entry to the owning <see cref="ICacheDirector{TKey}"/> instance.
         /// </summary>
         /// <returns>The cache entry itself to allow chaining.</returns>
-        ICacheEntry Commit();
+        ICacheEntry<TKey> Commit();
 
         /// <summary>
         /// Expires the entry immediately.
