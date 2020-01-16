@@ -508,5 +508,21 @@ namespace Outkeep.Core.Tests
             Assert.True(entry3.IsExpired);
             Assert.False(entry4.IsExpired);
         }
+
+        [Fact]
+        public void CreateEntryThrowsOnSizeTooLarge()
+        {
+            // arrange
+            var options = new CacheOptions { Capacity = 1000 };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var key = Guid.NewGuid().ToString();
+            var size = options.Capacity + 1;
+
+            // act
+            void action() => director.CreateEntry(key, 1001);
+
+            // assert
+            Assert.Throws<ArgumentOutOfRangeException>(nameof(size), action);
+        }
     }
 }
