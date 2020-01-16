@@ -21,12 +21,6 @@ steps:
     packageType: 'sdk'
     version: '3.1.x'
 
-- task: DotNetCoreCLI@2
-  displayName: "Restore"
-  inputs:
-    command: 'restore'
-    feedsToUse: 'select'
-
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'SonarCloud'
@@ -36,7 +30,13 @@ steps:
     projectName: 'Outkeep'
     extraProperties: |
       sonar.branch.name="$(Build.SourceBranch)"
-      sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"'
+      sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+
+- task: DotNetCoreCLI@2
+  displayName: "Restore"
+  inputs:
+    command: 'restore'
+    feedsToUse: 'select'
 
 - task: DotNetCoreCLI@2
   displayName: "Build"
