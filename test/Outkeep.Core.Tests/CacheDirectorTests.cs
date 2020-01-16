@@ -539,5 +539,21 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Throws<ArgumentNullException>(nameof(key), action);
         }
+
+        [Fact]
+        public void TryGetEntryHandlesNonExistingEntry()
+        {
+            // arrange
+            var options = new CacheOptions();
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var key = Guid.NewGuid().ToString();
+
+            // act
+            var result = director.TryGetEntry(key, out var entry);
+
+            // assert
+            Assert.False(result);
+            Assert.Null(entry);
+        }
     }
 }
