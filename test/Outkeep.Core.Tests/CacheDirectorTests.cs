@@ -508,5 +508,110 @@ namespace Outkeep.Core.Tests
             Assert.True(entry3.IsExpired);
             Assert.False(entry4.IsExpired);
         }
+
+        [Fact]
+        public void CreateEntryThrowsOnSizeTooLarge()
+        {
+            // arrange
+            var options = new CacheOptions { Capacity = 1000 };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var key = Guid.NewGuid().ToString();
+            var size = options.Capacity + 1;
+
+            // act
+            void action() => director.CreateEntry(key, 1001);
+
+            // assert
+            Assert.Throws<ArgumentOutOfRangeException>(nameof(size), action);
+        }
+
+        [Fact]
+        public void TryGetEntryThrowsOnNullKey()
+        {
+            // arrange
+            var options = new CacheOptions();
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            string? key = null;
+
+            // act
+            void action() => director.TryGetEntry(null!, out _);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(key), action);
+        }
+
+        [Fact]
+        public void TryGetEntryHandlesNonExistingEntry()
+        {
+            // arrange
+            var options = new CacheOptions();
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var key = Guid.NewGuid().ToString();
+
+            // act
+            var result = director.TryGetEntry(key, out var entry);
+
+            // assert
+            Assert.False(result);
+            Assert.Null(entry);
+        }
+
+        [Fact]
+        public void AddingExpiredEntryEvictsPreviousEntry()
+        {
+            // arrange
+            var options = new CacheOptions { Capacity = 1000 };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var key = Guid.NewGuid().ToString();
+
+            // act
+            var previous = director
+                .CreateEntry(key, 100)
+                .SetAbsoluteExpiration(DateTimeOffset.UtcNow.AddMinutes(1))
+                .Commit();
+
+            // assert
+            Assert.NotNull(previous);
+            Assert.False(previous.IsExpired);
+
+            // act
+            var entry = director
+                .CreateEntry(key, 100)
+                .SetAbsoluteExpiration(DateTime.UtcNow.AddMinutes(-1))
+                .Commit();
+
+            // assert
+            Assert.NotNull(entry);
+            Assert.False(entry.IsExpired);
+            Assert.True(previous.IsExpired);
+        }
+
+        [Fact]
+        public void ExpiresEntryOnOverflow()
+        {
+            // arrange
+            var options = new CacheOptions { Capacity = long.MaxValue };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var key = Guid.NewGuid().ToString();
+
+            // act
+            var filler = director
+                .CreateEntry(key, long.MaxValue - 100)
+                .Commit();
+
+            // assert
+            Assert.NotNull(filler);
+            Assert.False(filler.IsExpired);
+
+            // act
+            var entry = director
+                .CreateEntry(key, 1000)
+                .Commit();
+
+            // assert
+            Assert.NotNull(entry);
+            Assert.True(entry.IsExpired);
+            Assert.True(filler.IsExpired);
+        }
     }
 }
