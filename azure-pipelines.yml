@@ -14,27 +14,29 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
+    version: '2.x'
+
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
     version: '3.1.x'
 
-- task: DotNetCoreCLI@2
-  displayName: "Install Sonar Scanner Tool"
+- task: SonarCloudPrepare@1
   inputs:
-    command: 'custom'
-    custom: 'tool'
-    arguments: 'install -g dotnet-sonarscanner'
+    SonarCloud: 'SonarCloud'
+    organization: 'outcompute'
+    scannerMode: 'MSBuild'
+    projectKey: 'outkeep'
+    projectName: 'Outkeep'
+    extraProperties: |
+      sonar.branch.name="$(Build.SourceBranch)"
+      sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
 
 - task: DotNetCoreCLI@2
   displayName: "Restore"
   inputs:
     command: 'restore'
     feedsToUse: 'select'
-
-- task: DotNetCoreCLI@2
-  displayName: "Begin Sonar Scanner"
-  inputs:
-    command: 'custom'
-    custom: 'sonarscanner'
-    arguments: 'begin /k:"$(SonarQubeProjectKey)" /o:"$(SonarQubeOrganization)" /d:sonar.host.url="$(SonarQubeHostUrl)" /d:sonar.login="$(SonarQubeToken)" /d:sonar.branch.name="$(Build.SourceBranch)" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"'
 
 - task: DotNetCoreCLI@2
   displayName: "Build"
@@ -48,9 +50,8 @@ steps:
     command: 'test'
     arguments: '--no-build /p:CollectCoverage=true /p:CoverletOutput=coverage.opencover.xml /p:CoverletOutputFormat=opencover --configuration $(buildConfiguration)'
 
-- task: DotNetCoreCLI@2
-  displayName: "End Sonar Scanner"
+- task: SonarCloudAnalyze@1
+
+- task: SonarCloudPublish@1
   inputs:
-    command: 'custom'
-    custom: 'sonarscanner'
-    arguments: 'end /d:sonar.login="$(SonarQubeToken)"'
+    pollingTimeoutSec: '300'
