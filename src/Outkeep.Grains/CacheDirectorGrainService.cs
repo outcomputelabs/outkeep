@@ -21,7 +21,7 @@ namespace Outkeep.Grains
         private readonly CacheOptions _options;
         private readonly TimerArgs _timerArgs;
 
-        public CacheDirectorGrainService(IGrainIdentity identity, Silo silo, ILoggerFactory loggerFactory, ILogger<CacheDirectorGrainService> logger, IOptions<CacheOptions> options, ICacheDirector director)
+        public CacheDirectorGrainService(IGrainIdentity identity, Silo silo, ILoggerFactory loggerFactory, ILogger<CacheDirectorGrainService> logger, IOptions<CacheOptions> options, ICacheDirector<string> director)
             : base(identity, silo, loggerFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -80,7 +80,7 @@ namespace Outkeep.Grains
         /// </summary>
         private class TimerArgs
         {
-            public TimerArgs(CacheDirectorGrainService service, ICacheDirector director, ILogger logger)
+            public TimerArgs(CacheDirectorGrainService service, ICacheDirector<string> director, ILogger logger)
             {
                 Service = service;
                 Director = director;
@@ -88,7 +88,7 @@ namespace Outkeep.Grains
             }
 
             public CacheDirectorGrainService Service { get; }
-            public ICacheDirector Director { get; }
+            public ICacheDirector<string> Director { get; }
             public ILogger Logger { get; }
         }
 

@@ -12,7 +12,7 @@ namespace Outkeep.Grains
         CacheGrainOptions Options { get; }
         ICacheStorage Storage { get; }
         ISystemClock Clock { get; }
-        ICacheDirector Director { get; }
+        ICacheDirector<string> Director { get; }
         ITimerRegistry TimerRegistry { get; }
     }
 }

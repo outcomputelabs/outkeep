@@ -14,10 +14,10 @@ namespace Outkeep.Core.Tests
             // arrange
             var key = Guid.NewGuid().ToString();
             var size = 100;
-            var context = Mock.Of<ICacheContext>();
+            var context = Mock.Of<ICacheContext<string>>();
 
             // act
-            var entry = new CacheEntry(key, size, context);
+            var entry = new CacheEntry<string>(key, size, context);
 
             // assert
             Assert.Equal(size, entry.Size);
@@ -40,10 +40,10 @@ namespace Outkeep.Core.Tests
         public async Task EvictionSetsTask()
         {
             // arrange
-            var context = Mock.Of<ICacheContext>();
+            var context = Mock.Of<ICacheContext<string>>();
 
             // act
-            using var entry = new CacheEntry("SomeKey", 1000, context);
+            using var entry = new CacheEntry<string>("SomeKey", 1000, context);
 
             // assert
             Assert.Equal(TaskStatus.WaitingForActivation, entry.Evicted.Status);

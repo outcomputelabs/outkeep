@@ -253,7 +253,7 @@ namespace Outkeep.Grains.Tests
             // arrange
             var key = Guid.NewGuid().ToString();
             var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
-            var director = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector>();
+            var director = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector<string>>();
 
             // act
             await grain.SetAsync(Guid.NewGuid().ToByteArray().AsNullableImmutable(), null, null).ConfigureAwait(false);
@@ -318,7 +318,7 @@ namespace Outkeep.Grains.Tests
             Assert.Equal(value3, result3.Value.Value);
 
             // arrange - get the underlying entry
-            var okay = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector>().TryGetEntry(key, out var entry);
+            var okay = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector<string>>().TryGetEntry(key, out var entry);
             Assert.True(okay);
             Assert.NotNull(entry);
             var lastAccessed = entry!.UtcLastAccessed;

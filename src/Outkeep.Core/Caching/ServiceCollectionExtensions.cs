@@ -21,7 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddCacheDirector(this IServiceCollection services, Action<CacheOptions> configure)
         {
             return services
-                .AddSingleton<ICacheDirector, CacheDirector>()
+                .AddSingleton(typeof(ICacheDirector<>), typeof(CacheDirector<>))
                 .AddOptions<CacheOptions>()
                 .Configure(configure)
                 .ValidateDataAnnotations()
