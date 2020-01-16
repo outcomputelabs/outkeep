@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans;
+using Outkeep.Api.Http.Properties;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
@@ -113,20 +114,59 @@ namespace Outkeep.Api.Http
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogOutkeepHttpApiStarting();
+            Log.OutkeepHttpApiStarting(_logger);
 
             await _host.StartAsync(cancellationToken).ConfigureAwait(false);
 
-            _logger.LogOutkeepHttpApiStarted();
+            Log.OutkeepHttpApiStarted(_logger);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogOutkeepHttpApiStopping();
+            Log.OutkeepHttpApiStopping(_logger);
 
             await _host.StopAsync(cancellationToken).ConfigureAwait(false);
 
-            _logger.LogOutkeepHttpApiStopped();
+            Log.OutkeepHttpApiStopped(_logger);
+        }
+
+        private static class Log
+        {
+            private static readonly Action<ILogger, Exception?> OutkeepHttpApiStartingAction =
+                LoggerMessage.Define(
+                    LogLevel.Information,
+                    new EventId(0, nameof(OutkeepHttpApiStarting)),
+                    Resources.OutkeepHttpApiStarting);
+
+            public static void OutkeepHttpApiStarting(ILogger logger) =>
+                OutkeepHttpApiStartingAction(logger, null);
+
+            private static readonly Action<ILogger, Exception?> OutkeepHttpApiStartedAction =
+                LoggerMessage.Define(
+                    LogLevel.Information,
+                    new EventId(0, nameof(OutkeepHttpApiStarted)),
+                    Resources.OutkeepHttpApiStarted);
+
+            public static void OutkeepHttpApiStarted(ILogger logger) =>
+                OutkeepHttpApiStartedAction(logger, null);
+
+            private static readonly Action<ILogger, Exception?> OutkeepHttpApiStoppingAction =
+                LoggerMessage.Define(
+                    LogLevel.Information,
+                    new EventId(0, nameof(OutkeepHttpApiStopping)),
+                    Resources.OutkeepHttpApiStopping);
+
+            public static void OutkeepHttpApiStopping(ILogger logger) =>
+                OutkeepHttpApiStoppingAction(logger, null);
+
+            private static readonly Action<ILogger, Exception?> OutkeepHttpApiStoppedAction =
+                LoggerMessage.Define(
+                    LogLevel.Information,
+                    new EventId(0, nameof(OutkeepHttpApiStopped)),
+                    Resources.OutkeepHttpApiStopped);
+
+            public static void OutkeepHttpApiStopped(ILogger logger) =>
+                OutkeepHttpApiStoppedAction(logger, null);
         }
     }
 }
