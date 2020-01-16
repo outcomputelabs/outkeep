@@ -555,5 +555,35 @@ namespace Outkeep.Core.Tests
             Assert.False(result);
             Assert.Null(entry);
         }
+
+        [Fact]
+        public void AddingExpiredEntryEvictsPreviousEntry()
+        {
+            // arrange
+            var options = new CacheOptions { Capacity = 1000 };
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            var key = Guid.NewGuid().ToString();
+
+            // act
+            var previous = director
+                .CreateEntry(key, 100)
+                .SetAbsoluteExpiration(DateTimeOffset.UtcNow.AddMinutes(1))
+                .Commit();
+
+            // assert
+            Assert.NotNull(previous);
+            Assert.False(previous.IsExpired);
+
+            // act
+            var entry = director
+                .CreateEntry(key, 100)
+                .SetAbsoluteExpiration(DateTime.UtcNow.AddMinutes(-1))
+                .Commit();
+
+            // assert
+            Assert.NotNull(entry);
+            Assert.False(entry.IsExpired);
+            Assert.True(previous.IsExpired);
+        }
     }
 }
