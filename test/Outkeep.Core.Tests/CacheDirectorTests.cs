@@ -524,5 +524,20 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Throws<ArgumentOutOfRangeException>(nameof(size), action);
         }
+
+        [Fact]
+        public void TryGetEntryThrowsOnNullKey()
+        {
+            // arrange
+            var options = new CacheOptions();
+            var director = new CacheDirector(Options.Create(options), NullLogger<CacheDirector>.Instance, NullClock.Default);
+            string? key = null;
+
+            // act
+            void action() => director.TryGetEntry(null!, out _);
+
+            // assert
+            Assert.Throws<ArgumentNullException>(nameof(key), action);
+        }
     }
 }
