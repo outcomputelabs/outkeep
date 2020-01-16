@@ -316,6 +316,18 @@ namespace Outkeep.Grains.Tests
             Assert.NotEqual(Guid.Empty, result3.Tag);
             Assert.NotEqual(result2.Tag, result3.Tag);
             Assert.Equal(value3, result3.Value.Value);
+
+            // arrange - get the underlying entry
+            var okay = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector>().TryGetEntry(key, out var entry);
+            Assert.True(okay);
+            Assert.NotNull(entry);
+            var lastAccessed = entry!.UtcLastAccessed;
+
+            // act - access the value again to update the accessed timestamp
+            await grain.PollAsync(Guid.NewGuid()).ConfigureAwait(false);
+
+            // assert
+            Assert.True(entry.UtcLastAccessed > lastAccessed);
         }
     }
 }
