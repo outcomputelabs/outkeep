@@ -94,7 +94,7 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public void ContinueWithOnEvicted()
+        public async Task ContinueWithOnEvicted()
         {
             // arrange
             var entry = Mock.Of<ICacheEntry<string>>();
@@ -111,6 +111,7 @@ namespace Outkeep.Core.Tests
             var chain = entry.ContinueWithOnEvicted(action, CancellationToken.None);
 
             // assert
+            await Task.Delay(100).ConfigureAwait(false);
             Assert.Same(entry, chain);
             Assert.True(completed);
         }
