@@ -2,6 +2,7 @@
 using Orleans.Concurrency;
 using Orleans.Providers;
 using Orleans.Runtime;
+using Outkeep.Core;
 using Outkeep.Core.Caching;
 using Outkeep.Interfaces;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 namespace Outkeep.Grains
 {
     [Reentrant]
-    [StorageProvider(ProviderName = "OutkeepCache")]
+    [StorageProvider(ProviderName = OutkeepProviderNames.OutkeepCache)]
     internal class CacheGrain : Grain, ICacheGrain
     {
         private readonly ICacheGrainContext _context;
