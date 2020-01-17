@@ -94,21 +94,24 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public async Task ContinueWithOnEvicted()
+        public void ContinueWithOnEvicted()
         {
             // arrange
             var entry = Mock.Of<ICacheEntry<string>>();
-            var result = Task.FromResult(new CacheEvictionArgs<string>(entry, EvictionCause.Replaced));
+            var result = Task.FromResult(new CacheEvictionArgs<string>(entry));
             Mock.Get(entry).SetupGet(x => x.Evicted).Returns(result);
 
             // act
             var completed = false;
-            var chain = entry.ContinueWithOnEvicted(t => completed = true, out var continuation, CancellationToken.None);
+            Task action(CacheEvictionArgs<string> args)
+            {
+                completed = true;
+                return Task.CompletedTask;
+            }
+            var chain = entry.ContinueWithOnEvicted(action, CancellationToken.None);
 
             // assert
             Assert.Same(entry, chain);
-            Assert.NotNull(continuation);
-            await continuation.ConfigureAwait(false);
             Assert.True(completed);
         }
 
@@ -119,40 +122,7 @@ namespace Outkeep.Core.Tests
             ICacheEntry<string> entry = null!;
 
             // act
-            void action() => entry.ContinueWithOnEvicted(t => { }, CancellationToken.None);
-
-            // assert
-            Assert.Throws<ArgumentNullException>(nameof(entry), action);
-        }
-
-        [Fact]
-        public async Task ContinueWithOnEvictedWithState()
-        {
-            // arrange
-            var entry = Mock.Of<ICacheEntry<string>>();
-            var result = Task.FromResult(new CacheEvictionArgs<string>(entry, EvictionCause.Replaced));
-            Mock.Get(entry).SetupGet(x => x.Evicted).Returns(result);
-
-            // act
-            var completed = false;
-            var input = new object();
-            object? output = null;
-            entry.ContinueWithOnEvicted((t, s) => { completed = true; output = s; }, input, CancellationToken.None);
-
-            // assert
-            await Task.Delay(100).ConfigureAwait(false);
-            Assert.True(completed);
-            Assert.Same(input, output);
-        }
-
-        [Fact]
-        public void ContinueWithOnEvictedWithStateThrowsOnNullEntry()
-        {
-            // arrange
-            ICacheEntry<string> entry = null!;
-
-            // act
-            void action() => entry.ContinueWithOnEvicted((t, s) => { }, null, CancellationToken.None);
+            void action() => entry.ContinueWithOnEvicted(args => Task.CompletedTask, CancellationToken.None);
 
             // assert
             Assert.Throws<ArgumentNullException>(nameof(entry), action);

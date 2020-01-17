@@ -33,6 +33,6 @@ namespace Outkeep.Interfaces
         /// <summary>
         /// Long polls the grain for changes to the cache item.
         /// </summary>
-        Task<CachePulse> PollAsync(Guid tag);
+        ValueTask<CachePulse> PollAsync(Guid tag);
     }
 }

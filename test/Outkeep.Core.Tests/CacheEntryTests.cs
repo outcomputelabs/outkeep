@@ -61,7 +61,6 @@ namespace Outkeep.Core.Tests
             var result = await entry.Evicted.ConfigureAwait(false);
             Assert.Equal(TaskStatus.RanToCompletion, entry.Evicted.Status);
             Assert.Same(entry, result.CacheEntry);
-            Assert.Equal(EvictionCause.Replaced, result.EvictionCause);
         }
     }
 }

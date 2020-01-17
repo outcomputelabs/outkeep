@@ -73,7 +73,7 @@ namespace Outkeep.Core.Caching
         /// </summary>
         public void SetEvicted()
         {
-            _evicted.TrySetResult(new CacheEvictionArgs<TKey>(this, EvictionCause));
+            _evicted.TrySetResult(new CacheEvictionArgs<TKey>(this));
         }
 
         /// <inheritdoc />
@@ -126,7 +126,7 @@ namespace Outkeep.Core.Caching
         {
             EnsureCommitted();
 
-            SetExpired(EvictionCause.UserExpired);
+            SetExpired(EvictionCause.Expired);
 
             _context.OnEntryExpired(this);
         }

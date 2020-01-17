@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "benchmark\Ben
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Core.Abstractions", "src\Outkeep.Core.Abstractions\Outkeep.Core.Abstractions.csproj", "{6839C57B-2093-46A1-B788-17730F76185A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Hosting.Azure.Tests", "test\Outkeep.Hosting.Azure.Tests\Outkeep.Hosting.Azure.Tests.csproj", "{0509B45B-9D0C-4081-B88C-9009AE9E9241}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Hosting.Azure.Tests", "test\Outkeep.Hosting.Azure.Tests\Outkeep.Hosting.Azure.Tests.csproj", "{0509B45B-9D0C-4081-B88C-9009AE9E9241}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

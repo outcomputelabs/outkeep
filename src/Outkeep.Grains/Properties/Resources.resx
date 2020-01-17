@@ -126,6 +126,9 @@
   <data name="Exception_CacheGrainForKey_X_CannotWriteBecausePendingReadFailed" xml:space="preserve">
     <value>Cache Grain for key {0} cannot write state because a prior read has failed</value>
   </data>
+  <data name="Exception_CannotExecuteStorageOperationBecauseThePriorOperationFailed" xml:space="preserve">
+    <value>Cannot execute batched storage operation because the prior operation failed</value>
+  </data>
   <data name="Exception_XMustBeAPositiveX" xml:space="preserve">
     <value>{0} must be a positive {1}</value>
   </data>

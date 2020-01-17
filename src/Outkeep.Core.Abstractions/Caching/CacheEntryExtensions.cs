@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Orleans;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -72,31 +73,12 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Convenience method to schedule a continuation on the <see cref="ICacheEntry.Evicted"/> property using the current task scheduler.
         /// </summary>
-        public static ICacheEntry<TKey> ContinueWithOnEvicted<TKey>(this ICacheEntry<TKey> entry, Action<Task<CacheEvictionArgs<TKey>>, object?> action, object? state, CancellationToken cancellationToken = default) where TKey : notnull
+        public static ICacheEntry<TKey> ContinueWithOnEvicted<TKey>(this ICacheEntry<TKey> entry, Func<CacheEvictionArgs<TKey>, Task> action, CancellationToken cancellationToken = default) where TKey : notnull
         {
-            if (entry == null) throw new ArgumentNullException(nameof(entry));
+            if (entry is null) throw new ArgumentNullException(nameof(entry));
+            if (action is null) throw new ArgumentNullException(nameof(action));
 
-            entry.Evicted.ContinueWith(action, state, cancellationToken, TaskContinuationOptions.DenyChildAttach | TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
-
-            return entry;
-        }
-
-        /// <summary>
-        /// Convenience method to schedule a continuation on the <see cref="ICacheEntry.Evicted"/> property using the current task scheduler.
-        /// </summary>
-        public static ICacheEntry<TKey> ContinueWithOnEvicted<TKey>(this ICacheEntry<TKey> entry, Action<Task<CacheEvictionArgs<TKey>>> action, CancellationToken cancellationToken = default) where TKey : notnull
-        {
-            return ContinueWithOnEvicted(entry, action, out _, cancellationToken);
-        }
-
-        /// <summary>
-        /// Convenience method to schedule a continuation on the <see cref="ICacheEntry.Evicted"/> property using the current task scheduler.
-        /// </summary>
-        public static ICacheEntry<TKey> ContinueWithOnEvicted<TKey>(this ICacheEntry<TKey> entry, Action<Task<CacheEvictionArgs<TKey>>> action, out Task continuation, CancellationToken cancellationToken = default) where TKey : notnull
-        {
-            if (entry == null) throw new ArgumentNullException(nameof(entry));
-
-            continuation = entry.Evicted.ContinueWith(action, cancellationToken, TaskContinuationOptions.DenyChildAttach, TaskScheduler.Current);
+            entry.Evicted.ContinueWith((t, s) => ((Func<CacheEvictionArgs<TKey>, Task>)s)(t.Result), action, cancellationToken, TaskContinuationOptions.DenyChildAttach, TaskScheduler.Current).Unwrap().Ignore();
 
             return entry;
         }

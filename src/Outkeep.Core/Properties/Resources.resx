@@ -156,6 +156,9 @@
   <data name="Exception_CannotCompareProperties_X_And_X" xml:space="preserve">
     <value>Cannot compare properties {0} and {1}</value>
   </data>
+  <data name="Exception_CannotExecuteStorageOperationBecauseThePriorOperationFailed" xml:space="preserve">
+    <value>Cannot execute batched storage operation because the prior operation failed</value>
+  </data>
   <data name="Exception_CannotFindAPublicInstancePropertyNamed_X" xml:space="preserve">
     <value>Cannot find a public instance property named {0}</value>
   </data>

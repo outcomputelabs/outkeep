@@ -9,8 +9,6 @@
         Replaced = None + 200,
 
         Expired = None + 300,
-        TokenExpired = Expired + 1,
-        UserExpired = Expired + 2,
 
         Capacity = 400,
 
