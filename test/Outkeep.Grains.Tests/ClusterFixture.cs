@@ -45,6 +45,7 @@ namespace Outkeep.Grains.Tests
             public void Configure(ISiloHostBuilder hostBuilder)
             {
                 hostBuilder
+                    .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
                     .ConfigureApplicationParts(apm =>
                     {
                         apm.AddApplicationPart(typeof(EchoGrain).Assembly).WithReferences();
@@ -53,7 +54,6 @@ namespace Outkeep.Grains.Tests
                     .ConfigureServices((context, services) =>
                     {
                         services
-                            .AddMemoryCacheStorage()
                             .AddCacheDirector(options =>
                             {
                                 options.Capacity = 1000;

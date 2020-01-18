@@ -1,4 +1,4 @@
-﻿namespace Outkeep.Core
+﻿namespace Outkeep
 {
     public static partial class OutkeepProviderNames
     {

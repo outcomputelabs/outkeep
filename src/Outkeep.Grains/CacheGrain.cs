@@ -1,8 +1,6 @@
 ﻿using Orleans;
 using Orleans.Concurrency;
-using Orleans.Providers;
 using Orleans.Runtime;
-using Outkeep.Core;
 using Outkeep.Core.Caching;
 using Outkeep.Interfaces;
 using System;
@@ -11,14 +9,13 @@ using System.Threading.Tasks;
 namespace Outkeep.Grains
 {
     [Reentrant]
-    [StorageProvider(ProviderName = OutkeepProviderNames.OutkeepCache)]
     internal class CacheGrain : Grain, ICacheGrain
     {
         private readonly ICacheGrainContext _context;
         private readonly IPersistentState<CacheGrainState> _state;
         private readonly IPersistentState<CacheGrainFlags> _flags;
 
-        public CacheGrain(ICacheGrainContext context, [PersistentState("State")] IPersistentState<CacheGrainState> state, IPersistentState<CacheGrainFlags> flags)
+        public CacheGrain(ICacheGrainContext context, [PersistentState("State", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainState> state, [PersistentState("Flags", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainFlags> flags)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _state = state?.AsConflater() ?? throw new ArgumentNullException(nameof(state));
@@ -32,6 +29,8 @@ namespace Outkeep.Grains
 
         public override Task OnActivateAsync()
         {
+            RegisterTimer(TickMaintenanceAsyncDelegate, this, _context.Options.MaintenancePeriod, _context.Options.MaintenancePeriod);
+
             // see if we have state to recover
             if (_state.State.Value is null)
             {
@@ -62,8 +61,29 @@ namespace Outkeep.Grains
 
         public override Task OnDeactivateAsync()
         {
-            // release the space claim early
-            _entry?.Expire();
+            // release the space claim early but without expiring
+            _entry?.Dispose();
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Caches the maintenance delegate to avoid redundant allocations.
+        /// </summary>
+        private static readonly Func<object, Task> TickMaintenanceAsyncDelegate = TickMaintenanceAsync;
+
+        /// <summary>
+        /// Performs maintenance tasks on the grain.
+        /// </summary>
+        private static Task TickMaintenanceAsync(object state)
+        {
+            var myself = (CacheGrain)state;
+
+            if (myself._flags.State.HasChanged)
+            {
+                myself._flags.State.HasChanged = false;
+                return myself._flags.WriteStateAsync();
+            }
 
             return Task.CompletedTask;
         }
@@ -99,14 +119,15 @@ namespace Outkeep.Grains
                 _state.State.Value = null;
                 Publish();
 
-                // release it for garbage collection
+                // release the entry for garbage collection
                 _entry = null;
 
-                // also attempt to remove it from storage
+                // attempt to remove the content from storage
                 return ClearAllStateAsync();
             }
 
-            // otherwise the entry was evicted due to capacity reasons so shutdown the grain
+            // otherwise the entry was evicted due to capacity reasons
+            // therefore shutdown the grain to release the content for garbage collection
             DeactivateOnIdle();
 
             // early resolve any pending promises so the grain can shutdown
@@ -130,8 +151,16 @@ namespace Outkeep.Grains
         }
 
         /// <inheritdoc />
+        [ReadOnly]
         public ValueTask<CachePulse> GetAsync()
         {
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
+
+            if (_entry != null)
+            {
+                _entry.UtcLastAccessed = _flags.State.UtcLastAccessed;
+            }
+
             return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));
         }
 
@@ -146,8 +175,10 @@ namespace Outkeep.Grains
             }
 
             // reset the state to fulfill get requests
-            _state.State.Tag = Guid.NewGuid();
+            _state.State.Tag = Guid.Empty;
             _state.State.Value = null;
+            _state.State.AbsoluteExpiration = null;
+            _state.State.SlidingExpiration = null;
 
             // fulfill any pending promises
             Publish();
@@ -159,7 +190,7 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
-            // if we have an allocation then expire it and release it for garbage collection
+            // if we have a previous allocation then expire it and release it for garbage collection
             if (_entry != null)
             {
                 _entry?.Expire();
@@ -170,21 +201,24 @@ namespace Outkeep.Grains
             if (value.Value is null)
             {
                 // storing a null value is equivalent to a clear
-                _state.State.Tag = Guid.NewGuid();
+                _state.State.Tag = Guid.Empty;
                 _state.State.Value = null;
+                _state.State.AbsoluteExpiration = null;
+                _state.State.SlidingExpiration = null;
                 Publish();
                 return ClearAllStateAsync();
             }
 
             // check if the input has already expired
             var now = _context.Clock.UtcNow;
-            if (absoluteExpiration.HasValue && absoluteExpiration.Value <= now ||
-                (slidingExpiration.HasValue && _flags.State.UtcLastAccessed.Add(slidingExpiration.Value) <= now))
+            if (absoluteExpiration.HasValue && absoluteExpiration.Value <= now)
             {
                 // the input has already expired so there is no point adding it
                 // for our purpose the state has cleared
-                _state.State.Tag = Guid.NewGuid();
+                _state.State.Tag = Guid.Empty;
                 _state.State.Value = null;
+                _state.State.AbsoluteExpiration = null;
+                _state.State.SlidingExpiration = null;
                 Publish();
                 return ClearAllStateAsync();
             }
@@ -203,6 +237,8 @@ namespace Outkeep.Grains
             // update subs and lazy save everything
             _state.State.Tag = Guid.NewGuid();
             _state.State.Value = value.Value;
+            _state.State.AbsoluteExpiration = absoluteExpiration;
+            _state.State.SlidingExpiration = slidingExpiration;
             Publish();
             return WriteAllStateAsync();
         }
@@ -223,6 +259,13 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public ValueTask<CachePulse> PollAsync(Guid tag)
         {
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
+
+            if (_entry != null)
+            {
+                _entry.UtcLastAccessed = _flags.State.UtcLastAccessed;
+            }
+
             if (tag == _state.State.Tag)
             {
                 return new ValueTask<CachePulse>(_promise.Task.WithDefaultOnTimeout(new CachePulse(_state.State.Tag, null), _context.Options.ReactivePollingTimeout));

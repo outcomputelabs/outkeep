@@ -10,8 +10,8 @@
 
         Expired = None + 300,
 
-        Capacity = 400,
+        Capacity = None + 400,
 
-        Disposed = 500
+        Disposed = None + 500
     }
 }

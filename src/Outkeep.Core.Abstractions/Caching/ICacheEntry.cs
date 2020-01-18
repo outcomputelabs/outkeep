@@ -6,7 +6,8 @@ namespace Outkeep.Core.Caching
     /// <summary>
     /// Represents an entry in a <see cref="ICacheDirector"/> instance.
     /// </summary>
-    public interface ICacheEntry<TKey> where TKey : notnull
+    public interface ICacheEntry<TKey> : IDisposable
+        where TKey : notnull
     {
         /// <summary>
         /// Gets the key of the entry.
@@ -64,11 +65,13 @@ namespace Outkeep.Core.Caching
 
         /// <summary>
         /// Expires the entry immediately.
+        /// This does not evict the entry at call time but does it makes it elegible for eviction when applicable.
         /// </summary>
         void Expire();
 
         /// <summary>
         /// Marks the entry as expired if it has reached expiration time thresholds.
+        /// This does not evict the entry at call time but does it makes it elegible for eviction when applicable.
         /// </summary>
         bool TryExpire(DateTimeOffset now);
     }
