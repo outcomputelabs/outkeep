@@ -111,51 +111,21 @@ namespace Outkeep.Core.Tests
             // act
             var entry1 = director.CreateEntry("SomeKey1", 1).SetAbsoluteExpiration(clock.UtcNow.AddMinutes(1)).Commit();
             var entry2 = director.CreateEntry("SomeKey2", 2).SetAbsoluteExpiration(clock.UtcNow.AddMinutes(3)).Commit();
-            var entry3 = director.CreateEntry("SomeKey3", 4).SetSlidingExpiration(TimeSpan.FromMinutes(5)).Commit();
-            var entry4 = director.CreateEntry("SomeKey4", 8).SetSlidingExpiration(TimeSpan.FromMinutes(7)).Commit();
 
             // assert
-            Assert.Equal(4, director.Count);
-            Assert.Equal(entry1.Size + entry2.Size + entry3.Size + entry4.Size, director.Size);
+            Assert.Equal(2, director.Count);
+            Assert.Equal(entry1.Size + entry2.Size, director.Size);
             Assert.False(entry1.IsExpired);
             Assert.False(entry2.IsExpired);
-            Assert.False(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
 
             // act
-            director.EvictExpired();
-
-            // assert
-            Assert.Equal(4, director.Count);
-            Assert.Equal(entry1.Size + entry2.Size + entry3.Size + entry4.Size, director.Size);
-            Assert.False(entry1.IsExpired);
-            Assert.False(entry2.IsExpired);
-            Assert.False(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
-
-            // act
-            clock.UtcNow = clock.UtcNow.AddMinutes(2);
-            director.EvictExpired();
-
-            // assert
-            Assert.Equal(3, director.Count);
-            Assert.Equal(entry2.Size + entry3.Size + entry4.Size, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.False(entry2.IsExpired);
-            Assert.False(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
-
-            // act
-            clock.UtcNow = clock.UtcNow.AddMinutes(2);
             director.EvictExpired();
 
             // assert
             Assert.Equal(2, director.Count);
-            Assert.Equal(entry3.Size + entry4.Size, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.True(entry2.IsExpired);
-            Assert.False(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
+            Assert.Equal(entry1.Size + entry2.Size, director.Size);
+            Assert.False(entry1.IsExpired);
+            Assert.False(entry2.IsExpired);
 
             // act
             clock.UtcNow = clock.UtcNow.AddMinutes(2);
@@ -163,11 +133,19 @@ namespace Outkeep.Core.Tests
 
             // assert
             Assert.Equal(1, director.Count);
-            Assert.Equal(entry4.Size, director.Size);
+            Assert.Equal(entry2.Size, director.Size);
+            Assert.True(entry1.IsExpired);
+            Assert.False(entry2.IsExpired);
+
+            // act
+            clock.UtcNow = clock.UtcNow.AddMinutes(4);
+            director.EvictExpired();
+
+            // assert
+            Assert.Equal(0, director.Count);
+            Assert.Equal(0, director.Size);
             Assert.True(entry1.IsExpired);
             Assert.True(entry2.IsExpired);
-            Assert.True(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
         }
 
         [Fact]
