@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Outkeep.Core.Caching
 {
@@ -25,9 +25,9 @@ namespace Outkeep.Core.Caching
         bool IsExpired { get; }
 
         /// <summary>
-        /// Returns a task that completes when this entry is evicted.
+        /// Triggers when the entry is revoked.
         /// </summary>
-        Task<CacheEvictionArgs<TKey>> Evicted { get; }
+        CancellationToken Revoked { get; }
 
         /// <summary>
         /// Gets or sets the priority for this cache entry.

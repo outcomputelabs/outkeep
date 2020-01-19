@@ -50,7 +50,6 @@ namespace Outkeep.Grains
             _entry = _context.Director
                 .CreateEntry(PrimaryKey, _state.State.Value.Length)
                 .SetPriority(CachePriority.Normal)
-                .ContinueWithOnEvicted(HandleEvictedAsync)
                 .Commit();
 
             return Task.CompletedTask;
@@ -76,7 +75,16 @@ namespace Outkeep.Grains
         {
             var self = (CacheGrain)state;
 
-            // check if there is any state
+            // check if the memory allowance was revoked
+            if (self._entry != null && self._entry.Revoked.IsCancellationRequested)
+            {
+                // deactivate the grain to allow cluster rebalancing
+                self.DeactivateOnIdle();
+                self.Publish(false);
+                return Task.CompletedTask;
+            }
+
+            // check if there is any content to evaluate
             if (self._state.State.Tag == Guid.Empty)
             {
                 // nothing to do
@@ -130,38 +138,6 @@ namespace Outkeep.Grains
             return
                 (_state.State.AbsoluteExpiration.HasValue && _state.State.AbsoluteExpiration <= now) ||
                 (_state.State.SlidingExpiration.HasValue && _flags.State.UtcLastAccessed.Add(_state.State.SlidingExpiration.Value) <= now);
-        }
-
-        private Task HandleEvictedAsync(CacheEvictionArgs<string> args)
-        {
-            // see if we are receiving this out-of-band
-            if (_entry == null || args.CacheEntry != _entry) return Task.CompletedTask;
-
-            // see if the clawback is due to expiry
-            if (_entry.EvictionCause == EvictionCause.Expired)
-            {
-                // release the entry for garbage collection
-                _entry = null;
-
-                // propagate the expiration to pending requests
-                _state.State.Tag = Guid.Empty;
-                _state.State.Value = null;
-                _state.State.AbsoluteExpiration = null;
-                _state.State.SlidingExpiration = null;
-                Publish();
-
-                // attempt to remove the content from storage
-                return ClearAllStateAsync();
-            }
-
-            // otherwise the entry was evicted due to capacity reasons
-            // therefore shutdown the grain to release the content for garbage collection
-            DeactivateOnIdle();
-
-            // early resolve any pending promises to allow the grain to shutdown
-            Publish(false);
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -260,7 +236,6 @@ namespace Outkeep.Grains
             _entry = _context.Director
                 .CreateEntry(PrimaryKey, value.Value.Length)
                 .SetPriority(CachePriority.Normal)
-                .ContinueWithOnEvicted(HandleEvictedAsync)
                 .Commit();
 
             // update subs and lazy save everything

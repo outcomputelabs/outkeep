@@ -2,7 +2,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Outkeep.Core.Caching
 {
@@ -19,7 +18,7 @@ namespace Outkeep.Core.Caching
         /// <summary>
         /// Allows users to schedule continuations when the task completes.
         /// </summary>
-        private readonly TaskCompletionSource<CacheEvictionArgs<TKey>> _evicted;
+        private readonly CancellationTokenSource _revokedSource = new CancellationTokenSource();
 
         public CacheEntry(TKey key, long size, ICacheContext<TKey> context)
         {
@@ -27,8 +26,6 @@ namespace Outkeep.Core.Caching
             Size = size < 1 ? throw new ArgumentOutOfRangeException(nameof(size)) : size;
 
             _context = context ?? throw new ArgumentNullException(nameof(context));
-
-            _evicted = new TaskCompletionSource<CacheEvictionArgs<TKey>>();
         }
 
         /// <summary>
@@ -57,14 +54,14 @@ namespace Outkeep.Core.Caching
         public bool IsExpired => _evictionCause != EvictionCause.None;
 
         /// <inheritdoc />
-        public Task<CacheEvictionArgs<TKey>> Evicted => _evicted.Task;
+        public CancellationToken Revoked => _revokedSource.Token;
 
         /// <summary>
         /// Signals users that the parent director has evicted this entry.
         /// </summary>
         public void SetEvicted()
         {
-            _evicted.TrySetResult(new CacheEvictionArgs<TKey>(this));
+            _revokedSource.Cancel();
         }
 
         /// <summary>
@@ -134,6 +131,9 @@ namespace Outkeep.Core.Caching
             if (_disposed) return;
 
             SetExpired(EvictionCause.Disposed);
+            _revokedSource.Cancel();
+            _revokedSource.Dispose();
+
             _context.OnEntryExpired(this);
 
             _disposed = true;

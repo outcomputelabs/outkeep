@@ -1,7 +1,4 @@
-﻿using Orleans;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Outkeep.Core.Caching
 {
@@ -18,22 +15,9 @@ namespace Outkeep.Core.Caching
         /// <returns>The same cache entry instance to allow chaining.</returns>
         public static ICacheEntry<TKey> SetPriority<TKey>(this ICacheEntry<TKey> entry, CachePriority priority) where TKey : notnull
         {
-            if (entry == null) throw new ArgumentNullException(nameof(entry));
+            if (entry is null) throw new ArgumentNullException(nameof(entry));
 
             entry.Priority = priority;
-
-            return entry;
-        }
-
-        /// <summary>
-        /// Convenience method to schedule a continuation on the <see cref="ICacheEntry.Evicted"/> property using the current task scheduler.
-        /// </summary>
-        public static ICacheEntry<TKey> ContinueWithOnEvicted<TKey>(this ICacheEntry<TKey> entry, Func<CacheEvictionArgs<TKey>, Task> action, CancellationToken cancellationToken = default) where TKey : notnull
-        {
-            if (entry is null) throw new ArgumentNullException(nameof(entry));
-            if (action is null) throw new ArgumentNullException(nameof(action));
-
-            entry.Evicted.ContinueWith((t, s) => ((Func<CacheEvictionArgs<TKey>, Task>)s)(t.Result), action, cancellationToken, TaskContinuationOptions.DenyChildAttach, TaskScheduler.Current).Unwrap().Ignore();
 
             return entry;
         }
