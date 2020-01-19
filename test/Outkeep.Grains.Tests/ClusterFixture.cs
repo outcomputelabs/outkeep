@@ -2,14 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Orleans;
-using Orleans.Concurrency;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.TestingHost;
-using Outkeep.Interfaces;
 using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
 namespace Outkeep.Grains.Tests
 {
@@ -65,7 +62,6 @@ namespace Outkeep.Grains.Tests
                                 options.ReactivePollingTimeout = TimeSpan.FromSeconds(5);
                             });
                     })
-                    .AddCacheDirectorGrainService()
                     .UseServiceProviderFactory(services =>
                     {
                         var provider = services.BuildServiceProvider();
@@ -97,24 +93,5 @@ namespace Outkeep.Grains.Tests
                 throw new InvalidOperationException();
             }
         }
-    }
-
-    [StatelessWorker]
-    public class CacheDirectorGrainServiceTestGrain : Grain, ICacheDirectorGrainServiceTestGrain
-    {
-        private readonly ICacheDirectorGrainServiceClient _client;
-
-        public CacheDirectorGrainServiceTestGrain(ICacheDirectorGrainServiceClient client)
-        {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-        }
-
-        [ReadOnly]
-        public Task PingAsync() => _client.PingAsync();
-    }
-
-    public interface ICacheDirectorGrainServiceTestGrain : IGrainWithIntegerKey
-    {
-        Task PingAsync();
     }
 }
