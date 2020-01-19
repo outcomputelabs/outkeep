@@ -49,7 +49,6 @@ namespace Outkeep.Grains
             _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
             _entry = _context.Director
                 .CreateEntry(PrimaryKey, _state.State.Value.Length)
-                .SetAbsoluteExpiration(_state.State.AbsoluteExpiration)
                 .SetPriority(CachePriority.Normal)
                 .ContinueWithOnEvicted(HandleEvictedAsync)
                 .Commit();
@@ -260,7 +259,6 @@ namespace Outkeep.Grains
             _flags.State.UtcLastAccessed = now;
             _entry = _context.Director
                 .CreateEntry(PrimaryKey, value.Value.Length)
-                .SetAbsoluteExpiration(absoluteExpiration)
                 .SetPriority(CachePriority.Normal)
                 .ContinueWithOnEvicted(HandleEvictedAsync)
                 .Commit();

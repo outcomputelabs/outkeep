@@ -10,34 +10,6 @@ namespace Outkeep.Core.Tests
     public class CacheEntryExtensionsTests
     {
         [Fact]
-        public void SetAbsoluteExpiration()
-        {
-            // arrange
-            var entry = Mock.Of<ICacheEntry<string>>();
-            var absoluteExpiration = DateTimeOffset.UtcNow;
-
-            // act
-            var result = entry.SetAbsoluteExpiration(absoluteExpiration);
-
-            // assert
-            Mock.Get(entry).VerifySet(x => x.AbsoluteExpiration = absoluteExpiration);
-            Assert.Same(entry, result);
-        }
-
-        [Fact]
-        public void SetAbsoluteExpirationThrowsOnNullEntry()
-        {
-            // arrange
-            ICacheEntry<string> entry = null!;
-
-            // act
-            void action() => entry.SetAbsoluteExpiration(DateTimeOffset.UtcNow);
-
-            // assert
-            Assert.Throws<ArgumentNullException>(nameof(entry), action);
-        }
-
-        [Fact]
         public void SetPriority()
         {
             // arrange

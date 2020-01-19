@@ -30,11 +30,6 @@ namespace Outkeep.Core.Caching
         Task<CacheEvictionArgs<TKey>> Evicted { get; }
 
         /// <summary>
-        /// Gets or sets the fixed time at which the entry will expire.
-        /// </summary>
-        DateTimeOffset? AbsoluteExpiration { get; set; }
-
-        /// <summary>
         /// Gets or sets the priority for this cache entry.
         /// Entries will lower priority will face eviction first upon compaction.
         /// </summary>

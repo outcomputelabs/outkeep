@@ -52,7 +52,6 @@ namespace Outkeep.Core.Tests
             Assert.NotNull(entry);
             Assert.Equal(key, entry.Key);
             Assert.Equal(size, entry.Size);
-            Assert.Null(entry.AbsoluteExpiration);
             Assert.Equal(EvictionCause.None, entry.EvictionCause);
             Assert.False(entry.IsExpired);
             Assert.Equal(0, director.Count);
@@ -90,61 +89,6 @@ namespace Outkeep.Core.Tests
 
             // act
             Assert.Throws<ArgumentOutOfRangeException>(nameof(size), () => director.CreateEntry(key, size));
-        }
-
-        [Fact]
-        public void EvictExpiredEntries()
-        {
-            // arrange
-            var options = new CacheOptions
-            {
-                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                Capacity = 10000,
-            };
-            var clock = new NullClock
-            {
-                UtcNow = DateTimeOffset.UtcNow
-            };
-            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
-
-            // act
-            var entry1 = director.CreateEntry("SomeKey1", 1).SetAbsoluteExpiration(clock.UtcNow.AddMinutes(1)).Commit();
-            var entry2 = director.CreateEntry("SomeKey2", 2).SetAbsoluteExpiration(clock.UtcNow.AddMinutes(3)).Commit();
-
-            // assert
-            Assert.Equal(2, director.Count);
-            Assert.Equal(entry1.Size + entry2.Size, director.Size);
-            Assert.False(entry1.IsExpired);
-            Assert.False(entry2.IsExpired);
-
-            // act
-            director.EvictExpired();
-
-            // assert
-            Assert.Equal(2, director.Count);
-            Assert.Equal(entry1.Size + entry2.Size, director.Size);
-            Assert.False(entry1.IsExpired);
-            Assert.False(entry2.IsExpired);
-
-            // act
-            clock.UtcNow = clock.UtcNow.AddMinutes(2);
-            director.EvictExpired();
-
-            // assert
-            Assert.Equal(1, director.Count);
-            Assert.Equal(entry2.Size, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.False(entry2.IsExpired);
-
-            // act
-            clock.UtcNow = clock.UtcNow.AddMinutes(4);
-            director.EvictExpired();
-
-            // assert
-            Assert.Equal(0, director.Count);
-            Assert.Equal(0, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.True(entry2.IsExpired);
         }
 
         [Fact]
@@ -251,36 +195,6 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public void EarlyExpiresNewEntry()
-        {
-            // arrange
-            var options = new CacheOptions
-            {
-                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                Capacity = 10000,
-            };
-            var clock = new NullClock
-            {
-                UtcNow = DateTimeOffset.UtcNow
-            };
-            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
-            var key = "SomeKey";
-            var size1 = 6000;
-
-            // act
-            var entry = director
-                .CreateEntry(key, size1)
-                .SetAbsoluteExpiration(clock.UtcNow.AddMinutes(-1))
-                .Commit();
-
-            // assert
-            Assert.Equal(0, director.Count);
-            Assert.Equal(0, director.Size);
-            Assert.Equal(EvictionCause.Expired, entry.EvictionCause);
-            Assert.True(entry.IsExpired);
-        }
-
-        [Fact]
         public void ExpiresConcurrentEntryOnConflict()
         {
             // arrange
@@ -307,49 +221,6 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(1, director.Count);
             Assert.Equal(size, director.Size);
-        }
-
-        [Fact]
-        public void CompactRemovesExpiredEntriesFirst()
-        {
-            // arrange
-            var options = new CacheOptions
-            {
-                ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-                Capacity = 14000,
-            };
-            var clock = new NullClock
-            {
-                UtcNow = DateTimeOffset.UtcNow
-            };
-            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, clock);
-
-            // act
-            var entry1 = director.CreateEntry("Key1", 1000).SetPriority(CachePriority.Low).Commit();
-            var entry2 = director.CreateEntry("Key2", 2000).SetPriority(CachePriority.Normal).Commit();
-            var entry3 = director.CreateEntry("Key3", 4000).SetPriority(CachePriority.High).Commit();
-
-            // assert
-            Assert.Equal(3, director.Count);
-            Assert.Equal(entry1.Size + entry2.Size + entry3.Size, director.Size);
-
-            // act
-            entry3.AbsoluteExpiration = clock.UtcNow.AddMinutes(-1);
-
-            // assert
-            Assert.Equal(3, director.Count);
-            Assert.Equal(entry1.Size + entry2.Size + entry3.Size, director.Size);
-
-            // act
-            var entry4 = director.CreateEntry("Key4", 8000).SetPriority(CachePriority.Low).Commit();
-
-            // assert
-            Assert.Equal(3, director.Count);
-            Assert.Equal(entry1.Size + entry2.Size + entry4.Size, director.Size);
-            Assert.False(entry1.IsExpired);
-            Assert.False(entry2.IsExpired);
-            Assert.True(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
         }
 
         [Fact]
@@ -505,36 +376,6 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.False(result);
             Assert.Null(entry);
-        }
-
-        [Fact]
-        public void AddingExpiredEntryEvictsPreviousEntry()
-        {
-            // arrange
-            var options = new CacheOptions { Capacity = 1000 };
-            var director = new CacheDirector<string>(Options.Create(options), NullLogger<CacheDirector<string>>.Instance, NullClock.Default);
-            var key = Guid.NewGuid().ToString();
-
-            // act
-            var previous = director
-                .CreateEntry(key, 100)
-                .SetAbsoluteExpiration(DateTimeOffset.UtcNow.AddMinutes(1))
-                .Commit();
-
-            // assert
-            Assert.NotNull(previous);
-            Assert.False(previous.IsExpired);
-
-            // act
-            var entry = director
-                .CreateEntry(key, 100)
-                .SetAbsoluteExpiration(DateTime.UtcNow.AddMinutes(-1))
-                .Commit();
-
-            // assert
-            Assert.NotNull(entry);
-            Assert.False(entry.IsExpired);
-            Assert.True(previous.IsExpired);
         }
 
         [Fact]

@@ -11,21 +11,6 @@ namespace Outkeep.Core.Caching
     public static class CacheEntryExtensions
     {
         /// <summary>
-        /// Sets the absolute expiration for this cache entry.
-        /// </summary>
-        /// <param name="entry">The cache entry instance upon which to set the absolute expiration.</param>
-        /// <param name="absoluteExpiration">The absolute expiration to set upon the cache entry.</param>
-        /// <returns>The same cache entry instance to allow chaining.</returns>
-        public static ICacheEntry<TKey> SetAbsoluteExpiration<TKey>(this ICacheEntry<TKey> entry, DateTimeOffset? absoluteExpiration) where TKey : notnull
-        {
-            if (entry == null) throw new ArgumentNullException(nameof(entry));
-
-            entry.AbsoluteExpiration = absoluteExpiration;
-
-            return entry;
-        }
-
-        /// <summary>
         /// Sets the priority for this cache entry.
         /// </summary>
         /// <param name="entry">The cache entry instance upon which to set the priority.</param>
