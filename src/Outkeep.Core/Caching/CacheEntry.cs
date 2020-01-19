@@ -48,9 +48,6 @@ namespace Outkeep.Core.Caching
         public long Size { get; }
 
         /// <inheritdoc />
-        public DateTimeOffset? AbsoluteExpiration { get; set; }
-
-        /// <inheritdoc />
         public CachePriority Priority { get; set; } = CachePriority.Normal;
 
         /// <inheritdoc />
@@ -68,23 +65,6 @@ namespace Outkeep.Core.Caching
         public void SetEvicted()
         {
             _evicted.TrySetResult(new CacheEvictionArgs<TKey>(this));
-        }
-
-        /// <inheritdoc />
-        public bool TryExpire(DateTimeOffset now)
-        {
-            // no-op if the entry is already expired
-            if (IsExpired) return true;
-
-            // expire if the entry reached absolute expiration time regardless of sliding expiration time
-            if (AbsoluteExpiration.HasValue && AbsoluteExpiration.Value <= now)
-            {
-                SetExpired(EvictionCause.Expired);
-                return true;
-            }
-
-            // otherwise dont expire
-            return false;
         }
 
         /// <summary>

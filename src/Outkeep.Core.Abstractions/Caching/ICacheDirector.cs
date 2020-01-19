@@ -35,11 +35,5 @@
         /// Get the capacity managed by this cache director.
         /// </summary>
         long Capacity { get; }
-
-        /// <summary>
-        /// Scans the cache for expired entries and removes them as appropriate, scheduling callback invocation.
-        /// Does not compact the cache.
-        /// </summary>
-        void EvictExpired();
     }
 }

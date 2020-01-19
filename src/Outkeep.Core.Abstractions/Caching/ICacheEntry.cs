@@ -51,11 +51,5 @@ namespace Outkeep.Core.Caching
         /// This does not evict the entry at call time but does it makes it elegible for eviction when applicable.
         /// </summary>
         void Expire();
-
-        /// <summary>
-        /// Marks the entry as expired if it has reached expiration time thresholds.
-        /// This does not evict the entry at call time but does it makes it elegible for eviction when applicable.
-        /// </summary>
-        bool TryExpire(DateTimeOffset now);
     }
 }

@@ -14,13 +14,11 @@ namespace Outkeep.Core.Caching
     {
         private readonly ILogger _logger;
         private readonly CacheOptions _options;
-        private readonly ISystemClock _clock;
 
-        public CacheDirector(IOptions<CacheOptions> options, ILogger<CacheDirector<TKey>> logger, ISystemClock clock)
+        public CacheDirector(IOptions<CacheOptions> options, ILogger<CacheDirector<TKey>> logger)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _clock = clock ?? throw new ArgumentNullException(nameof(clock));
 
             _buckets = new ConcurrentDictionary<CacheEntry<TKey>, bool>[3];
             for (var i = 0; i < 3; ++i)
@@ -99,9 +97,6 @@ namespace Outkeep.Core.Caching
         /// <param name="entry">The entry to accept.</param>
         public void OnEntryCommitted(CacheEntry<TKey> entry)
         {
-            // keep the current clock so evaluations are consistent
-            var now = _clock.UtcNow;
-
             // mark any previous entry as expired but do not remove it yet
             // we must keep the entry in place to detect race conditions without locking
             var previous = TryExpire(entry.Key);
@@ -120,20 +115,6 @@ namespace Outkeep.Core.Caching
                 // an attempt to add an entry must remove any old entry to avoid keeping stale data
                 // however only remove the previous entry if it was the same we found otherwise a concurrent thread already took care of it
                 if (previous != null) TryEvictEntry(previous);
-
-                return;
-            }
-
-            // attempt to early expire the entry to account for this thread suspending or early timeouts
-            if (entry.TryExpire(now))
-            {
-                entry.SetEvicted();
-
-                // ensure eviction of previous entry regardless
-                if (previous != null) TryEvictEntry(previous);
-
-                // rollback the space claim
-                Interlocked.Add(ref _size, -entry.Size);
 
                 return;
             }
@@ -312,28 +293,8 @@ namespace Outkeep.Core.Caching
             TryEvictEntry(entry);
         }
 
-        /// <inheritdoc />
-        public void EvictExpired()
-        {
-            var now = _clock.UtcNow;
-
-            foreach (var pair in _entries)
-            {
-                var entry = pair.Value;
-                if (entry.TryExpire(now))
-                {
-                    TryEvictEntry(entry);
-                }
-            }
-        }
-
         /// <summary>
         /// Evicts enough entries to make room for the given quota and priority level.
-        /// Eviction happens in this order:
-        ///     1. Enough already expired entries.
-        ///     2. If the priority demand is at least <see cref="CachePriority.Low"/>, enough entries from the low priority bucket.
-        ///     3. If the priority demand is at least <see cref="CachePriority.Normal"/>, enough entries from the normal priority bucket.
-        ///     4. If the priority demand is at least <see cref="CachePriority.High"/>, enough entries from the high priority bucket.
         /// </summary>
         /// <param name="quota">The size demand to meet.</param>
         /// <param name="priority">The priority demand to meet.</param>
@@ -344,25 +305,7 @@ namespace Outkeep.Core.Caching
         /// </remarks>
         private bool TryCompact(long quota, CachePriority priority)
         {
-            var now = _clock.UtcNow;
-
-            // evict expired entries from all buckets first
-            // we enumerate the buckets as opposed to the main dictionary
-            // to help remove possible orphans created due to early expiration during commit
-            for (var i = 0; i < _buckets.Length; ++i)
-            {
-                foreach (var item in _buckets[i])
-                {
-                    var entry = item.Key;
-                    if (entry.TryExpire(now) && TryEvictEntry(entry) && (quota -= entry.Size) <= 0)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            // if evicting expired entries was not enough
-            // then we must early evict enough entries to meet the quota
+            // evict enough entries to meet the quota
             // we only evict entries in buckets of up the priority of the new entry
             var max = (int)(priority == CachePriority.NeverRemove ? CachePriority.High : priority);
             for (var i = 0; i <= max; ++i)
