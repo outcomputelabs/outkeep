@@ -38,34 +38,6 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public void SetSlidingExpiration()
-        {
-            // arrange
-            var entry = Mock.Of<ICacheEntry<string>>();
-            var slidingExpiration = TimeSpan.FromMinutes(1);
-
-            // act
-            var result = entry.SetSlidingExpiration(slidingExpiration);
-
-            // assert
-            Mock.Get(entry).VerifySet(x => x.SlidingExpiration = slidingExpiration);
-            Assert.Same(entry, result);
-        }
-
-        [Fact]
-        public void SetSlidingExpirationThrowsOnNullEntry()
-        {
-            // arrange
-            ICacheEntry<string> entry = null!;
-
-            // act
-            void action() => entry.SetSlidingExpiration(TimeSpan.Zero);
-
-            // assert
-            Assert.Throws<ArgumentNullException>(nameof(entry), action);
-        }
-
-        [Fact]
         public void SetPriority()
         {
             // arrange

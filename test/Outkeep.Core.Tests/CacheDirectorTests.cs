@@ -55,7 +55,6 @@ namespace Outkeep.Core.Tests
             Assert.Null(entry.AbsoluteExpiration);
             Assert.Equal(EvictionCause.None, entry.EvictionCause);
             Assert.False(entry.IsExpired);
-            Assert.Null(entry.SlidingExpiration);
             Assert.Equal(0, director.Count);
             Assert.Equal(0, director.Size);
 

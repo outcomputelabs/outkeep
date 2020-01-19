@@ -51,9 +51,6 @@ namespace Outkeep.Core.Caching
         public DateTimeOffset? AbsoluteExpiration { get; set; }
 
         /// <inheritdoc />
-        public TimeSpan? SlidingExpiration { get; set; }
-
-        /// <inheritdoc />
         public CachePriority Priority { get; set; } = CachePriority.Normal;
 
         /// <inheritdoc />

@@ -26,21 +26,6 @@ namespace Outkeep.Core.Caching
         }
 
         /// <summary>
-        /// Sets the sliding expiration for this cache entry.
-        /// </summary>
-        /// <param name="entry">The cache entry instance upon which to set the sliding expiration.</param>
-        /// <param name="slidingExpiration">The sliding expiration to set upon the cache entry.</param>
-        /// <returns>The same cache entry instance to allow chaining.</returns>
-        public static ICacheEntry<TKey> SetSlidingExpiration<TKey>(this ICacheEntry<TKey> entry, TimeSpan? slidingExpiration) where TKey : notnull
-        {
-            if (entry == null) throw new ArgumentNullException(nameof(entry));
-
-            entry.SlidingExpiration = slidingExpiration;
-
-            return entry;
-        }
-
-        /// <summary>
         /// Sets the priority for this cache entry.
         /// </summary>
         /// <param name="entry">The cache entry instance upon which to set the priority.</param>

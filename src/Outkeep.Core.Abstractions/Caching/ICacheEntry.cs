@@ -35,11 +35,6 @@ namespace Outkeep.Core.Caching
         DateTimeOffset? AbsoluteExpiration { get; set; }
 
         /// <summary>
-        /// Gets or sets the sliding timespan at which the entry will expire.
-        /// </summary>
-        TimeSpan? SlidingExpiration { get; set; }
-
-        /// <summary>
         /// Gets or sets the priority for this cache entry.
         /// Entries will lower priority will face eviction first upon compaction.
         /// </summary>

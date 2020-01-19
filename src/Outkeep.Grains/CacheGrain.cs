@@ -50,7 +50,6 @@ namespace Outkeep.Grains
             _entry = _context.Director
                 .CreateEntry(PrimaryKey, _state.State.Value.Length)
                 .SetAbsoluteExpiration(_state.State.AbsoluteExpiration)
-                .SetSlidingExpiration(_state.State.SlidingExpiration)
                 .SetPriority(CachePriority.Normal)
                 .ContinueWithOnEvicted(HandleEvictedAsync)
                 .Commit();
@@ -262,7 +261,6 @@ namespace Outkeep.Grains
             _entry = _context.Director
                 .CreateEntry(PrimaryKey, value.Value.Length)
                 .SetAbsoluteExpiration(absoluteExpiration)
-                .SetSlidingExpiration(slidingExpiration)
                 .SetPriority(CachePriority.Normal)
                 .ContinueWithOnEvicted(HandleEvictedAsync)
                 .Commit();
