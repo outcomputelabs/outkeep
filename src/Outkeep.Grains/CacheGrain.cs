@@ -76,7 +76,7 @@ namespace Outkeep.Grains
             var self = (CacheGrain)state;
 
             // check if the memory allowance was revoked
-            if (self._entry != null && self._entry.Revoked.IsCancellationRequested)
+            if (self._entry != null && self._entry.IsRevoked)
             {
                 // deactivate the grain to allow cluster rebalancing
                 self.DeactivateOnIdle();
@@ -87,29 +87,13 @@ namespace Outkeep.Grains
             // check if there is any content to evaluate
             if (self._state.State.Tag == Guid.Empty)
             {
-                // nothing to do
                 return Task.CompletedTask;
             }
 
             // check if the content has expired
             if (self.IsExpired())
             {
-                // release the token claim
-                if (self._entry != null)
-                {
-                    self._entry.Expire();
-                    self._entry = null;
-                }
-
-                // clear and publish the state
-                self._state.State.Tag = Guid.Empty;
-                self._state.State.Value = null;
-                self._state.State.AbsoluteExpiration = null;
-                self._state.State.SlidingExpiration = null;
-                self.Publish();
-
-                // attempt to remove stored state as well
-                return self.ClearAllStateAsync();
+                return self.ResetAsync();
             }
 
             // save the flags if they have changed
@@ -120,6 +104,30 @@ namespace Outkeep.Grains
             }
 
             return Task.CompletedTask;
+        }
+
+        private Task ResetAsync()
+        {
+            // release the memory allowance
+            ReleaseToken();
+
+            // clear and publish the state
+            _state.State.Tag = Guid.Empty;
+            _state.State.Value = null;
+            _state.State.AbsoluteExpiration = null;
+            _state.State.SlidingExpiration = null;
+            Publish();
+
+            // attempt to remove stored state as well
+            return Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync());
+        }
+
+        private void ReleaseToken()
+        {
+            if (_entry is null) return;
+
+            _entry.Revoke();
+            _entry = null;
         }
 
         private Task ClearAllStateAsync()
@@ -168,36 +176,14 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task RemoveAsync()
         {
-            // check if there is anything to remove
-            if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
-
-            // if we have an allocation then expire it and release it for garbage collection
-            if (_entry != null)
-            {
-                _entry.Expire();
-                _entry = null;
-            }
-
-            // reset the state to fulfill get requests
-            _state.State.Tag = Guid.Empty;
-            _state.State.Value = null;
-            _state.State.AbsoluteExpiration = null;
-            _state.State.SlidingExpiration = null;
-            Publish();
-
-            // attempt to clear storage as well
-            return ClearAllStateAsync();
+            DeactivateOnIdle();
+            return ResetAsync();
         }
 
         /// <inheritdoc />
         public Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
-            // if we have a previous allocation then expire it and release it for garbage collection
-            if (_entry != null)
-            {
-                _entry.Expire();
-                _entry = null;
-            }
+            ReleaseToken();
 
             // check if there is anything to set at all
             // setting null content is equivalent to clearing
@@ -206,13 +192,7 @@ namespace Outkeep.Grains
                 // noop if there is nothing to clear
                 if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
 
-                // otherwise clear and propagate
-                _state.State.Tag = Guid.Empty;
-                _state.State.Value = null;
-                _state.State.AbsoluteExpiration = null;
-                _state.State.SlidingExpiration = null;
-                Publish();
-                return ClearAllStateAsync();
+                return ResetAsync();
             }
 
             // check if the input has already expired
@@ -222,13 +202,7 @@ namespace Outkeep.Grains
                 // noop if there is nothing to clear
                 if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
 
-                // otherwise clear and propagate
-                _state.State.Tag = Guid.Empty;
-                _state.State.Value = null;
-                _state.State.AbsoluteExpiration = null;
-                _state.State.SlidingExpiration = null;
-                Publish();
-                return ClearAllStateAsync();
+                return ResetAsync();
             }
 
             // claim space in the current box

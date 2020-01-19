@@ -9,9 +9,9 @@
         public void OnEntryCommitted(CacheEntry<TKey> entry);
 
         /// <summary>
-        /// Invoked by each entry after self-expiry.
+        /// Invoked by each entry after self-revocation.
         /// </summary>
-        /// <param name="entry">The entry that has expired.</param>
-        public void OnEntryExpired(CacheEntry<TKey> entry);
+        /// <param name="entry">The entry that has self-revoked.</param>
+        public void OnEntryRevoked(CacheEntry<TKey> entry);
     }
 }

@@ -20,9 +20,9 @@ namespace Outkeep.Core.Caching
         long Size { get; }
 
         /// <summary>
-        /// Indicates whether this entry has expired.
+        /// Indicates whether this entry is revoked.
         /// </summary>
-        bool IsExpired { get; }
+        bool IsRevoked { get; }
 
         /// <summary>
         /// Triggers when the entry is revoked.
@@ -36,20 +36,14 @@ namespace Outkeep.Core.Caching
         CachePriority Priority { get; set; }
 
         /// <summary>
-        /// Gets the eviction cause for this cache entry.
-        /// </summary>
-        EvictionCause EvictionCause { get; }
-
-        /// <summary>
         /// Commits this cache entry to the owning <see cref="ICacheDirector{TKey}"/> instance.
         /// </summary>
         /// <returns>The cache entry itself to allow chaining.</returns>
         ICacheEntry<TKey> Commit();
 
         /// <summary>
-        /// Expires the entry immediately.
-        /// This does not evict the entry at call time but does it makes it elegible for eviction when applicable.
+        /// Revokes the entry immediately.
         /// </summary>
-        void Expire();
+        void Revoke();
     }
 }

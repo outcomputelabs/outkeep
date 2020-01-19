@@ -32,7 +32,7 @@ namespace Outkeep.Core.Tests
             entry.Dispose();
 
             // assert
-            Mock.Get(context).Verify(x => x.OnEntryExpired(entry));
+            Mock.Get(context).Verify(x => x.OnEntryRevoked(entry));
         }
     }
 }

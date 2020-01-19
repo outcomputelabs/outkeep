@@ -48,8 +48,7 @@ namespace Outkeep.Core.Tests
             Assert.NotNull(entry);
             Assert.Equal(key, entry.Key);
             Assert.Equal(size, entry.Size);
-            Assert.Equal(EvictionCause.None, entry.EvictionCause);
-            Assert.False(entry.IsExpired);
+            Assert.False(entry.IsRevoked);
             Assert.Equal(0, director.Count);
             Assert.Equal(0, director.Size);
 
@@ -61,7 +60,7 @@ namespace Outkeep.Core.Tests
             Assert.Equal(size, director.Size);
 
             // act
-            entry.Expire();
+            entry.Revoke();
             Assert.Equal(0, director.Count);
             Assert.Equal(0, director.Size);
         }
@@ -121,8 +120,7 @@ namespace Outkeep.Core.Tests
 
             // assert
             Assert.NotNull(entry1);
-            Assert.Equal(EvictionCause.None, entry1.EvictionCause);
-            Assert.False(entry1.IsExpired);
+            Assert.False(entry1.IsRevoked);
             Assert.Equal(1, director.Count);
             Assert.Equal(size1, director.Size);
 
@@ -130,12 +128,10 @@ namespace Outkeep.Core.Tests
             var entry2 = director.CreateEntry(key, size2).Commit();
 
             // assert
-            Assert.Equal(EvictionCause.Replaced, entry1.EvictionCause);
-            Assert.True(entry1.IsExpired);
+            Assert.True(entry1.IsRevoked);
 
             Assert.NotNull(entry2);
-            Assert.Equal(EvictionCause.None, entry2.EvictionCause);
-            Assert.False(entry2.IsExpired);
+            Assert.False(entry2.IsRevoked);
             Assert.Equal(1, director.Count);
             Assert.Equal(size2, director.Size);
         }
@@ -158,7 +154,7 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(1, director.Count);
             Assert.Equal(entry1.Size, director.Size);
-            Assert.False(entry1.IsExpired);
+            Assert.False(entry1.IsRevoked);
 
             // act
             var entry2 = director.CreateEntry(key, 10000).SetPriority(CachePriority.NeverRemove).Commit();
@@ -167,11 +163,8 @@ namespace Outkeep.Core.Tests
             Assert.Equal(0, director.Count);
             Assert.Equal(0, director.Size);
 
-            Assert.True(entry1.IsExpired);
-            Assert.Equal(EvictionCause.Replaced, entry1.EvictionCause);
-
-            Assert.True(entry2.IsExpired);
-            Assert.Equal(EvictionCause.Capacity, entry2.EvictionCause);
+            Assert.True(entry1.IsRevoked);
+            Assert.True(entry2.IsRevoked);
         }
 
         [Fact]
@@ -225,10 +218,10 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(3, director.Count);
             Assert.Equal(entry2.Size + entry3.Size + entry4.Size, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.False(entry2.IsExpired);
-            Assert.False(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
+            Assert.True(entry1.IsRevoked);
+            Assert.False(entry2.IsRevoked);
+            Assert.False(entry3.IsRevoked);
+            Assert.False(entry4.IsRevoked);
         }
 
         [Fact]
@@ -257,10 +250,10 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(2, director.Count);
             Assert.Equal(entry3.Size + entry4.Size, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.True(entry2.IsExpired);
-            Assert.False(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
+            Assert.True(entry1.IsRevoked);
+            Assert.True(entry2.IsRevoked);
+            Assert.False(entry3.IsRevoked);
+            Assert.False(entry4.IsRevoked);
         }
 
         [Fact]
@@ -289,10 +282,10 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(1, director.Count);
             Assert.Equal(entry4.Size, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.True(entry2.IsExpired);
-            Assert.True(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
+            Assert.True(entry1.IsRevoked);
+            Assert.True(entry2.IsRevoked);
+            Assert.True(entry3.IsRevoked);
+            Assert.False(entry4.IsRevoked);
         }
 
         [Fact]
@@ -357,7 +350,7 @@ namespace Outkeep.Core.Tests
 
             // assert
             Assert.NotNull(filler);
-            Assert.False(filler.IsExpired);
+            Assert.False(filler.IsRevoked);
 
             // act
             var entry = director
@@ -366,8 +359,8 @@ namespace Outkeep.Core.Tests
 
             // assert
             Assert.NotNull(entry);
-            Assert.True(entry.IsExpired);
-            Assert.True(filler.IsExpired);
+            Assert.True(entry.IsRevoked);
+            Assert.True(filler.IsRevoked);
         }
     }
 }

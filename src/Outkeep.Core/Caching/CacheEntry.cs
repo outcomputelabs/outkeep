@@ -1,6 +1,5 @@
 ﻿using Outkeep.Core.Properties;
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Outkeep.Core.Caching
@@ -33,11 +32,6 @@ namespace Outkeep.Core.Caching
         /// </summary>
         private bool _committed;
 
-        /// <summary>
-        /// The cause behind the eviction of this entry.
-        /// </summary>
-        private EvictionCause _evictionCause = EvictionCause.None;
-
         /// <inheritdoc />
         public TKey Key { get; }
 
@@ -48,30 +42,10 @@ namespace Outkeep.Core.Caching
         public CachePriority Priority { get; set; } = CachePriority.Normal;
 
         /// <inheritdoc />
-        public EvictionCause EvictionCause => _evictionCause;
-
-        /// <inheritdoc />
-        public bool IsExpired => _evictionCause != EvictionCause.None;
-
-        /// <inheritdoc />
         public CancellationToken Revoked => _revokedSource.Token;
 
-        /// <summary>
-        /// Signals users that the parent director has evicted this entry.
-        /// </summary>
-        public void SetEvicted()
-        {
-            _revokedSource.Cancel();
-        }
-
-        /// <summary>
-        /// Marks the entry as expired for the given reason, making it ellegible for removal.
-        /// </summary>
-        internal void SetExpired(EvictionCause reason)
-        {
-            // the first thread to set an eviction cause wins
-            Interlocked.CompareExchange(ref Unsafe.As<EvictionCause, int>(ref _evictionCause), (int)reason, (int)EvictionCause.None);
-        }
+        /// <inheritdoc />
+        public bool IsRevoked => _revokedSource.IsCancellationRequested;
 
         /// <inheritdoc />
         public ICacheEntry<TKey> Commit()
@@ -86,13 +60,12 @@ namespace Outkeep.Core.Caching
         }
 
         /// <inheritdoc />
-        public void Expire()
+        public void Revoke()
         {
             EnsureCommitted();
 
-            SetExpired(EvictionCause.Expired);
-
-            _context.OnEntryExpired(this);
+            _revokedSource.Cancel();
+            _context.OnEntryRevoked(this);
         }
 
         /// <summary>
@@ -124,17 +97,18 @@ namespace Outkeep.Core.Caching
         private bool _disposed;
 
         /// <summary>
-        /// Disposing the cache entry removes it from the owning cache director.
+        /// Disposing the allocation entry also revokes it.
         /// </summary>
         public void Dispose()
         {
             if (_disposed) return;
 
-            SetExpired(EvictionCause.Disposed);
-            _revokedSource.Cancel();
+            if (!_revokedSource.IsCancellationRequested)
+            {
+                _revokedSource.Cancel();
+                _context.OnEntryRevoked(this);
+            }
             _revokedSource.Dispose();
-
-            _context.OnEntryExpired(this);
 
             _disposed = true;
 

@@ -142,16 +142,6 @@ namespace Outkeep.Grains.Tests
             await storage.ReadStateAsync(grainType, reference, state).ConfigureAwait(false);
             Assert.Equal(Guid.Empty, state.State.Tag);
             Assert.Null(state.State.Value);
-
-            // arrange - add dummy value to storage
-            state.State.Tag = Guid.NewGuid();
-            state.State.Value = Guid.NewGuid().ToByteArray();
-            await storage.WriteStateAsync(grainType, reference, state).ConfigureAwait(false);
-
-            // assert value is cleared from memory and not reloaded
-            result = await grain.GetAsync().ConfigureAwait(false);
-            Assert.Equal(Guid.Empty, result.Tag);
-            Assert.Null(result.Value.Value);
         }
 
         [Fact]

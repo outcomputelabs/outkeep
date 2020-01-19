@@ -78,18 +78,6 @@ namespace Outkeep.Core.Caching
         }
 
         /// <summary>
-        /// Attempts to find and expire the item with the given key.
-        /// </summary>
-        private CacheEntry<TKey> TryExpire(TKey key)
-        {
-            if (_entries.TryGetValue(key, out var previous))
-            {
-                previous.SetExpired(EvictionCause.Replaced);
-            }
-            return previous;
-        }
-
-        /// <summary>
         /// Accepts an entry into this cache director.
         /// This method is to be called from <see cref="CacheEntry.Commit"/> after entry configuration.
         /// This is the critical performance path in the director.
@@ -99,7 +87,7 @@ namespace Outkeep.Core.Caching
         {
             // mark any previous entry as expired but do not remove it yet
             // we must keep the entry in place to detect race conditions without locking
-            var previous = TryExpire(entry.Key);
+            _entries.TryGetValue(entry.Key, out var previous);
 
             // try to allocate space for the new entry
             var allocated = TryClaimSpace(entry);
@@ -108,18 +96,17 @@ namespace Outkeep.Core.Caching
             if (!allocated)
             {
                 // early expire this entry in case it is not already
-                entry.SetExpired(EvictionCause.Capacity);
-                entry.SetEvicted();
+                entry.Revoke();
 
                 // if we found a previous entry then evict it as well
                 // an attempt to add an entry must remove any old entry to avoid keeping stale data
                 // however only remove the previous entry if it was the same we found otherwise a concurrent thread already took care of it
-                if (previous != null) TryEvictEntry(previous);
+                if (previous != null) previous.Revoke();
 
                 return;
             }
 
-            // the entry claimed space without contention and did not expire early
+            // the entry claimed space without contention
             bool added;
 
             // check if we had found a previous entry
@@ -143,7 +130,7 @@ namespace Outkeep.Core.Caching
                     Interlocked.Add(ref _size, -previous.Size);
 
                     // notify subscribers that the previous entry was evicted
-                    previous.SetEvicted();
+                    previous.Revoke();
                 }
                 else
                 {
@@ -171,10 +158,7 @@ namespace Outkeep.Core.Caching
                 // this should be a very rare occurrence if at all as each entry should only be accessed by their own thread-safe grain instance in the first place
 
                 // early expire this entry
-                entry.SetExpired(EvictionCause.Replaced);
-
-                // early notify the user
-                entry.SetEvicted();
+                entry.Revoke();
 
                 // rollback the space claim so other entries can claim it
                 Interlocked.Add(ref _size, -entry.Size);
@@ -274,10 +258,7 @@ namespace Outkeep.Core.Caching
                 TryUnbucket(entry);
 
                 // expire the entry if not expired yet
-                entry.SetExpired(EvictionCause.Removed);
-
-                // notify the user of eviction
-                entry.SetEvicted();
+                entry.Revoke();
 
                 return true;
             }
@@ -285,10 +266,8 @@ namespace Outkeep.Core.Caching
             return false;
         }
 
-        /// <summary>
-        /// Called by each entry on self expiry.
-        /// </summary>
-        public void OnEntryExpired(CacheEntry<TKey> entry)
+        /// <inheritdoc />
+        public void OnEntryRevoked(CacheEntry<TKey> entry)
         {
             TryEvictEntry(entry);
         }
