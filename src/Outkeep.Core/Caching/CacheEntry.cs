@@ -9,7 +9,7 @@ namespace Outkeep.Core.Caching
     /// <summary>
     /// Implements a cache entry as used by <see cref="CacheDirector"/>.
     /// </summary>
-    internal sealed class CacheEntry<TKey> : ICacheEntry<TKey>, IDisposable where TKey : notnull
+    internal sealed class CacheEntry<TKey> : ICacheEntry<TKey> where TKey : notnull
     {
         /// <summary>
         /// The cache context to use for raising notifications.
