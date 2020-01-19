@@ -102,9 +102,6 @@ namespace Outkeep.Core.Caching
             // keep the current clock so evaluations are consistent
             var now = _clock.UtcNow;
 
-            // setting the entry counts as the first access
-            entry.UtcLastAccessed = now;
-
             // mark any previous entry as expired but do not remove it yet
             // we must keep the entry in place to detect race conditions without locking
             var previous = TryExpire(entry.Key);

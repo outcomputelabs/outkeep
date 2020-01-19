@@ -273,28 +273,6 @@ namespace Outkeep.Grains.Tests
         }
 
         [Fact]
-        public async Task RefreshUpdatesLastAccessedTimestamp()
-        {
-            // arrange
-            var key = Guid.NewGuid().ToString();
-            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
-            var director = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector<string>>();
-
-            // act
-            await grain.SetAsync(Guid.NewGuid().ToByteArray().AsNullableImmutable(), null, null).ConfigureAwait(false);
-
-            // assert
-            Assert.True(director.TryGetEntry(key, out var entry));
-            var accessed = entry?.UtcLastAccessed;
-
-            // act
-            await grain.RefreshAsync().ConfigureAwait(false);
-
-            // assert
-            Assert.True(entry?.UtcLastAccessed > accessed);
-        }
-
-        [Fact]
         public async Task PollAsyncLifecycle()
         {
             // arrange
@@ -346,13 +324,9 @@ namespace Outkeep.Grains.Tests
             var okay = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector<string>>().TryGetEntry(key, out var entry);
             Assert.True(okay);
             Assert.NotNull(entry);
-            var lastAccessed = entry!.UtcLastAccessed;
 
             // act - access the value again to update the accessed timestamp
             await grain.PollAsync(Guid.NewGuid()).ConfigureAwait(false);
-
-            // assert
-            Assert.True(entry.UtcLastAccessed > lastAccessed);
 
             // act - long poll the value again to test the empty pulse response
             var result5 = await grain.PollAsync(result3.Tag);

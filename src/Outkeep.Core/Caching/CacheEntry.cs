@@ -54,9 +54,6 @@ namespace Outkeep.Core.Caching
         public TimeSpan? SlidingExpiration { get; set; }
 
         /// <inheritdoc />
-        public DateTimeOffset UtcLastAccessed { get; set; }
-
-        /// <inheritdoc />
         public CachePriority Priority { get; set; } = CachePriority.Normal;
 
         /// <inheritdoc />
@@ -84,13 +81,6 @@ namespace Outkeep.Core.Caching
 
             // expire if the entry reached absolute expiration time regardless of sliding expiration time
             if (AbsoluteExpiration.HasValue && AbsoluteExpiration.Value <= now)
-            {
-                SetExpired(EvictionCause.Expired);
-                return true;
-            }
-
-            // otherwise expire if the entry reached sliding expiration
-            if (SlidingExpiration.HasValue && now - UtcLastAccessed >= SlidingExpiration)
             {
                 SetExpired(EvictionCause.Expired);
                 return true;

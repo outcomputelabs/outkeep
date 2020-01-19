@@ -128,18 +128,5 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Throws<ArgumentNullException>(nameof(entry), action);
         }
-
-        [Fact]
-        public void SetUtcLastAccessedThrowsOnNullEntry()
-        {
-            // arrange
-            ICacheEntry<string> entry = null!;
-
-            // act
-            void action() => entry.SetUtcLastAccessed(DateTimeOffset.UtcNow);
-
-            // assert
-            Assert.Throws<ArgumentNullException>(nameof(entry), action);
-        }
     }
 }

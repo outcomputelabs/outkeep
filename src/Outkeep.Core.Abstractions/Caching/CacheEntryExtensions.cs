@@ -11,21 +11,6 @@ namespace Outkeep.Core.Caching
     public static class CacheEntryExtensions
     {
         /// <summary>
-        /// Sets the <see cref="ICacheEntry.UtcLastAccessed"/> time for this cache entry.
-        /// </summary>
-        /// <param name="entry">The cache entry.</param>
-        /// <param name="utcLastAccessed">The value for the <see cref="ICacheEntry.UtcLastAccessed"/> property.</param>
-        /// <returns>The same cache entry instance to allow chaining.</returns>
-        public static ICacheEntry<TKey> SetUtcLastAccessed<TKey>(this ICacheEntry<TKey> entry, DateTimeOffset utcLastAccessed) where TKey : notnull
-        {
-            if (entry is null) throw new ArgumentNullException(nameof(entry));
-
-            entry.UtcLastAccessed = utcLastAccessed;
-
-            return entry;
-        }
-
-        /// <summary>
         /// Sets the absolute expiration for this cache entry.
         /// </summary>
         /// <param name="entry">The cache entry instance upon which to set the absolute expiration.</param>

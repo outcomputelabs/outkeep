@@ -56,7 +56,6 @@ namespace Outkeep.Core.Tests
             Assert.Equal(EvictionCause.None, entry.EvictionCause);
             Assert.False(entry.IsExpired);
             Assert.Null(entry.SlidingExpiration);
-            Assert.Equal(DateTimeOffset.MinValue, entry.UtcLastAccessed);
             Assert.Equal(0, director.Count);
             Assert.Equal(0, director.Size);
 
@@ -169,31 +168,6 @@ namespace Outkeep.Core.Tests
             Assert.True(entry2.IsExpired);
             Assert.True(entry3.IsExpired);
             Assert.False(entry4.IsExpired);
-
-            // act
-            clock.UtcNow = clock.UtcNow.AddMinutes(2);
-            entry4.UtcLastAccessed = clock.UtcNow.AddMinutes(1);
-            director.EvictExpired();
-
-            // assert
-            Assert.Equal(1, director.Count);
-            Assert.Equal(entry4.Size, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.True(entry2.IsExpired);
-            Assert.True(entry3.IsExpired);
-            Assert.False(entry4.IsExpired);
-
-            // act
-            clock.UtcNow = entry4.UtcLastAccessed.Add(entry4.SlidingExpiration.GetValueOrDefault()).AddMinutes(1);
-            director.EvictExpired();
-
-            // assert
-            Assert.Equal(0, director.Count);
-            Assert.Equal(0, director.Size);
-            Assert.True(entry1.IsExpired);
-            Assert.True(entry2.IsExpired);
-            Assert.True(entry3.IsExpired);
-            Assert.True(entry4.IsExpired);
         }
 
         [Fact]

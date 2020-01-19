@@ -52,7 +52,6 @@ namespace Outkeep.Grains
                 .SetAbsoluteExpiration(_state.State.AbsoluteExpiration)
                 .SetSlidingExpiration(_state.State.SlidingExpiration)
                 .SetPriority(CachePriority.Normal)
-                .SetUtcLastAccessed(_flags.State.UtcLastAccessed)
                 .ContinueWithOnEvicted(HandleEvictedAsync)
                 .Commit();
 
@@ -61,7 +60,7 @@ namespace Outkeep.Grains
 
         public override Task OnDeactivateAsync()
         {
-            // release the space claim early but without expiring
+            // release the token claim early without expiring
             _entry?.Dispose();
 
             return Task.CompletedTask;
@@ -77,12 +76,41 @@ namespace Outkeep.Grains
         /// </summary>
         private static Task TickMaintenanceAsync(object state)
         {
-            var myself = (CacheGrain)state;
+            var self = (CacheGrain)state;
 
-            if (myself._flags.State.HasChanged)
+            // check if there is any state
+            if (self._state.State.Tag == Guid.Empty)
             {
-                myself._flags.State.HasChanged = false;
-                return myself._flags.WriteStateAsync();
+                // nothing to do
+                return Task.CompletedTask;
+            }
+
+            // check if the content has expired
+            if (self.IsExpired())
+            {
+                // release the token claim
+                if (self._entry != null)
+                {
+                    self._entry.Expire();
+                    self._entry = null;
+                }
+
+                // clear and publish the state
+                self._state.State.Tag = Guid.Empty;
+                self._state.State.Value = null;
+                self._state.State.AbsoluteExpiration = null;
+                self._state.State.SlidingExpiration = null;
+                self.Publish();
+
+                // attempt to remove stored state as well
+                return self.ClearAllStateAsync();
+            }
+
+            // save the flags if they have changed
+            if (self._flags.State.HasChanged)
+            {
+                self._flags.State.HasChanged = false;
+                return self._flags.WriteStateAsync();
             }
 
             return Task.CompletedTask;
@@ -102,25 +130,27 @@ namespace Outkeep.Grains
         {
             var now = _context.Clock.UtcNow;
             return
-                (_state.State.AbsoluteExpiration.GetValueOrDefault(DateTimeOffset.MaxValue) <= now) ||
+                (_state.State.AbsoluteExpiration.HasValue && _state.State.AbsoluteExpiration <= now) ||
                 (_state.State.SlidingExpiration.HasValue && _flags.State.UtcLastAccessed.Add(_state.State.SlidingExpiration.Value) <= now);
         }
 
         private Task HandleEvictedAsync(CacheEvictionArgs<string> args)
         {
             // see if we are receiving this out-of-band
-            if (args.CacheEntry != _entry) return Task.CompletedTask;
+            if (_entry == null || args.CacheEntry != _entry) return Task.CompletedTask;
 
-            // see why the entry was evicted
+            // see if the clawback is due to expiry
             if (_entry.EvictionCause == EvictionCause.Expired)
             {
-                // if the entry expired then propagate it asap to users
-                _state.State.Tag = Guid.Empty;
-                _state.State.Value = null;
-                Publish();
-
                 // release the entry for garbage collection
                 _entry = null;
+
+                // propagate the expiration to pending requests
+                _state.State.Tag = Guid.Empty;
+                _state.State.Value = null;
+                _state.State.AbsoluteExpiration = null;
+                _state.State.SlidingExpiration = null;
+                Publish();
 
                 // attempt to remove the content from storage
                 return ClearAllStateAsync();
@@ -130,12 +160,15 @@ namespace Outkeep.Grains
             // therefore shutdown the grain to release the content for garbage collection
             DeactivateOnIdle();
 
-            // early resolve any pending promises so the grain can shutdown
+            // early resolve any pending promises to allow the grain to shutdown
             Publish(false);
 
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Publishes the current cache content to any pending reactive requests.
+        /// </summary>
         private void Publish(bool success = true)
         {
             if (success)
@@ -151,15 +184,9 @@ namespace Outkeep.Grains
         }
 
         /// <inheritdoc />
-        [ReadOnly]
         public ValueTask<CachePulse> GetAsync()
         {
             _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
-
-            if (_entry != null)
-            {
-                _entry.UtcLastAccessed = _flags.State.UtcLastAccessed;
-            }
 
             return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));
         }
@@ -167,10 +194,13 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task RemoveAsync()
         {
+            // check if there is anything to remove
+            if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
+
             // if we have an allocation then expire it and release it for garbage collection
             if (_entry != null)
             {
-                _entry?.Expire();
+                _entry.Expire();
                 _entry = null;
             }
 
@@ -179,8 +209,6 @@ namespace Outkeep.Grains
             _state.State.Value = null;
             _state.State.AbsoluteExpiration = null;
             _state.State.SlidingExpiration = null;
-
-            // fulfill any pending promises
             Publish();
 
             // attempt to clear storage as well
@@ -193,14 +221,18 @@ namespace Outkeep.Grains
             // if we have a previous allocation then expire it and release it for garbage collection
             if (_entry != null)
             {
-                _entry?.Expire();
+                _entry.Expire();
                 _entry = null;
             }
 
             // check if there is anything to set at all
+            // setting null content is equivalent to clearing
             if (value.Value is null)
             {
-                // storing a null value is equivalent to a clear
+                // noop if there is nothing to clear
+                if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
+
+                // otherwise clear and propagate
                 _state.State.Tag = Guid.Empty;
                 _state.State.Value = null;
                 _state.State.AbsoluteExpiration = null;
@@ -213,8 +245,10 @@ namespace Outkeep.Grains
             var now = _context.Clock.UtcNow;
             if (absoluteExpiration.HasValue && absoluteExpiration.Value <= now)
             {
-                // the input has already expired so there is no point adding it
-                // for our purpose the state has cleared
+                // noop if there is nothing to clear
+                if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
+
+                // otherwise clear and propagate
                 _state.State.Tag = Guid.Empty;
                 _state.State.Value = null;
                 _state.State.AbsoluteExpiration = null;
@@ -230,7 +264,6 @@ namespace Outkeep.Grains
                 .SetAbsoluteExpiration(absoluteExpiration)
                 .SetSlidingExpiration(slidingExpiration)
                 .SetPriority(CachePriority.Normal)
-                .SetUtcLastAccessed(_flags.State.UtcLastAccessed)
                 .ContinueWithOnEvicted(HandleEvictedAsync)
                 .Commit();
 
@@ -248,11 +281,6 @@ namespace Outkeep.Grains
         {
             _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
 
-            if (_entry != null)
-            {
-                _entry.UtcLastAccessed = _flags.State.UtcLastAccessed;
-            }
-
             return _flags.WriteStateAsync();
         }
 
@@ -260,11 +288,6 @@ namespace Outkeep.Grains
         public ValueTask<CachePulse> PollAsync(Guid tag)
         {
             _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
-
-            if (_entry != null)
-            {
-                _entry.UtcLastAccessed = _flags.State.UtcLastAccessed;
-            }
 
             if (tag == _state.State.Tag)
             {

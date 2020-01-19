@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Outkeep.Core.Caching
 {
     /// <summary>
-    /// Represents an entry in a <see cref="ICacheDirector"/> instance.
+    /// Represents an entry in the cache director.
     /// </summary>
     public interface ICacheEntry<TKey> : IDisposable
         where TKey : notnull
@@ -38,13 +38,6 @@ namespace Outkeep.Core.Caching
         /// Gets or sets the sliding timespan at which the entry will expire.
         /// </summary>
         TimeSpan? SlidingExpiration { get; set; }
-
-        /// <summary>
-        /// Gets or sets the last time at which the entry was accessed.
-        /// The user should update this property as appropriate during the lifetime of the application.
-        /// This property will impact evaluation by sliding expiration.
-        /// </summary>
-        DateTimeOffset UtcLastAccessed { get; set; }
 
         /// <summary>
         /// Gets or sets the priority for this cache entry.
