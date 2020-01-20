@@ -62,6 +62,24 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        public void GetsFirstFreePortWithSingleParameter()
+        {
+            // arrange
+            var factory = Mock.Of<ITcpListenerWrapperFactory>();
+            Mock.Get(factory).Setup(x => x.Create(1, true).Start()).Throws(new SocketException());
+            Mock.Get(factory).Setup(x => x.Create(2, true).Start()).Throws(new SocketException());
+            Mock.Get(factory).Setup(x => x.Create(3, true).Stop()).Throws(new SocketException());
+
+            var helper = new TcpHelper(factory);
+
+            // act
+            var port = helper.GetFreePort(1);
+
+            // assert
+            Assert.Equal(3, port);
+        }
+
+        [Fact]
         public void ThrowsOnNoFreePort()
         {
             // arrange
