@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Orleans.Timers;
 using Outkeep.Core;
 using Outkeep.Core.Caching;
-using Outkeep.Core.Storage;
 using System;
 
 namespace Outkeep.Grains
@@ -13,11 +12,10 @@ namespace Outkeep.Grains
     /// </summary>
     internal class CacheGrainContext : ICacheGrainContext
     {
-        public CacheGrainContext(ILogger<CacheGrain> logger, IOptions<CacheGrainOptions> options, ICacheStorage storage, ISystemClock clock, ICacheDirector<string> director, ITimerRegistry timerRegistry)
+        public CacheGrainContext(ILogger<CacheGrain> logger, IOptions<CacheGrainOptions> options, ISystemClock clock, ICacheDirector<string> director, ITimerRegistry timerRegistry)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-            Storage = storage ?? throw new ArgumentNullException(nameof(storage));
             Clock = clock ?? throw new ArgumentNullException(nameof(clock));
             Director = director ?? throw new ArgumentNullException(nameof(director));
             TimerRegistry = timerRegistry ?? throw new ArgumentNullException(nameof(timerRegistry));
@@ -26,8 +24,6 @@ namespace Outkeep.Grains
         public ILogger Logger { get; }
 
         public CacheGrainOptions Options { get; }
-
-        public ICacheStorage Storage { get; }
 
         public ISystemClock Clock { get; }
 

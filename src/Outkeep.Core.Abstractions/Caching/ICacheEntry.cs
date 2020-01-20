@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace Outkeep.Core.Caching
 {
     /// <summary>
-    /// Represents an entry in a <see cref="ICacheDirector"/> instance.
+    /// Represents an entry in the cache director.
     /// </summary>
-    public interface ICacheEntry<TKey> where TKey : notnull
+    public interface ICacheEntry<TKey> : IDisposable
+        where TKey : notnull
     {
         /// <summary>
         /// Gets the key of the entry.
@@ -19,31 +20,14 @@ namespace Outkeep.Core.Caching
         long Size { get; }
 
         /// <summary>
-        /// Indicates whether this entry has expired.
+        /// Indicates whether this entry is revoked.
         /// </summary>
-        bool IsExpired { get; }
+        bool IsRevoked { get; }
 
         /// <summary>
-        /// Returns a task that completes when this entry is evicted.
+        /// Triggers when the entry is revoked.
         /// </summary>
-        Task<CacheEvictionArgs<TKey>> Evicted { get; }
-
-        /// <summary>
-        /// Gets or sets the fixed time at which the entry will expire.
-        /// </summary>
-        DateTimeOffset? AbsoluteExpiration { get; set; }
-
-        /// <summary>
-        /// Gets or sets the sliding timespan at which the entry will expire.
-        /// </summary>
-        TimeSpan? SlidingExpiration { get; set; }
-
-        /// <summary>
-        /// Gets or sets the last time at which the entry was accessed.
-        /// The user should update this property as appropriate during the lifetime of the application.
-        /// This property will impact evaluation by sliding expiration.
-        /// </summary>
-        DateTimeOffset UtcLastAccessed { get; set; }
+        CancellationToken Revoked { get; }
 
         /// <summary>
         /// Gets or sets the priority for this cache entry.
@@ -52,24 +36,14 @@ namespace Outkeep.Core.Caching
         CachePriority Priority { get; set; }
 
         /// <summary>
-        /// Gets the eviction cause for this cache entry.
-        /// </summary>
-        EvictionCause EvictionCause { get; }
-
-        /// <summary>
         /// Commits this cache entry to the owning <see cref="ICacheDirector{TKey}"/> instance.
         /// </summary>
         /// <returns>The cache entry itself to allow chaining.</returns>
         ICacheEntry<TKey> Commit();
 
         /// <summary>
-        /// Expires the entry immediately.
+        /// Revokes the entry immediately.
         /// </summary>
-        void Expire();
-
-        /// <summary>
-        /// Marks the entry as expired if it has reached expiration time thresholds.
-        /// </summary>
-        bool TryExpire(DateTimeOffset now);
+        void Revoke();
     }
 }

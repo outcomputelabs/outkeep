@@ -4,19 +4,16 @@ namespace Outkeep.Core.Caching
 {
     public readonly struct CacheEvictionArgs<TKey> : IEquatable<CacheEvictionArgs<TKey>> where TKey : notnull
     {
-        public CacheEvictionArgs(ICacheEntry<TKey> cacheEntry, EvictionCause evictionCause)
+        public CacheEvictionArgs(ICacheEntry<TKey> cacheEntry)
         {
             CacheEntry = cacheEntry;
-            EvictionCause = evictionCause;
         }
 
         public ICacheEntry<TKey> CacheEntry { get; }
-        public EvictionCause EvictionCause { get; }
 
         public bool Equals(CacheEvictionArgs<TKey> other)
         {
-            return CacheEntry == other.CacheEntry
-                && EvictionCause == other.EvictionCause;
+            return CacheEntry == other.CacheEntry;
         }
 
         public override bool Equals(object obj)
@@ -26,7 +23,7 @@ namespace Outkeep.Core.Caching
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(CacheEntry, EvictionCause);
+            return HashCode.Combine(CacheEntry);
         }
 
         public static bool operator ==(CacheEvictionArgs<TKey> left, CacheEvictionArgs<TKey> right)

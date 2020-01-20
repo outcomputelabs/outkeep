@@ -2,7 +2,6 @@
 using Orleans.Timers;
 using Outkeep.Core;
 using Outkeep.Core.Caching;
-using Outkeep.Core.Storage;
 
 namespace Outkeep.Grains
 {
@@ -10,7 +9,6 @@ namespace Outkeep.Grains
     {
         ILogger Logger { get; }
         CacheGrainOptions Options { get; }
-        ICacheStorage Storage { get; }
         ISystemClock Clock { get; }
         ICacheDirector<string> Director { get; }
         ITimerRegistry TimerRegistry { get; }

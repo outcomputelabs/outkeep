@@ -178,6 +178,15 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot execute batched storage operation because the prior operation failed.
+        /// </summary>
+        internal static string Exception_CannotExecuteStorageOperationBecauseThePriorOperationFailed {
+            get {
+                return ResourceManager.GetString("Exception_CannotExecuteStorageOperationBecauseThePriorOperationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find a public instance property named {0}.
         /// </summary>
         internal static string Exception_CannotFindAPublicInstancePropertyNamed_X {

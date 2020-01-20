@@ -1,7 +1,6 @@
 ﻿using Moq;
 using Outkeep.Core.Caching;
 using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Outkeep.Core.Tests
@@ -33,35 +32,7 @@ namespace Outkeep.Core.Tests
             entry.Dispose();
 
             // assert
-            Mock.Get(context).Verify(x => x.OnEntryExpired(entry));
-        }
-
-        [Fact]
-        public async Task EvictionSetsTask()
-        {
-            // arrange
-            var context = Mock.Of<ICacheContext<string>>();
-
-            // act
-            using var entry = new CacheEntry<string>("SomeKey", 1000, context);
-
-            // assert
-            Assert.Equal(TaskStatus.WaitingForActivation, entry.Evicted.Status);
-
-            // act
-            entry.SetExpired(EvictionCause.Replaced);
-
-            // assert
-            Assert.Equal(TaskStatus.WaitingForActivation, entry.Evicted.Status);
-
-            // act
-            entry.SetEvicted();
-
-            // assert
-            var result = await entry.Evicted.ConfigureAwait(false);
-            Assert.Equal(TaskStatus.RanToCompletion, entry.Evicted.Status);
-            Assert.Same(entry, result.CacheEntry);
-            Assert.Equal(EvictionCause.Replaced, result.EvictionCause);
+            Mock.Get(context).Verify(x => x.OnEntryRevoked(entry));
         }
     }
 }

@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Concurrency;
+using Orleans.Runtime;
+using Orleans.Storage;
 using Outkeep.Core.Caching;
-using Outkeep.Core.Storage;
 using Outkeep.Interfaces;
 using System;
 using System.Diagnostics;
@@ -43,18 +44,24 @@ namespace Outkeep.Grains.Tests
             // arrange
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
+            var tag = Guid.NewGuid();
+            var grain = _fixture.PrimarySiloServiceProvider.GetRequiredService<IGrainFactory>().GetCacheGrain(key);
+            var storage = _fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IGrainStorage>(OutkeepProviderNames.OutkeepCache);
+            var reference = (GrainReference)grain;
 
-            await _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheStorage>()
-                .WriteAsync(key, new CacheItem(value, null, null))
+            await storage
+                .WriteStateAsync($"{typeof(CacheGrain).FullName},{typeof(CacheGrain).Namespace}.State", reference, new GrainState<CacheGrainState>(new CacheGrainState()
+                {
+                    Tag = tag,
+                    Value = value,
+                }))
                 .ConfigureAwait(false);
 
             // act
-            var result = await _fixture.Cluster.GrainFactory
-                .GetGrain<ICacheGrain>(key)
-                .GetAsync();
+            var result = await grain.GetAsync();
 
             // assert
-            Assert.NotNull(result.Value.Value);
+            Assert.Equal(tag, result.Tag);
             Assert.Equal(value, result.Value.Value);
         }
 
@@ -63,29 +70,36 @@ namespace Outkeep.Grains.Tests
         {
             // arrange
             var key = Guid.NewGuid().ToString();
+            var tag = Guid.NewGuid();
             var value = Guid.NewGuid().ToByteArray();
+            var grain = _fixture.PrimarySiloServiceProvider.GetRequiredService<IGrainFactory>().GetCacheGrain(key);
+            var storage = _fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IGrainStorage>(OutkeepProviderNames.OutkeepCache);
+            var reference = (GrainReference)grain;
+            var grainType = $"{typeof(CacheGrain).FullName},{typeof(CacheGrain).Namespace}.State";
+            var state = new GrainState<CacheGrainState>(new CacheGrainState
+            {
+                Tag = tag,
+                Value = value,
+            });
 
-            await _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheStorage>()
-                .WriteAsync(key, new CacheItem(value, null, null))
+            await storage
+                .WriteStateAsync(grainType, reference, state)
                 .ConfigureAwait(false);
 
             // act - this will load the value from storage
-            var result = await _fixture.Cluster.GrainFactory
-                .GetGrain<ICacheGrain>(key)
-                .GetAsync();
+            var result = await grain.GetAsync();
 
             // assert
+            Assert.Equal(tag, result.Tag);
             Assert.Equal(value, result.Value.Value);
 
             // arrange - clear storage
-            await _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheStorage>()
-                .ClearAsync(key)
+            await storage
+                .ClearStateAsync(grainType, reference, state)
                 .ConfigureAwait(false);
 
             // act - this must reuse the value in memory
-            result = await _fixture.Cluster.GrainFactory
-                .GetGrain<ICacheGrain>(key)
-                .GetAsync();
+            result = await grain.GetAsync();
 
             // assert
             Assert.Equal(value, result.Value.Value);
@@ -97,7 +111,10 @@ namespace Outkeep.Grains.Tests
             // arrange
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
-            var grain = _fixture.Cluster.GrainFactory.GetGrain<ICacheGrain>(key);
+            var grain = _fixture.PrimarySiloServiceProvider.GetRequiredService<IGrainFactory>().GetCacheGrain(key);
+            var storage = _fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IGrainStorage>(OutkeepProviderNames.OutkeepCache);
+            var reference = (GrainReference)grain;
+            var grainType = $"{typeof(CacheGrain).FullName},{typeof(CacheGrain).Namespace}.State";
 
             // act - set the value
             var absolute = DateTimeOffset.UtcNow.AddHours(1);
@@ -105,14 +122,13 @@ namespace Outkeep.Grains.Tests
             await grain.SetAsync(new Immutable<byte[]?>(value), absolute, sliding).ConfigureAwait(false);
 
             // assert value is set in storage
-            var stored = await _fixture.PrimarySiloServiceProvider
-                .GetRequiredService<ICacheStorage>()
-                .ReadAsync(key)
-                .ConfigureAwait(false);
+            var state = new GrainState<CacheGrainState>(new CacheGrainState());
+            await storage.ReadStateAsync(grainType, reference, state).ConfigureAwait(false);
 
-            Assert.Equal(value, stored.Value.Value);
-            Assert.Equal(absolute, stored.Value.AbsoluteExpiration);
-            Assert.Equal(sliding, stored.Value.SlidingExpiration);
+            Assert.NotEqual(Guid.Empty, state.State.Tag);
+            Assert.Equal(value, state.State.Value);
+            Assert.Equal(absolute, state.State.AbsoluteExpiration);
+            Assert.Equal(sliding, state.State.SlidingExpiration);
 
             // assert value is set in memory
             var result = await grain.GetAsync().ConfigureAwait(false);
@@ -122,22 +138,10 @@ namespace Outkeep.Grains.Tests
             await grain.RemoveAsync().ConfigureAwait(false);
 
             // assert value is cleared from storage
-            var cleared = await _fixture.PrimarySiloServiceProvider
-                .GetRequiredService<ICacheStorage>()
-                .ReadAsync(key)
-                .ConfigureAwait(false);
-
-            Assert.False(cleared.HasValue);
-
-            // arrange - add dummy value to storage
-            await _fixture.PrimarySiloServiceProvider
-                .GetRequiredService<ICacheStorage>()
-                .WriteAsync(key, new CacheItem(value, absolute, sliding))
-                .ConfigureAwait(false);
-
-            // assert value is cleared from memory and not reloaded
-            result = await grain.GetAsync().ConfigureAwait(false);
-            Assert.Null(result.Value.Value);
+            state = new GrainState<CacheGrainState>(new CacheGrainState());
+            await storage.ReadStateAsync(grainType, reference, state).ConfigureAwait(false);
+            Assert.Equal(Guid.Empty, state.State.Tag);
+            Assert.Null(state.State.Value);
         }
 
         [Fact]
@@ -145,26 +149,29 @@ namespace Outkeep.Grains.Tests
         {
             // arrange
             var key = Guid.NewGuid().ToString();
-            var value = Guid.NewGuid().ToByteArray();
+            var grain = _fixture.PrimarySiloServiceProvider.GetRequiredService<IGrainFactory>().GetCacheGrain(key);
+            var storage = _fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IGrainStorage>(OutkeepProviderNames.OutkeepCache);
+            var reference = (GrainReference)grain;
+            var grainType = $"{typeof(CacheGrain).FullName},{typeof(CacheGrain).Namespace}.State";
 
-            await _fixture.PrimarySiloServiceProvider
-                .GetRequiredService<ICacheStorage>()
-                .WriteAsync(key, new CacheItem(value, DateTimeOffset.UtcNow.AddMinutes(-1), null))
-                .ConfigureAwait(false);
+            var state = new GrainState<CacheGrainState>(new CacheGrainState
+            {
+                Tag = Guid.NewGuid(),
+                Value = Guid.NewGuid().ToByteArray(),
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(-1),
+                SlidingExpiration = null
+            });
+            await storage.WriteStateAsync(grainType, reference, state).ConfigureAwait(false);
 
             // act
-            var result = await _fixture.Cluster.GrainFactory
-                .GetCacheGrain(key)
-                .GetAsync();
+            var result = await grain.GetAsync();
 
             // assert
-            Assert.NotEqual(Guid.Empty, result.Tag);
+            Assert.Equal(Guid.Empty, result.Tag);
             Assert.Null(result.Value.Value);
 
             // act
-            var repeat = await _fixture.Cluster.GrainFactory
-                .GetCacheGrain(key)
-                .GetAsync();
+            var repeat = await grain.GetAsync();
 
             // assert
             Assert.Equal(result.Tag, repeat.Tag);
@@ -178,16 +185,14 @@ namespace Outkeep.Grains.Tests
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
             var absoluteExpiration = DateTimeOffset.UtcNow.AddSeconds(1);
+            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
 
             // act
-            await _fixture.Cluster.GrainFactory
-                .GetCacheGrain(key)
+            await grain
                 .SetAsync(new Immutable<byte[]?>(value), absoluteExpiration, null)
                 .ConfigureAwait(false);
 
-            var result = await _fixture.Cluster.GrainFactory
-                .GetCacheGrain(key)
-                .GetAsync();
+            var result = await grain.GetAsync();
 
             // assert
             Assert.Equal(value, result.Value.Value);
@@ -197,18 +202,14 @@ namespace Outkeep.Grains.Tests
             await Task.Delay(2000).ConfigureAwait(false);
 
             // act
-            result = await _fixture.Cluster.GrainFactory
-                .GetCacheGrain(key)
-                .GetAsync();
+            result = await grain.GetAsync();
 
             // assert
+            Assert.Equal(Guid.Empty, result.Tag);
             Assert.Null(result.Value.Value);
-            Assert.NotEqual(Guid.Empty, result.Tag);
 
             // act
-            var repeat = await _fixture.Cluster.GrainFactory
-                .GetCacheGrain(key)
-                .GetAsync();
+            var repeat = await grain.GetAsync();
 
             // assert
             Assert.Equal(result.Tag, repeat.Tag);
@@ -235,38 +236,30 @@ namespace Outkeep.Grains.Tests
             // arrange
             var key = Guid.NewGuid().ToString();
             var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
-            var storage = _fixture.PrimarySiloServiceProvider.GetService<ICacheStorage>();
+            var storage = _fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IGrainStorage>(OutkeepProviderNames.OutkeepCache);
+            var reference = (GrainReference)_fixture.PrimarySiloServiceProvider.GetRequiredService<IGrainFactory>().GetCacheGrain(key);
+            var grainType = $"{typeof(CacheGrain).FullName},{typeof(CacheGrain).Namespace}.State";
 
-            await storage.WriteAsync(key, new CacheItem(Guid.NewGuid().ToByteArray(), DateTimeOffset.UtcNow.AddDays(1), TimeSpan.MaxValue)).ConfigureAwait(false);
+            var state = new GrainState<CacheGrainState>(new CacheGrainState
+            {
+                Tag = Guid.NewGuid(),
+                Value = Guid.NewGuid().ToByteArray(),
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1),
+                SlidingExpiration = TimeSpan.FromMinutes(1)
+            });
+            await storage.WriteStateAsync(grainType, reference, state).ConfigureAwait(false);
 
             // act
             await grain.SetAsync(new Immutable<byte[]?>(null), DateTimeOffset.UtcNow.AddMinutes(1), TimeSpan.MaxValue).ConfigureAwait(false);
 
             // assert
-            var result = await storage.ReadAsync(key).ConfigureAwait(false);
-            Assert.False(result.HasValue);
-        }
+            state = new GrainState<CacheGrainState>(new CacheGrainState());
+            await storage.ReadStateAsync(grainType, reference, state).ConfigureAwait(false);
 
-        [Fact]
-        public async Task RefreshUpdatesLastAccessedTimestamp()
-        {
-            // arrange
-            var key = Guid.NewGuid().ToString();
-            var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
-            var director = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector<string>>();
-
-            // act
-            await grain.SetAsync(Guid.NewGuid().ToByteArray().AsNullableImmutable(), null, null).ConfigureAwait(false);
-
-            // assert
-            Assert.True(director.TryGetEntry(key, out var entry));
-            var accessed = entry?.UtcLastAccessed;
-
-            // act
-            await grain.RefreshAsync().ConfigureAwait(false);
-
-            // assert
-            Assert.True(entry?.UtcLastAccessed > accessed);
+            Assert.Equal(Guid.Empty, state.State.Tag);
+            Assert.Null(state.State.Value);
+            Assert.Null(state.State.AbsoluteExpiration);
+            Assert.Null(state.State.SlidingExpiration);
         }
 
         [Fact]
@@ -283,9 +276,9 @@ namespace Outkeep.Grains.Tests
             var result1 = await grain.PollAsync(tag).ConfigureAwait(false);
             watch1.Stop();
 
-            // assert
+            // assert - the initial pulse should be empty
             Assert.True(watch1.Elapsed < TimeSpan.FromSeconds(1));
-            Assert.NotEqual(Guid.Empty, result1.Tag);
+            Assert.Equal(Guid.Empty, result1.Tag);
             Assert.Null(result1.Value.Value);
 
             // act - this waits till timeout to return an empty pulse with the same tag as input
@@ -293,8 +286,8 @@ namespace Outkeep.Grains.Tests
             var result2 = await grain.PollAsync(result1.Tag).ConfigureAwait(false);
             watch2.Stop();
 
-            // assert
-            Assert.True(watch2.Elapsed > options.ReactivePollingTimeout);
+            // assert - the delayed pulse return the same tag and no value
+            Assert.True(watch2.Elapsed >= options.ReactivePollingTimeout);
             Assert.Equal(result1.Tag, result2.Tag);
             Assert.Null(result2.Value.Value);
 
@@ -309,7 +302,7 @@ namespace Outkeep.Grains.Tests
             var value3 = Guid.NewGuid().ToByteArray();
             await grain.SetAsync(value3.AsNullableImmutable(), null, null).ConfigureAwait(false);
 
-            // assert
+            // assert - the resolved returns the data we set midway
             var result3 = await task3.ConfigureAwait(false);
             watch3.Stop();
             Assert.True(watch3.Elapsed < TimeSpan.FromSeconds(1));
@@ -321,13 +314,14 @@ namespace Outkeep.Grains.Tests
             var okay = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector<string>>().TryGetEntry(key, out var entry);
             Assert.True(okay);
             Assert.NotNull(entry);
-            var lastAccessed = entry!.UtcLastAccessed;
 
             // act - access the value again to update the accessed timestamp
             await grain.PollAsync(Guid.NewGuid()).ConfigureAwait(false);
 
-            // assert
-            Assert.True(entry.UtcLastAccessed > lastAccessed);
+            // act - long poll the value again to test the empty pulse response
+            var result5 = await grain.PollAsync(result3.Tag);
+            Assert.Equal(result3.Tag, result5.Tag);
+            Assert.Null(result5.Value.Value);
         }
     }
 }

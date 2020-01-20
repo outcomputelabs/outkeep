@@ -89,6 +89,15 @@ namespace Outkeep.Grains.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot execute batched storage operation because the prior operation failed.
+        /// </summary>
+        internal static string Exception_CannotExecuteStorageOperationBecauseThePriorOperationFailed {
+            get {
+                return ResourceManager.GetString("Exception_CannotExecuteStorageOperationBecauseThePriorOperationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be a positive {1}.
         /// </summary>
         internal static string Exception_XMustBeAPositiveX {

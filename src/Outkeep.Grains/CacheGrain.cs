@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Orleans;
+﻿using Orleans;
 using Orleans.Concurrency;
+using Orleans.Runtime;
 using Outkeep.Core.Caching;
-using Outkeep.Core.Storage;
-using Outkeep.Grains.Properties;
 using Outkeep.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -11,272 +9,237 @@ using System.Threading.Tasks;
 namespace Outkeep.Grains
 {
     [Reentrant]
-    internal class CacheGrain : Grain, ICacheGrain, IIncomingGrainCallFilter
+    internal class CacheGrain : Grain, ICacheGrain
     {
         private readonly ICacheGrainContext _context;
+        private readonly IPersistentState<CacheGrainState> _state;
+        private readonly IPersistentState<CacheGrainFlags> _flags;
 
-        public CacheGrain(ICacheGrainContext context)
+        public CacheGrain(ICacheGrainContext context, [PersistentState("State", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainState> state, [PersistentState("Flags", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainFlags> flags)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-
-            _pulse = CachePulse.RandomNull();
-            _promise = new TaskCompletionSource<CachePulse>(_pulse);
+            _state = state?.AsConflater() ?? throw new ArgumentNullException(nameof(state));
+            _flags = flags?.AsConflater() ?? throw new ArgumentNullException(nameof(flags));
         }
 
-        private CachePulse _pulse;
-        private TaskCompletionSource<CachePulse> _promise;
-        private Task? _outstandingStorageOperation = null;
+        private TaskCompletionSource<CachePulse> _promise = new TaskCompletionSource<CachePulse>();
         private ICacheEntry<string>? _entry;
 
         private string PrimaryKey => this.GetPrimaryKeyString();
 
-        public override async Task OnActivateAsync()
+        public override Task OnActivateAsync()
         {
-            // attempt to load from storage
-            var item = await _context.Storage.ReadAsync(PrimaryKey).ConfigureAwait(true);
-            if (!item.HasValue)
+            RegisterTimer(TickMaintenanceAsyncDelegate, this, _context.Options.MaintenancePeriod, _context.Options.MaintenancePeriod);
+
+            // see if we have state to recover
+            if (_state.State.Value is null)
             {
-                SetPulse(CachePulse.RandomNull());
-                return;
+                // there is nothing to recover
+                return Task.CompletedTask;
             }
 
-            // attempt to claim space in the current box
+            // see if the stored state has expired
+            if (IsExpired())
+            {
+                // the state has expired so remove it early
+                return ClearAllStateAsync();
+            }
+
+            // attempt to claim space in the current box for the loaded state
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
             _entry = _context.Director
-                .CreateEntry(PrimaryKey, item.Value.Value.Length + IntPtr.Size)
-                .SetAbsoluteExpiration(item.Value.AbsoluteExpiration)
-                .SetSlidingExpiration(item.Value.SlidingExpiration)
+                .CreateEntry(PrimaryKey, _state.State.Value.Length)
                 .SetPriority(CachePriority.Normal)
-                .SetUtcLastAccessed(_context.Clock.UtcNow)
-                .ContinueWithOnEvicted(HandleEvicted)
                 .Commit();
-
-            // see if we were successful and if not then release the content now
-            if (_entry.TryExpire(_context.Clock.UtcNow))
-            {
-                _entry = null;
-                SetPulse(CachePulse.RandomNull());
-                return;
-            }
-
-            // otherwise keep the content
-            SetPulse(CachePulse.Random(item.Value.Value));
-        }
-
-        public override Task OnDeactivateAsync()
-        {
-            ClearEntry();
 
             return Task.CompletedTask;
         }
 
-        private void HandleEvicted(Task<CacheEvictionArgs<string>> args)
+        public override Task OnDeactivateAsync()
         {
-            if (args.Result.CacheEntry == _entry)
-            {
-                ClearEntry();
-                SetPulse(CachePulse.RandomNull());
-            }
+            // release the token claim early without expiring
+            _entry?.Dispose();
+
+            return Task.CompletedTask;
         }
 
-        private void SetPulse(CachePulse pulse)
+        /// <summary>
+        /// Caches the maintenance delegate to avoid redundant allocations.
+        /// </summary>
+        private static readonly Func<object, Task> TickMaintenanceAsyncDelegate = TickMaintenanceAsync;
+
+        /// <summary>
+        /// Performs maintenance tasks on the grain.
+        /// </summary>
+        private static Task TickMaintenanceAsync(object state)
         {
-            _pulse = pulse;
-            _promise.TrySetResult(pulse);
+            var self = (CacheGrain)state;
+
+            // check if the memory allowance was revoked
+            if (self._entry != null && self._entry.IsRevoked)
+            {
+                // deactivate the grain to allow cluster rebalancing
+                self.DeactivateOnIdle();
+                self.Publish(false);
+                return Task.CompletedTask;
+            }
+
+            // check if there is any content to evaluate
+            if (self._state.State.Tag == Guid.Empty)
+            {
+                return Task.CompletedTask;
+            }
+
+            // check if the content has expired
+            if (self.IsExpired())
+            {
+                return self.ResetAsync();
+            }
+
+            // save the flags if they have changed
+            if (self._flags.State.HasChanged)
+            {
+                self._flags.State.HasChanged = false;
+                return self._flags.WriteStateAsync();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task ResetAsync()
+        {
+            // release the memory allowance
+            ReleaseToken();
+
+            // clear and publish the state
+            _state.State.Tag = Guid.Empty;
+            _state.State.Value = null;
+            _state.State.AbsoluteExpiration = null;
+            _state.State.SlidingExpiration = null;
+            Publish();
+
+            // attempt to remove stored state as well
+            return Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync());
+        }
+
+        private void ReleaseToken()
+        {
+            if (_entry is null) return;
+
+            _entry.Revoke();
+            _entry = null;
+        }
+
+        private Task ClearAllStateAsync()
+        {
+            return Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync());
+        }
+
+        private Task WriteAllStateAsync()
+        {
+            return Task.WhenAll(_state.WriteStateAsync(), _flags.WriteStateAsync());
+        }
+
+        private bool IsExpired()
+        {
+            var now = _context.Clock.UtcNow;
+            return
+                (_state.State.AbsoluteExpiration.HasValue && _state.State.AbsoluteExpiration <= now) ||
+                (_state.State.SlidingExpiration.HasValue && _flags.State.UtcLastAccessed.Add(_state.State.SlidingExpiration.Value) <= now);
+        }
+
+        /// <summary>
+        /// Publishes the current cache content to any pending reactive requests.
+        /// </summary>
+        private void Publish(bool success = true)
+        {
+            if (success)
+            {
+                _promise.TrySetResult(new CachePulse(_state.State.Tag, _state.State.Value));
+            }
+            else
+            {
+                _promise.TrySetCanceled();
+            }
+
             _promise = new TaskCompletionSource<CachePulse>();
-        }
-
-        private void ClearEntry()
-        {
-            if (_entry != null)
-            {
-                _entry.Expire();
-                _entry = null;
-            }
         }
 
         /// <inheritdoc />
         public ValueTask<CachePulse> GetAsync()
         {
-            if (_entry != null)
-            {
-                _entry.UtcLastAccessed = _context.Clock.UtcNow;
-            }
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
 
-            return new ValueTask<CachePulse>(_pulse);
+            return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));
         }
 
         /// <inheritdoc />
         public Task RemoveAsync()
         {
-            // check if we have any entry active
-            if (_entry == null)
-            {
-                // this grain has no entry so there is nothing to do
-                return Task.CompletedTask;
-            }
-
-            // unconditionally expire and release the entry for gc
-            _entry.Expire();
-            _entry = null;
-
-            // fulfill any pending requests
-            SetPulse(CachePulse.RandomNull());
-
-            // remove the entry from storage
-            return PersistAsync();
+            DeactivateOnIdle();
+            return ResetAsync();
         }
 
         /// <inheritdoc />
         public Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
-            // clear any previous entry
-            ClearEntry();
+            ReleaseToken();
 
             // check if there is anything to set at all
+            // setting null content is equivalent to clearing
             if (value.Value is null)
             {
-                // storing a null value is equivalent to a clear
-                SetPulse(CachePulse.RandomNull());
-                return PersistAsync();
+                // noop if there is nothing to clear
+                if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
+
+                return ResetAsync();
+            }
+
+            // check if the input has already expired
+            var now = _context.Clock.UtcNow;
+            if (absoluteExpiration.HasValue && absoluteExpiration.Value <= now)
+            {
+                // noop if there is nothing to clear
+                if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
+
+                return ResetAsync();
             }
 
             // claim space in the current box
+            _flags.State.UtcLastAccessed = now;
             _entry = _context.Director
-                .CreateEntry(PrimaryKey, value.Value.Length + IntPtr.Size)
-                .SetAbsoluteExpiration(absoluteExpiration)
-                .SetSlidingExpiration(slidingExpiration)
+                .CreateEntry(PrimaryKey, value.Value.Length)
                 .SetPriority(CachePriority.Normal)
-                .SetUtcLastAccessed(_context.Clock.UtcNow)
-                .ContinueWithOnEvicted(HandleEvicted)
                 .Commit();
 
-            // update subs and lazy save
-            SetPulse(CachePulse.Random(value));
-            return PersistAsync();
-        }
-
-        /// <summary>
-        /// Executes storage operations in a reentrancy-safe way.
-        /// </summary>
-        private async Task PersistAsync()
-        {
-            // check if there is an outstanding storage operation
-            // if there is one it will not include the values we have just staged
-            var thisTask = _outstandingStorageOperation;
-            if (thisTask != null)
-            {
-                try
-                {
-                    await thisTask.ConfigureAwait(true);
-                }
-                catch (Exception ex)
-                {
-                    // while we do not want to observe past exceptions
-                    // we do want to stop execution early if the outstanding operation failed
-                    throw new InvalidOperationException(Resources.Exception_CacheGrainForKey_X_CannotExecuteStorageOperationBecauseThePriorOperationFailed.Format(PrimaryKey), ex);
-                }
-                finally
-                {
-                    // if this continuation beat other write attempts then we null out the task to allow further attempts
-                    // if the tasks are different then other attempts have already started
-                    if (thisTask == _outstandingStorageOperation)
-                    {
-                        _outstandingStorageOperation = null;
-                    }
-                }
-            }
-
-            // at this point this continuation is either the first to get here or other continuations may have gotten here already
-            if (_outstandingStorageOperation == null)
-            {
-                // this means this is (probably) the first continuation to get to this point
-                // therefore this continuation gets to start the next storage operation
-
-                if (_entry is null || _pulse.Value.Value == null)
-                {
-                    _outstandingStorageOperation = _context.Storage.ClearAsync(PrimaryKey);
-                }
-                else
-                {
-                    _outstandingStorageOperation = _context.Storage.WriteAsync(PrimaryKey, new CacheItem(_pulse.Value.Value, _entry.AbsoluteExpiration, _entry.SlidingExpiration));
-                }
-
-                thisTask = _outstandingStorageOperation;
-            }
-            else
-            {
-                // getting here means another continuation has already started a write operation
-                // that write operation already covers the value of the current task so we can await on it
-                thisTask = _outstandingStorageOperation;
-            }
-
-            // either way we can now wait for the outstanding operation
-            try
-            {
-                await thisTask.ConfigureAwait(true);
-            }
-            finally
-            {
-                // if this continuation beat other write attempts here then we null out the task to allow further attempts
-                // otherwise some other write attempt has already started
-                if (thisTask == _outstandingStorageOperation)
-                {
-                    _outstandingStorageOperation = null;
-                }
-            }
+            // update subs and lazy save everything
+            _state.State.Tag = Guid.NewGuid();
+            _state.State.Value = value.Value;
+            _state.State.AbsoluteExpiration = absoluteExpiration;
+            _state.State.SlidingExpiration = slidingExpiration;
+            Publish();
+            return WriteAllStateAsync();
         }
 
         /// <inheritdoc />
         public Task RefreshAsync()
         {
-            if (_entry != null)
-            {
-                _entry.UtcLastAccessed = _context.Clock.UtcNow;
-            }
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
 
-            return Task.CompletedTask;
+            return _flags.WriteStateAsync();
         }
 
         /// <inheritdoc />
-        public Task<CachePulse> PollAsync(Guid tag)
+        public ValueTask<CachePulse> PollAsync(Guid tag)
         {
-            // if we have an entry then update the last accessed date
-            if (_entry != null)
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
+
+            if (tag == _state.State.Tag)
             {
-                _entry.UtcLastAccessed = _context.Clock.UtcNow;
+                return new ValueTask<CachePulse>(_promise.Task.WithDefaultOnTimeout(new CachePulse(_state.State.Tag, null), _context.Options.ReactivePollingTimeout));
             }
 
-            if (tag == _pulse.Tag)
-            {
-                return _promise.Task.WithDefaultOnTimeout(_pulse, _context.Options.ReactivePollingTimeout);
-            }
-
-            return Task.FromResult(_pulse);
-        }
-
-        public async Task Invoke(IIncomingGrainCallContext context)
-        {
-            // we do not yet tolerate any errors on this grain
-            // we will refactor this once the grain supports deffered saving
-            try
-            {
-                await context.Invoke().ConfigureAwait(true);
-            }
-            catch (Exception ex)
-            {
-                DeactivateOnIdle();
-                Log.Failed(_context.Logger, PrimaryKey, ex);
-                throw;
-            }
-        }
-
-        private static class Log
-        {
-            private static readonly Action<ILogger, string, Exception> _failed =
-                LoggerMessage.Define<string>(LogLevel.Error, new EventId(1, nameof(Failed)), Resources.Log_CacheGrainForKey_X_FailedAndWillBeDeactivatedNow);
-
-            public static void Failed(ILogger logger, string key, Exception exception) =>
-                _failed(logger, key, exception);
+            return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));
         }
     }
 }
