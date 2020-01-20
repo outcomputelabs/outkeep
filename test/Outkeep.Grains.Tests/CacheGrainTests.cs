@@ -287,7 +287,7 @@ namespace Outkeep.Grains.Tests
             watch2.Stop();
 
             // assert - the delayed pulse return the same tag and no value
-            Assert.True(watch2.Elapsed > options.ReactivePollingTimeout);
+            Assert.True(watch2.Elapsed >= options.ReactivePollingTimeout);
             Assert.Equal(result1.Tag, result2.Tag);
             Assert.Null(result2.Value.Value);
 
