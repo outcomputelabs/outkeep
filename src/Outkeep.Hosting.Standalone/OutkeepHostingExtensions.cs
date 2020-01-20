@@ -1,5 +1,5 @@
 ﻿using Orleans.Hosting;
-using Outkeep.Hosting;
+using Outkeep.Core.Tcp;
 using System;
 using System.Net;
 

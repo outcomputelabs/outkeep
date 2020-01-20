@@ -61,24 +61,6 @@ namespace Outkeep.Hosting.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not open a dynamic port for exclusive use.
-        /// </summary>
-        internal static string ExceptionCouldNotOpenADynamicPortForExclusiveUse {
-            get {
-                return ResourceManager.GetString("ExceptionCouldNotOpenADynamicPortForExclusiveUse", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected endpoint type.
-        /// </summary>
-        internal static string ExceptionUnexpectedEndpointType {
-            get {
-                return ResourceManager.GetString("ExceptionUnexpectedEndpointType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Outkeep Server Started.
         /// </summary>
         internal static string LogOutkeepServerStarted {
@@ -111,15 +93,6 @@ namespace Outkeep.Hosting.Properties {
         internal static string LogOutkeepServerStopping {
             get {
                 return ResourceManager.GetString("LogOutkeepServerStopping", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to There are no free ports within the input range.
-        /// </summary>
-        internal static string ThereAreNoFreePortsWithinTheInputRange {
-            get {
-                return ResourceManager.GetString("ThereAreNoFreePortsWithinTheInputRange", resourceCulture);
             }
         }
     }

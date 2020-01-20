@@ -1,11 +1,12 @@
 ﻿using Moq;
-using Outkeep.Hosting.Properties;
+using Outkeep.Core.Properties;
+using Outkeep.Core.Tcp;
 using System;
 using System.Net;
 using System.Net.Sockets;
 using Xunit;
 
-namespace Outkeep.Hosting.Tests
+namespace Outkeep.Core.Tests
 {
     public class TcpHelperTests
     {
@@ -61,6 +62,24 @@ namespace Outkeep.Hosting.Tests
         }
 
         [Fact]
+        public void GetsFirstFreePortWithSingleParameter()
+        {
+            // arrange
+            var factory = Mock.Of<ITcpListenerWrapperFactory>();
+            Mock.Get(factory).Setup(x => x.Create(1, true).Start()).Throws(new SocketException());
+            Mock.Get(factory).Setup(x => x.Create(2, true).Start()).Throws(new SocketException());
+            Mock.Get(factory).Setup(x => x.Create(3, true).Stop()).Throws(new SocketException());
+
+            var helper = new TcpHelper(factory);
+
+            // act
+            var port = helper.GetFreePort(1);
+
+            // assert
+            Assert.Equal(3, port);
+        }
+
+        [Fact]
         public void ThrowsOnNoFreePort()
         {
             // arrange
@@ -73,7 +92,7 @@ namespace Outkeep.Hosting.Tests
 
             // act and assert
             var error = Assert.Throws<InvalidOperationException>(() => helper.GetFreePort(1, 3));
-            Assert.Equal(Resources.ThereAreNoFreePortsWithinTheInputRange, error.Message);
+            Assert.Equal(Resources.Exception_ThereAreNoFreePortsWithinTheInputRange, error.Message);
         }
 
         [Fact]
@@ -103,7 +122,7 @@ namespace Outkeep.Hosting.Tests
 
             // act and assert
             var error = Assert.Throws<InvalidOperationException>(() => helper.GetFreeDynamicPort());
-            Assert.Equal(Resources.ExceptionUnexpectedEndpointType, error.Message);
+            Assert.Equal(Resources.Exception_UnexpectedEndpointType, error.Message);
         }
 
         [Fact]
@@ -117,7 +136,7 @@ namespace Outkeep.Hosting.Tests
 
             // act and assert
             var error = Assert.Throws<InvalidOperationException>(() => helper.GetFreeDynamicPort());
-            Assert.Equal(Resources.ExceptionCouldNotOpenADynamicPortForExclusiveUse, error.Message);
+            Assert.Equal(Resources.Exception_CouldNotOpenADynamicPortForExclusiveUse, error.Message);
             Assert.Same(ex, error.InnerException);
         }
 
@@ -125,6 +144,34 @@ namespace Outkeep.Hosting.Tests
         public void HasDefault()
         {
             Assert.NotNull(TcpHelper.Default);
+        }
+
+        [Fact]
+        public void GetFreePortThrowsOnStartPortGreaterThanMaxPort()
+        {
+            // arrange
+            var helper = new TcpHelper(TcpListenerWrapperFactory.Default);
+            var start = IPEndPoint.MaxPort + 1;
+
+            // act
+            void action() => helper.GetFreePort(start);
+
+            // assert
+            Assert.Throws<ArgumentOutOfRangeException>(nameof(start), action);
+        }
+
+        [Fact]
+        public void GetFreePortThrowsOnEndPortGreaterThanMaxPort()
+        {
+            // arrange
+            var helper = new TcpHelper(TcpListenerWrapperFactory.Default);
+            var end = IPEndPoint.MaxPort + 1;
+
+            // act
+            void action() => helper.GetFreePort(1, IPEndPoint.MaxPort + 1);
+
+            // assert
+            Assert.Throws<ArgumentOutOfRangeException>(nameof(end), action);
         }
     }
 }

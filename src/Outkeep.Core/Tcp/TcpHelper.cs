@@ -1,9 +1,9 @@
-﻿using Outkeep.Hosting.Properties;
+﻿using Outkeep.Core.Properties;
 using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Outkeep.Hosting
+namespace Outkeep.Core.Tcp
 {
     public sealed class TcpHelper
     {
@@ -54,7 +54,7 @@ namespace Outkeep.Hosting
                 }
             }
 
-            throw new InvalidOperationException(Resources.ThereAreNoFreePortsWithinTheInputRange);
+            throw new InvalidOperationException(Resources.Exception_ThereAreNoFreePortsWithinTheInputRange);
         }
 
         public int GetFreeDynamicPort()
@@ -70,12 +70,12 @@ namespace Outkeep.Hosting
                 }
                 else
                 {
-                    throw new InvalidOperationException(Resources.ExceptionUnexpectedEndpointType);
+                    throw new InvalidOperationException(Resources.Exception_UnexpectedEndpointType);
                 }
             }
             catch (SocketException ex)
             {
-                throw new InvalidOperationException(Resources.ExceptionCouldNotOpenADynamicPortForExclusiveUse, ex);
+                throw new InvalidOperationException(Resources.Exception_CouldNotOpenADynamicPortForExclusiveUse, ex);
             }
             finally
             {
