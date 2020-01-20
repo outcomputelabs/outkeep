@@ -147,7 +147,21 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
-        public void GetFreePortThrowsOnPortGreaterThanMaxPort()
+        public void GetFreePortThrowsOnStartPortGreaterThanMaxPort()
+        {
+            // arrange
+            var helper = new TcpHelper(TcpListenerWrapperFactory.Default);
+            var start = IPEndPoint.MaxPort + 1;
+
+            // act
+            void action() => helper.GetFreePort(start);
+
+            // assert
+            Assert.Throws<ArgumentOutOfRangeException>(nameof(start), action);
+        }
+
+        [Fact]
+        public void GetFreePortThrowsOnEndPortGreaterThanMaxPort()
         {
             // arrange
             var helper = new TcpHelper(TcpListenerWrapperFactory.Default);
