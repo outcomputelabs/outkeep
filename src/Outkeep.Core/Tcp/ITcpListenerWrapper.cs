@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-namespace Outkeep.Hosting
+namespace Outkeep.Core.Tcp
 {
     /// <summary>
     /// Wraps static calls to the <see cref="TcpListener"/> class to facilitate testing.

@@ -165,6 +165,9 @@
   <data name="Exception_ConditionForType_X_WithValue_X_IsNotSupported" xml:space="preserve">
     <value>Condition for type {0} with value {1} is not supported</value>
   </data>
+  <data name="Exception_CouldNotOpenADynamicPortForExclusiveUse" xml:space="preserve">
+    <value>Could not open a dynamic port for exclusive use</value>
+  </data>
   <data name="Exception_FailedToClearCacheFile_X_ForKey_X" xml:space="preserve">
     <value>Failed to clear cache file {0} for key {1}</value>
   </data>
@@ -182,6 +185,12 @@
   </data>
   <data name="Exception_Property_X_WithValue_X_MustBeGreaterThanOrEqualToProperty_X_WithValue_X" xml:space="preserve">
     <value>Property {0} with value {1} must be greater than or equal to {2} with value {3}</value>
+  </data>
+  <data name="Exception_ThereAreNoFreePortsWithinTheInputRange" xml:space="preserve">
+    <value>There are no free ports within the input range</value>
+  </data>
+  <data name="Exception_UnexpectedEndpointType" xml:space="preserve">
+    <value>Unexpected endpoint type</value>
   </data>
   <data name="Log_CacheDirectorCannotCompactToTargetSizeOf_X" xml:space="preserve">
     <value>The cache director could not compact the cache to target capacity of {Size}</value>

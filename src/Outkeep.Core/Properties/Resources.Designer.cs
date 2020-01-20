@@ -205,6 +205,15 @@ namespace Outkeep.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not open a dynamic port for exclusive use.
+        /// </summary>
+        internal static string Exception_CouldNotOpenADynamicPortForExclusiveUse {
+            get {
+                return ResourceManager.GetString("Exception_CouldNotOpenADynamicPortForExclusiveUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to clear cache file {0} for key {1}.
         /// </summary>
         internal static string Exception_FailedToClearCacheFile_X_ForKey_X {
@@ -256,6 +265,24 @@ namespace Outkeep.Core.Properties {
             get {
                 return ResourceManager.GetString("Exception_Property_X_WithValue_X_MustBeGreaterThanOrEqualToProperty_X_WithValue_X" +
                         "", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no free ports within the input range.
+        /// </summary>
+        internal static string Exception_ThereAreNoFreePortsWithinTheInputRange {
+            get {
+                return ResourceManager.GetString("Exception_ThereAreNoFreePortsWithinTheInputRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected endpoint type.
+        /// </summary>
+        internal static string Exception_UnexpectedEndpointType {
+            get {
+                return ResourceManager.GetString("Exception_UnexpectedEndpointType", resourceCulture);
             }
         }
         

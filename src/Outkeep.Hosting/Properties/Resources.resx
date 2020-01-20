@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ExceptionCouldNotOpenADynamicPortForExclusiveUse" xml:space="preserve">
-    <value>Could not open a dynamic port for exclusive use</value>
-  </data>
-  <data name="ExceptionUnexpectedEndpointType" xml:space="preserve">
-    <value>Unexpected endpoint type</value>
-  </data>
   <data name="LogOutkeepServerStarted" xml:space="preserve">
     <value>Outkeep Server Started</value>
   </data>
@@ -134,8 +128,5 @@
   </data>
   <data name="LogOutkeepServerStopping" xml:space="preserve">
     <value>Outkeep Server Stopping</value>
-  </data>
-  <data name="ThereAreNoFreePortsWithinTheInputRange" xml:space="preserve">
-    <value>There are no free ports within the input range</value>
   </data>
 </root>
