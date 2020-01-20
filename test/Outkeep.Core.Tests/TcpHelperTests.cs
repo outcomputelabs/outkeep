@@ -145,5 +145,19 @@ namespace Outkeep.Core.Tests
         {
             Assert.NotNull(TcpHelper.Default);
         }
+
+        [Fact]
+        public void GetFreePortThrowsOnPortGreaterThanMaxPort()
+        {
+            // arrange
+            var helper = new TcpHelper(TcpListenerWrapperFactory.Default);
+            var end = IPEndPoint.MaxPort + 1;
+
+            // act
+            void action() => helper.GetFreePort(1, IPEndPoint.MaxPort + 1);
+
+            // assert
+            Assert.Throws<ArgumentOutOfRangeException>(nameof(end), action);
+        }
     }
 }
