@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Orleans;
+using Outkeep.Core.Tcp;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -15,10 +16,11 @@ namespace Outkeep.Api.Http.Tests
         public async Task Cycles()
         {
             // arrange
+            var port = TcpHelper.Default.GetFreeDynamicPort();
             var logger = new NullLogger<OutkeepHttpApiHostedService>();
             var options = new OutkeepHttpApiServerOptions
             {
-                ApiUri = new Uri("http://localhost:51234")
+                ApiUri = new Uri($"http://localhost:{port}")
             };
             var loggerProviders = new ILoggerProvider[] { NullLoggerProvider.Instance };
             var grainFactory = Mock.Of<IGrainFactory>();
