@@ -61,7 +61,7 @@ namespace Outkeep.Application.Standalone.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} - HttpApi: {1}.
+        ///   Looks up a localized string similar to {0} - Silo: {1}, Gateway: {2}, HttpApi: {3}.
         /// </summary>
         internal static string Console_Title {
             get {
