@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Outkeep.Core;
+using Outkeep.Core.Caching;
 using Outkeep.Grains;
 using Serilog;
 using System;
@@ -46,7 +47,11 @@ namespace Outkeep.Application.Standalone
                 {
                     outkeep.Configure<CacheGrainOptions>(options =>
                     {
-                        options.ReactivePollingTimeout = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCaching:ReactivePollingTimeout");
+                        context.Configuration.GetSection("Outkeep:DistributedCaching").Bind(options);
+                    });
+                    outkeep.Configure<CacheOptions>(options =>
+                    {
+                        options.Capacity = 1000000;
                     });
                     outkeep.AddNullGrainStorage(OutkeepProviderNames.OutkeepCache);
                     outkeep.UseStandaloneClustering();
