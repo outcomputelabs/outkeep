@@ -6,14 +6,6 @@ namespace Outkeep.Core
 {
     public static class OutkeepServerBuilderExtensions
     {
-        public static IOutkeepServerBuilder Configure<TOptions>(this IOutkeepServerBuilder builder, Action<TOptions> configure) where TOptions : class
-        {
-            return builder.ConfigureServices(services =>
-            {
-                services.Configure(configure);
-            });
-        }
-
         public static IOutkeepServerBuilder ConfigureServices(this IOutkeepServerBuilder builder, Action<IServiceCollection> configure)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));

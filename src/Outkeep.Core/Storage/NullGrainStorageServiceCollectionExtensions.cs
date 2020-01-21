@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Orleans.Providers;
+﻿using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Storage;
+using Outkeep.Core.Storage;
 
-namespace Outkeep.Core.Storage
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class NullGrainStorageServiceCollectionExtensions
     {

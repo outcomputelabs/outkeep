@@ -48,7 +48,7 @@ namespace Outkeep.Application.Standalone
                     {
                         options.ReactivePollingTimeout = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCaching:ReactivePollingTimeout");
                     });
-
+                    outkeep.AddNullGrainStorage(OutkeepProviderNames.OutkeepCache);
                     outkeep.UseStandaloneClustering();
                     outkeep.UseHttpApi(options =>
                     {
