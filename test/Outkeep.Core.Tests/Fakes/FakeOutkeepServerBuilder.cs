@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans.Hosting;
+using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
@@ -26,6 +27,7 @@ namespace Outkeep.Core.Tests.Fakes
         public IServiceProvider BuildServiceProvider(HostBuilderContext context, ISiloBuilder silo)
         {
             var services = new ServiceCollection();
+            services.AddSingleton(typeof(IKeyedServiceCollection<,>), typeof(KeyedServiceCollection<,>));
 
             foreach (var configure in _serviceConfigurators)
             {
