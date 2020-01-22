@@ -1,4 +1,5 @@
-﻿using Orleans.Runtime;
+﻿using Orleans.Providers;
+using Orleans.Runtime;
 using Orleans.Storage;
 using Outkeep.Core.Storage;
 using Outkeep.Core.Tests.Fakes;
@@ -22,6 +23,20 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Same(builder, result);
             Assert.IsType<NullGrainStorage>(builder.BuildServiceProvider(null!, null!).GetServiceByName<IGrainStorage>(name));
+        }
+
+        [Fact]
+        public void AddNullGrainStorageAsDefaultAddsServices()
+        {
+            // arrange
+            var builder = new FakeOutkeepServerBuilder();
+
+            // act
+            var result = builder.AddNullGrainStorageAsDefault();
+
+            // assert
+            Assert.Same(builder, result);
+            Assert.IsType<NullGrainStorage>(builder.BuildServiceProvider(null!, null!).GetServiceByName<IGrainStorage>(ProviderConstants.DEFAULT_STORAGE_PROVIDER_NAME));
         }
     }
 }
