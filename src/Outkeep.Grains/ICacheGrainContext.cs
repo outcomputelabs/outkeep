@@ -5,7 +5,7 @@ using Outkeep.Core.Caching;
 
 namespace Outkeep.Grains
 {
-    internal interface ICacheGrainContext
+    public interface ICacheGrainContext
     {
         ILogger Logger { get; }
         CacheGrainOptions Options { get; }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Outkeep.Core;
 using Outkeep.Grains;
 using Outkeep.Hosting;
 
@@ -11,10 +11,17 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCoreServices(this IServiceCollection services)
         {
-            return services
+            services
                 .AddHostedService<OutkeepServerHostedService>()
-                .AddSingleton<IValidateOptions<CacheGrainOptions>, CacheGrainOptionsValidator>()
+                .AddSingleton<ISystemClock, SystemClock>()
                 .AddCacheDirector();
+
+            services
+                .AddSingleton<ICacheGrainContext, CacheGrainContext>()
+                .AddOptions<CacheGrainOptions>()
+                .ValidateDataAnnotations();
+
+            return services;
         }
     }
 }
