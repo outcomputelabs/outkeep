@@ -29,7 +29,10 @@ namespace Outkeep.Application.Standalone.Tests
             await service.StartAsync(default).ConfigureAwait(false);
 
             // assert
-            Assert.Equal(Console.Title, Resources.Console_Title.Format(nameof(Standalone), endpointOptions.SiloPort, endpointOptions.GatewayPort, httpApiOptions.ApiUri?.Port ?? -1));
+            if (Environment.UserInteractive)
+            {
+                Assert.Equal(Console.Title, Resources.Console_Title.Format(nameof(Standalone), endpointOptions.SiloPort, endpointOptions.GatewayPort, httpApiOptions.ApiUri?.Port ?? -1));
+            }
 
             // act
             await service.StopAsync(default).ConfigureAwait(false);
