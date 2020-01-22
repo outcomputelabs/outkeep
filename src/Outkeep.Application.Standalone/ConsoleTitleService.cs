@@ -27,7 +27,14 @@ namespace Outkeep.Application.Standalone
         {
             if (Environment.UserInteractive)
             {
-                Console.Title = Resources.Console_Title.Format(nameof(Standalone), _endpointOptions.SiloPort, _endpointOptions.GatewayPort, _httpApiOptions.ApiUri?.Port ?? -1);
+                try
+                {
+                    Console.Title = Resources.Console_Title.Format(nameof(Standalone), _endpointOptions.SiloPort, _endpointOptions.GatewayPort, _httpApiOptions.ApiUri?.Port ?? -1);
+                }
+                catch (InvalidOperationException)
+                {
+                    // noop - some platforms do not support the console title
+                }
             }
 
             return Task.CompletedTask;
