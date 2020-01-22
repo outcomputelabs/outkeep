@@ -33,7 +33,7 @@ namespace Outkeep.Application.Standalone.Tests
             {
                 Assert.Equal(Console.Title, Resources.Console_Title.Format(nameof(Standalone), endpointOptions.SiloPort, endpointOptions.GatewayPort, httpApiOptions.ApiUri?.Port ?? -1));
             }
-            catch (InvalidOperationException)
+            catch (PlatformNotSupportedException)
             {
                 // noop - some platforms do not support the console title
             }

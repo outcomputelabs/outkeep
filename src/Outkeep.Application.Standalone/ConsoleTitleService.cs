@@ -31,7 +31,7 @@ namespace Outkeep.Application.Standalone
                 {
                     Console.Title = Resources.Console_Title.Format(nameof(Standalone), _endpointOptions.SiloPort, _endpointOptions.GatewayPort, _httpApiOptions.ApiUri?.Port ?? -1);
                 }
-                catch (InvalidOperationException)
+                catch (PlatformNotSupportedException)
                 {
                     // noop - some platforms do not support the console title
                 }
