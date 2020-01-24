@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Grains.Interfaces", "src\Outkeep.Interfaces\Outkeep.Grains.Interfaces.csproj", "{29276F78-E04F-4B39-804E-5E15A105CE69}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Client", "src\Outkeep.Client\Outkeep.Client.csproj", "{9A37CE1B-F752-438B-A279-92673F9AD573}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}"
@@ -39,8 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Api.Http", "src\Out
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Api.Http.Tests", "test\Outkeep.Api.Http.Tests\Outkeep.Api.Http.Tests.csproj", "{585B4133-1FA1-4E21-ADD4-EB841A4E69A2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Interfaces.Tests", "test\Outkeep.Interfaces.Tests\Outkeep.Interfaces.Tests.csproj", "{46240BA1-37FD-4CC6-9C32-9AA4B60DB1B2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Core.Tests", "test\Outkeep.Core.Tests\Outkeep.Core.Tests.csproj", "{AED6CA53-B99E-43B0-9127-2F1E3B0DA188}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Hosting.Standalone.Tests", "test\Outkeep.Hosting.Standalone.Tests\Outkeep.Hosting.Standalone.Tests.csproj", "{144CBFE0-C467-4070-AA30-0CAFBCAA47C2}"
@@ -53,16 +49,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Hosting.Azure.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Application.Standalone.Tests", "test\Outkeep.Application.Standalone.Tests\Outkeep.Application.Standalone.Tests.csproj", "{9F312FD4-A0AD-4D7D-9EAB-90D89DA149BD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Grains.Interfaces", "src\Outkeep.Grains.Interfaces\Outkeep.Grains.Interfaces.csproj", "{F6DC3A0B-D360-443A-A91A-7A0B23696C17}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Grains.Interfaces.Tests", "test\Outkeep.Grains.Interfaces.Tests\Outkeep.Grains.Interfaces.Tests.csproj", "{BE39ACD8-6890-4981-B19F-D638BB70280A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{29276F78-E04F-4B39-804E-5E15A105CE69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29276F78-E04F-4B39-804E-5E15A105CE69}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29276F78-E04F-4B39-804E-5E15A105CE69}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29276F78-E04F-4B39-804E-5E15A105CE69}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9A37CE1B-F752-438B-A279-92673F9AD573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9A37CE1B-F752-438B-A279-92673F9AD573}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A37CE1B-F752-438B-A279-92673F9AD573}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -115,10 +111,6 @@ Global
 		{585B4133-1FA1-4E21-ADD4-EB841A4E69A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{585B4133-1FA1-4E21-ADD4-EB841A4E69A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{585B4133-1FA1-4E21-ADD4-EB841A4E69A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{46240BA1-37FD-4CC6-9C32-9AA4B60DB1B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{46240BA1-37FD-4CC6-9C32-9AA4B60DB1B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{46240BA1-37FD-4CC6-9C32-9AA4B60DB1B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{46240BA1-37FD-4CC6-9C32-9AA4B60DB1B2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AED6CA53-B99E-43B0-9127-2F1E3B0DA188}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AED6CA53-B99E-43B0-9127-2F1E3B0DA188}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AED6CA53-B99E-43B0-9127-2F1E3B0DA188}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -143,6 +135,14 @@ Global
 		{9F312FD4-A0AD-4D7D-9EAB-90D89DA149BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F312FD4-A0AD-4D7D-9EAB-90D89DA149BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F312FD4-A0AD-4D7D-9EAB-90D89DA149BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6DC3A0B-D360-443A-A91A-7A0B23696C17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6DC3A0B-D360-443A-A91A-7A0B23696C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6DC3A0B-D360-443A-A91A-7A0B23696C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6DC3A0B-D360-443A-A91A-7A0B23696C17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE39ACD8-6890-4981-B19F-D638BB70280A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE39ACD8-6890-4981-B19F-D638BB70280A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE39ACD8-6890-4981-B19F-D638BB70280A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE39ACD8-6890-4981-B19F-D638BB70280A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,12 +152,12 @@ Global
 		{80F04F5A-5F87-439A-AE28-64B65A9E180D} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{4B1FF738-A813-4D39-94E2-6ADB852F8B07} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{585B4133-1FA1-4E21-ADD4-EB841A4E69A2} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
-		{46240BA1-37FD-4CC6-9C32-9AA4B60DB1B2} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{AED6CA53-B99E-43B0-9127-2F1E3B0DA188} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{144CBFE0-C467-4070-AA30-0CAFBCAA47C2} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{6341A7B8-3D7E-4289-8842-43225D0593CB} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{0509B45B-9D0C-4081-B88C-9009AE9E9241} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 		{9F312FD4-A0AD-4D7D-9EAB-90D89DA149BD} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
+		{BE39ACD8-6890-4981-B19F-D638BB70280A} = {2D1ED9D7-4191-4D8D-BD2D-CD322EB9B94E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF479E3D-6C10-47A9-8079-70834C9DD8EB}

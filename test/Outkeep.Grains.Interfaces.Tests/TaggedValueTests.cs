@@ -1,8 +1,7 @@
-﻿using Outkeep.Grains;
-using System;
+﻿using System;
 using Xunit;
 
-namespace Outkeep.Interfaces.Tests
+namespace Outkeep.Grains.Interfaces.Tests
 {
     public class TaggedValueTests
     {

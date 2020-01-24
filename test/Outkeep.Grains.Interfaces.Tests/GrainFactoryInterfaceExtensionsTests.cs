@@ -1,10 +1,9 @@
 ﻿using Moq;
 using Orleans;
-using Outkeep.Grains;
 using System;
 using Xunit;
 
-namespace Outkeep.Interfaces.Tests
+namespace Outkeep.Grains.Interfaces.Tests
 {
     public class GrainFactoryInterfaceExtensionsTests
     {
