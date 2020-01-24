@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Outkeep.Interfaces\Outkeep.Interfaces.csproj" />
+    <ProjectReference Include="..\Outkeep.Interfaces\Outkeep.Grains.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>

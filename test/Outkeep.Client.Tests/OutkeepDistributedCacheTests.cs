@@ -3,7 +3,7 @@ using Moq;
 using Orleans;
 using Orleans.Concurrency;
 using Outkeep.Core;
-using Outkeep.Interfaces;
+using Outkeep.Grains;
 using System;
 using System.Threading.Tasks;
 using Xunit;

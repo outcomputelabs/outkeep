@@ -4,7 +4,7 @@ using Orleans;
 using Orleans.Runtime;
 using Outkeep.Api.Http.Controllers.V0;
 using Outkeep.Api.Http.Models.V0;
-using Outkeep.Interfaces;
+using Outkeep.Grains;
 using System;
 using System.Threading.Tasks;
 using Xunit;

@@ -2,7 +2,6 @@
 using Orleans;
 using Orleans.Concurrency;
 using Outkeep.Grains.Properties;
-using Outkeep.Interfaces;
 using System;
 using System.Threading.Tasks;
 

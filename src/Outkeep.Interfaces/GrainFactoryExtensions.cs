@@ -1,4 +1,4 @@
-﻿using Outkeep.Interfaces;
+﻿using Outkeep.Grains;
 using System;
 
 namespace Orleans

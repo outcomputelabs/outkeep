@@ -1,7 +1,7 @@
 ﻿using Orleans.Concurrency;
 using System;
 
-namespace Outkeep.Interfaces
+namespace Outkeep.Grains
 {
     /// <summary>
     /// Associates a value with an entity tag or version identifier.

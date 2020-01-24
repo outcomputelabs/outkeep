@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Orleans.Concurrency;
-using Outkeep.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.ComponentModel.DataAnnotations;
