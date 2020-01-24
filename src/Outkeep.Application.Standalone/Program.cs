@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Orleans.Hosting;
+using Orleans.Statistics;
 using Outkeep.Core;
 using Outkeep.Core.Caching;
 using Outkeep.Grains;
@@ -58,6 +60,11 @@ namespace Outkeep.Application.Standalone
                     outkeep.UseHttpApi(options =>
                     {
                         options.ApiUri = new Uri(context.Configuration["Outkeep:Http:ApiUri"]);
+                    });
+                    outkeep.ConfigureSilo(silo =>
+                    {
+                        silo.AddPerfCountersTelemetryConsumer();
+                        silo.UsePerfCounterEnvironmentStatistics();
                     });
                 })
                 .UseConsoleTitle()

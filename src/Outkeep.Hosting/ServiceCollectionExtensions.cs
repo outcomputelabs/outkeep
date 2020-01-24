@@ -11,6 +11,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCoreServices(this IServiceCollection services)
         {
+            services.AddMemoryPressureMonitor();
+
             services
                 .AddHostedService<OutkeepServerHostedService>()
                 .AddSingleton<ISystemClock, SystemClock>()
