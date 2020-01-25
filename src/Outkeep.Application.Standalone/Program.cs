@@ -63,7 +63,6 @@ namespace Outkeep.Application.Standalone
                     });
                     outkeep.ConfigureSilo(silo =>
                     {
-                        silo.AddPerfCountersTelemetryConsumer();
                         silo.UsePerfCounterEnvironmentStatistics();
                     });
                 })

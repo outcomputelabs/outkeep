@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Outkeep.Grains
+namespace Outkeep.Grains.Governance
 {
     [Serializable]
     public class ResourceGovernorException : OutkeepException

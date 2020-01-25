@@ -98,6 +98,24 @@ namespace Outkeep.Grains.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No default Resource Governor found for grain type {0}.
+        /// </summary>
+        internal static string Exception_NoDefaultResourceGovernorFoundForGrainType_X {
+            get {
+                return ResourceManager.GetString("Exception_NoDefaultResourceGovernorFoundForGrainType_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Resource Governor named {0} found for grain type {1}.
+        /// </summary>
+        internal static string Exception_NoResourceGovernorNamed_X_FoundForGrainType_X {
+            get {
+                return ResourceManager.GetString("Exception_NoResourceGovernorNamed_X_FoundForGrainType_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be a positive {1}.
         /// </summary>
         internal static string Exception_XMustBeAPositiveX {

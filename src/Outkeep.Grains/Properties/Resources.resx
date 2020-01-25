@@ -129,6 +129,12 @@
   <data name="Exception_CannotExecuteStorageOperationBecauseThePriorOperationFailed" xml:space="preserve">
     <value>Cannot execute batched storage operation because the prior operation failed</value>
   </data>
+  <data name="Exception_NoDefaultResourceGovernorFoundForGrainType_X" xml:space="preserve">
+    <value>No default Resource Governor found for grain type {0}</value>
+  </data>
+  <data name="Exception_NoResourceGovernorNamed_X_FoundForGrainType_X" xml:space="preserve">
+    <value>No Resource Governor named {0} found for grain type {1}</value>
+  </data>
   <data name="Exception_XMustBeAPositiveX" xml:space="preserve">
     <value>{0} must be a positive {1}</value>
   </data>
