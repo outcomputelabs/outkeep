@@ -1,7 +1,7 @@
 ﻿using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
-using Outkeep.Core.Caching;
+using Outkeep.Grains.Governance;
 using System;
 using System.Threading.Tasks;
 
@@ -13,18 +13,21 @@ namespace Outkeep.Grains
         private readonly ICacheGrainContext _context;
         private readonly IPersistentState<CacheGrainState> _state;
         private readonly IPersistentState<CacheGrainFlags> _flags;
+        private readonly IWeakActivationState<ActivityState> _activity;
 
-        public CacheGrain(ICacheGrainContext context, [PersistentState("State", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainState> state, [PersistentState("Flags", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainFlags> flags)
+        public CacheGrain(
+            ICacheGrainContext context,
+            [PersistentState("State", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainState> state,
+            [PersistentState("Flags", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainFlags> flags,
+            [WeakActivationState("Memory")] IWeakActivationState<ActivityState> activity)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _state = state?.AsConflater() ?? throw new ArgumentNullException(nameof(state));
             _flags = flags?.AsConflater() ?? throw new ArgumentNullException(nameof(flags));
+            _activity = activity ?? throw new ArgumentNullException(nameof(activity));
         }
 
         private TaskCompletionSource<CachePulse> _promise = new TaskCompletionSource<CachePulse>();
-        private ICacheEntry<string>? _entry;
-
-        private string PrimaryKey => this.GetPrimaryKeyString();
 
         public override Task OnActivateAsync()
         {
@@ -44,22 +47,9 @@ namespace Outkeep.Grains
                 return ClearAllStateAsync();
             }
 
-            // attempt to claim space in the current box for the loaded state
-            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
-            _entry = _context.Director
-                .CreateEntry(PrimaryKey, _state.State.Value.Length)
-                .SetPriority(CachePriority.Normal)
-                .Commit();
-
-            return Task.CompletedTask;
-        }
-
-        public override Task OnDeactivateAsync()
-        {
-            // release the token claim early without expiring
-            _entry?.Dispose();
-
-            return Task.CompletedTask;
+            // otherwise enroll as a weak activation
+            _activity.State.Priority = ActivityPriority.Normal;
+            return _activity.EnlistAsync();
         }
 
         /// <summary>
@@ -73,15 +63,6 @@ namespace Outkeep.Grains
         private static Task TickMaintenanceAsync(object state)
         {
             var self = (CacheGrain)state;
-
-            // check if the memory allowance was revoked
-            if (self._entry != null && self._entry.IsRevoked)
-            {
-                // deactivate the grain to allow cluster rebalancing
-                self.DeactivateOnIdle();
-                self.Publish(false);
-                return Task.CompletedTask;
-            }
 
             // check if there is any content to evaluate
             if (self._state.State.Tag == Guid.Empty)
@@ -107,9 +88,6 @@ namespace Outkeep.Grains
 
         private Task ResetAsync()
         {
-            // release the memory allowance
-            ReleaseToken();
-
             // clear and publish the state
             _state.State.Tag = Guid.Empty;
             _state.State.Value = null;
@@ -119,14 +97,6 @@ namespace Outkeep.Grains
 
             // attempt to remove stored state as well
             return Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync());
-        }
-
-        private void ReleaseToken()
-        {
-            if (_entry is null) return;
-
-            _entry.Revoke();
-            _entry = null;
         }
 
         private Task ClearAllStateAsync()
@@ -182,8 +152,6 @@ namespace Outkeep.Grains
         /// <inheritdoc />
         public Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
-            ReleaseToken();
-
             // check if there is anything to set at all
             // setting null content is equivalent to clearing
             if (value.Value is null)
@@ -204,12 +172,7 @@ namespace Outkeep.Grains
                 return ResetAsync();
             }
 
-            // claim space in the current box
             _flags.State.UtcLastAccessed = now;
-            _entry = _context.Director
-                .CreateEntry(PrimaryKey, value.Value.Length)
-                .SetPriority(CachePriority.Normal)
-                .Commit();
 
             // update subs and lazy save everything
             _state.State.Tag = Guid.NewGuid();

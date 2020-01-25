@@ -27,7 +27,7 @@ namespace Outkeep.Grains.Governance
 
         public TState State { get; }
 
-        public Task ApplyAsync()
+        public Task EnlistAsync()
         {
             _enlisted = true;
             return _governor.EnlistAsync(_context.GrainInstance.AsReference<IGrainControlExtension>(), State);

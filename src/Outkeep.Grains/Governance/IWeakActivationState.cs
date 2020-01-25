@@ -10,6 +10,6 @@ namespace Outkeep.Grains.Governance
     {
         TState State { get; }
 
-        Task ApplyAsync();
+        Task EnlistAsync();
     }
 }
