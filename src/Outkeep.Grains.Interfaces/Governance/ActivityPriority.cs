@@ -1,4 +1,4 @@
-﻿namespace Outkeep.Grains
+﻿namespace Outkeep.Grains.Governance
 {
     public enum ActivityPriority
     {
