@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Outkeep.Grains.Governance
 {
-    internal class WeakActivationStateAttributeMapper : IAttributeToFactoryMapper<WeakActivationStateAttribute>
+    public class WeakActivationStateAttributeMapper : IAttributeToFactoryMapper<WeakActivationStateAttribute>
     {
         private static readonly MethodInfo _create = typeof(IWeakActivationStateFactory).GetMethod(nameof(IWeakActivationStateFactory.Create));
 

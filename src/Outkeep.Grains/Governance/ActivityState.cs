@@ -1,6 +1,6 @@
 ﻿namespace Outkeep.Grains.Governance
 {
-    public class ActivityState
+    public class ActivityState : IWeakActivationFactor
     {
         public ActivityPriority Priority { get; set; } = ActivityPriority.Normal;
     }

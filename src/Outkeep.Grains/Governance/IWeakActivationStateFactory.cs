@@ -4,6 +4,6 @@ namespace Outkeep.Grains.Governance
 {
     public interface IWeakActivationStateFactory
     {
-        IWeakActivationState<TState> Create<TState>(IGrainActivationContext context, IWeakActivationStateConfiguration config) where TState : new();
+        IWeakActivationState<TState> Create<TState>(IGrainActivationContext context, IWeakActivationStateConfiguration config) where TState : IWeakActivationFactor, new();
     }
 }

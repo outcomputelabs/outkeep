@@ -1,34 +1,87 @@
-﻿using Microsoft.Extensions.Logging;
-using Orleans.Core;
-using Orleans.Runtime;
+﻿using Microsoft.Extensions.Hosting;
+using Orleans;
 using Outkeep.Core.Governance;
 using System;
+using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Outkeep.Grains.Governance.Memory
 {
-    public class MemoryResourceGovernor : GrainService
+    public sealed class MemoryResourceGovernor : IHostedService, IResourceGovernor<ActivityState>, IDisposable
     {
         private readonly IMemoryPressureMonitor _monitor;
+        private readonly IGrainFactory _factory;
 
-        public MemoryResourceGovernor(IGrainIdentity grainId, Silo silo, ILoggerFactory loggerFactory, IMemoryPressureMonitor monitor)
-            : base(grainId, silo, loggerFactory)
+        public MemoryResourceGovernor(IMemoryPressureMonitor monitor, IGrainFactory factory)
         {
             _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        public override Task Start()
-        {
-            RegisterTimer(TickGovern, this, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+        private readonly ConcurrentDictionary<IGrainControlExtension, ActivityState> _registry = new ConcurrentDictionary<IGrainControlExtension, ActivityState>();
+        private Timer? _timer;
 
-            return base.Start();
-        }
-
-        private static Task TickGovern(object state)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            // todo: do maintenance here
+            // todo: move the timespans to options
+            _timer = new Timer(TickGovern, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
 
             return Task.CompletedTask;
         }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            if (_timer != null)
+            {
+                _timer.Dispose();
+                _timer = null;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task EnlistAsync(IGrainControlExtension subject, ActivityState state)
+        {
+            _registry[subject] = state;
+
+            return Task.CompletedTask;
+        }
+
+        public Task LeaveAsync(IGrainControlExtension subject)
+        {
+            _registry.TryRemove(subject, out _);
+
+            return Task.CompletedTask;
+        }
+
+        private void TickGovern(object state)
+        {
+            // todo: do some governing here
+        }
+
+        #region Disposable
+
+        public void Dispose()
+        {
+            InnerDispose();
+            GC.SuppressFinalize(this);
+        }
+
+        private void InnerDispose()
+        {
+            if (_timer != null)
+            {
+                _timer.Dispose();
+                _timer = null;
+            }
+        }
+
+        ~MemoryResourceGovernor()
+        {
+            InnerDispose();
+        }
+
+        #endregion Disposable
     }
 }

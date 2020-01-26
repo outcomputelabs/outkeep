@@ -1,5 +1,9 @@
-﻿using Outkeep.Core;
+﻿using Orleans.Runtime;
+using Outkeep;
+using Outkeep.Core;
 using Outkeep.Grains;
+using Outkeep.Grains.Governance;
+using Outkeep.Grains.Governance.Memory;
 using Outkeep.Hosting;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -12,6 +16,13 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddCoreServices(this IServiceCollection services)
         {
             services.AddMemoryPressureMonitor();
+
+            // add weak activation facet
+            services.AddSingleton<IWeakActivationStateFactory, WeakActivationStateFactory>();
+            services.AddSingleton<IAttributeToFactoryMapper<WeakActivationStateAttribute>, WeakActivationStateAttributeMapper>();
+
+            // add default memory resource governor
+            services.AddSingletonNamedService<IResourceGovernor<ActivityState>, MemoryResourceGovernor>(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
 
             services
                 .AddHostedService<OutkeepServerHostedService>()

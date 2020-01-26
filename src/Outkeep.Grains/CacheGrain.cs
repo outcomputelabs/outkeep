@@ -19,7 +19,7 @@ namespace Outkeep.Grains
             ICacheGrainContext context,
             [PersistentState("State", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainState> state,
             [PersistentState("Flags", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainFlags> flags,
-            [WeakActivationState("Memory")] IWeakActivationState<ActivityState> activity)
+            [WeakActivationState(OutkeepProviderNames.OutkeepMemoryResourceGovernor)] IWeakActivationState<ActivityState> activity)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _state = state?.AsConflater() ?? throw new ArgumentNullException(nameof(state));

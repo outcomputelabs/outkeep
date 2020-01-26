@@ -10,7 +10,7 @@ namespace Outkeep.Grains.Governance
     /// Default implementation of <see cref="IWeakActivationState{T}"/>.
     /// </summary>
     internal sealed class WeakActivationState<TState> : IWeakActivationState<TState>, ILifecycleParticipant<IGrainLifecycle>
-        where TState : new()
+        where TState : IWeakActivationFactor, new()
     {
         private readonly IGrainActivationContext _context;
         private readonly IResourceGovernor<TState> _governor;
