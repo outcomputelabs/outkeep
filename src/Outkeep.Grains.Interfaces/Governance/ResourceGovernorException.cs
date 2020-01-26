@@ -1,5 +1,4 @@
-﻿using Outkeep.Core;
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 
 namespace Outkeep.Governance

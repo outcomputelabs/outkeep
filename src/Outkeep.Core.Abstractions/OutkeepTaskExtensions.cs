@@ -1,6 +1,6 @@
 ﻿namespace System.Threading.Tasks
 {
-    public static class TaskExtensions
+    public static class OutkeepTaskExtensions
     {
         /// <summary>
         /// Creates a task that completes when the given task completes or a timeout is reached.

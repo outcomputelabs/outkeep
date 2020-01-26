@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace Outkeep.Core.Tcp
+namespace Outkeep.Tcp
 {
     /// <summary>
     /// Wraps static calls to the <see cref="TcpListener"/> class to facilitate testing.

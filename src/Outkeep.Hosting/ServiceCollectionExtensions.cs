@@ -2,7 +2,6 @@
 using Orleans.Runtime;
 using Outkeep;
 using Outkeep.Caching;
-using Outkeep.Core;
 using Outkeep.Governance;
 using Outkeep.Governance.Memory;
 using Outkeep.Hosting;
@@ -16,7 +15,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCoreServices(this IServiceCollection services)
         {
-            services.AddMemoryPressureMonitor();
+            // add the built-in memory pressure monitor
+            services.AddSingleton<IMemoryPressureMonitor, MemoryPressureMonitor>();
 
             // add weak activation facet
             services.AddSingleton<IWeakActivationStateFactory, WeakActivationStateFactory>();
@@ -32,11 +32,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services
                 .AddHostedService<OutkeepServerHostedService>()
-                .AddSingleton<ISystemClock, SystemClock>()
-                .AddCacheDirector();
+                .AddSingleton<ISystemClock, SystemClock>();
 
             services
-                .AddSingleton<ICacheGrainContext, CacheGrainContext>()
                 .AddOptions<CacheGrainOptions>()
                 .ValidateDataAnnotations();
 

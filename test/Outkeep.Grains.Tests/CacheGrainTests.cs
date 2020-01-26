@@ -5,7 +5,6 @@ using Orleans.Concurrency;
 using Orleans.Runtime;
 using Orleans.Storage;
 using Outkeep.Caching;
-using Outkeep.Core.Caching;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -309,11 +308,6 @@ namespace Outkeep.Grains.Tests
             Assert.NotEqual(Guid.Empty, result3.Tag);
             Assert.NotEqual(result2.Tag, result3.Tag);
             Assert.Equal(value3, result3.Value.Value);
-
-            // arrange - get the underlying entry
-            var okay = _fixture.PrimarySiloServiceProvider.GetRequiredService<ICacheDirector<string>>().TryGetEntry(key, out var entry);
-            Assert.True(okay);
-            Assert.NotNull(entry);
 
             // act - access the value again to update the accessed timestamp
             await grain.PollAsync(Guid.NewGuid()).ConfigureAwait(false);

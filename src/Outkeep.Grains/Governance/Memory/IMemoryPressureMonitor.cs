@@ -1,4 +1,4 @@
-﻿namespace Outkeep.Core.Governance
+﻿namespace Outkeep.Governance.Memory
 {
     public interface IMemoryPressureMonitor
     {

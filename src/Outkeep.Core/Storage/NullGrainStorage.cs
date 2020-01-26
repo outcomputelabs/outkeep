@@ -3,7 +3,7 @@ using Orleans.Runtime;
 using Orleans.Storage;
 using System.Threading.Tasks;
 
-namespace Outkeep.Core.Storage
+namespace Outkeep.Storage
 {
     /// <summary>
     /// Implements an <see cref="IGrainStorage"/> service that does not write or read state.

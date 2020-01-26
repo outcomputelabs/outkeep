@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Outkeep.Core
+namespace Outkeep.Storage
 {
     public static class NullGrainStorageOutkeepServerBuilderExtensions
     {

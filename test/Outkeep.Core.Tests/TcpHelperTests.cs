@@ -1,6 +1,6 @@
 ﻿using Moq;
-using Outkeep.Core.Properties;
-using Outkeep.Core.Tcp;
+using Outkeep.Properties;
+using Outkeep.Tcp;
 using System;
 using System.Net;
 using System.Net.Sockets;

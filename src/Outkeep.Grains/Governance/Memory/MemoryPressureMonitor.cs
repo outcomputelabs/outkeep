@@ -2,9 +2,9 @@
 using Orleans.Statistics;
 using System;
 
-namespace Outkeep.Core.Governance
+namespace Outkeep.Governance.Memory
 {
-    internal class MemoryPressureMonitor : IMemoryPressureMonitor
+    public class MemoryPressureMonitor : IMemoryPressureMonitor
     {
         private readonly IHostEnvironmentStatistics _stats;
         private readonly MemoryPressureOptions _options;
@@ -40,7 +40,7 @@ namespace Outkeep.Core.Governance
                 }
 
                 // memory is under pressure if ratio is below the threshold
-                if (_options.LowMemoryThreshold.HasValue && (available.Value / total.Value) < _options.LowMemoryThreshold)
+                if (_options.LowMemoryThreshold.HasValue && available.Value / total.Value < _options.LowMemoryThreshold)
                 {
                     return true;
                 }

@@ -5,7 +5,7 @@ namespace System
     /// <summary>
     /// Quality-of-life extensions for strings.
     /// </summary>
-    public static class StringExtensions
+    public static class OutkeepStringExtensions
     {
         public static string Format(this string format, object arg0)
         {

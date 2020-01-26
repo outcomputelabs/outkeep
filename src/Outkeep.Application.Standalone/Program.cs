@@ -4,7 +4,6 @@ using Microsoft.Extensions.Hosting;
 using Orleans.Statistics;
 using Outkeep.Caching;
 using Outkeep.Core;
-using Outkeep.Core.Caching;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -50,11 +49,6 @@ namespace Outkeep.Application.Standalone
                     {
                         context.Configuration.GetSection("Outkeep:DistributedCaching").Bind(options);
                     });
-                    outkeep.Configure<CacheOptions>(options =>
-                    {
-                        options.Capacity = 1000000;
-                    });
-                    outkeep.AddNullGrainStorage(OutkeepProviderNames.OutkeepCache);
                     outkeep.UseStandaloneClustering();
                     outkeep.UseHttpApi(options =>
                     {

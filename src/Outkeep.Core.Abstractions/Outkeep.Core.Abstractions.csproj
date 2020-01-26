@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <NeutralLanguage>en-GB</NeutralLanguage>
-    <RootNamespace>Outkeep.Core</RootNamespace>
+    <RootNamespace>Outkeep</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

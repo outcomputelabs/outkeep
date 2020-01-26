@@ -1,9 +1,9 @@
-﻿using Outkeep.Core.Properties;
+﻿using Outkeep.Properties;
 using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Outkeep.Core.Tcp
+namespace Outkeep.Tcp
 {
     public sealed class TcpHelper
     {

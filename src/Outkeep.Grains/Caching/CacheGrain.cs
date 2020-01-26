@@ -1,4 +1,5 @@
-﻿using Orleans;
+﻿using Microsoft.Extensions.Options;
+using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
 using Outkeep.Governance;
@@ -10,18 +11,21 @@ namespace Outkeep.Caching
     [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain
     {
-        private readonly ICacheGrainContext _context;
+        private readonly CacheGrainOptions _options;
+        private readonly ISystemClock _clock;
         private readonly IPersistentState<CacheGrainState> _state;
         private readonly IPersistentState<CacheGrainFlags> _flags;
         private readonly IWeakActivationState<ActivityState> _activity;
 
         public CacheGrain(
-            ICacheGrainContext context,
+            IOptions<CacheGrainOptions> options,
+            ISystemClock clock,
             [PersistentState("State", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainState> state,
             [PersistentState("Flags", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainFlags> flags,
             [WeakActivationState(OutkeepProviderNames.OutkeepMemoryResourceGovernor)] IWeakActivationState<ActivityState> activity)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _clock = clock ?? throw new ArgumentNullException(nameof(clock));
             _state = state?.AsConflater() ?? throw new ArgumentNullException(nameof(state));
             _flags = flags?.AsConflater() ?? throw new ArgumentNullException(nameof(flags));
             _activity = activity ?? throw new ArgumentNullException(nameof(activity));
@@ -31,7 +35,7 @@ namespace Outkeep.Caching
 
         public override Task OnActivateAsync()
         {
-            RegisterTimer(TickMaintenanceAsyncDelegate, this, _context.Options.MaintenancePeriod, _context.Options.MaintenancePeriod);
+            RegisterTimer(TickMaintenanceAsyncDelegate, this, _options.MaintenancePeriod, _options.MaintenancePeriod);
 
             // see if we have state to recover
             if (_state.State.Value is null)
@@ -111,7 +115,7 @@ namespace Outkeep.Caching
 
         private bool IsExpired()
         {
-            var now = _context.Clock.UtcNow;
+            var now = _clock.UtcNow;
             return
                 _state.State.AbsoluteExpiration.HasValue && _state.State.AbsoluteExpiration <= now ||
                 _state.State.SlidingExpiration.HasValue && _flags.State.UtcLastAccessed.Add(_state.State.SlidingExpiration.Value) <= now;
@@ -137,7 +141,7 @@ namespace Outkeep.Caching
         /// <inheritdoc />
         public ValueTask<CachePulse> GetAsync()
         {
-            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
+            _flags.State.UtcLastAccessed = _clock.UtcNow;
 
             return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));
         }
@@ -163,7 +167,7 @@ namespace Outkeep.Caching
             }
 
             // check if the input has already expired
-            var now = _context.Clock.UtcNow;
+            var now = _clock.UtcNow;
             if (absoluteExpiration.HasValue && absoluteExpiration.Value <= now)
             {
                 // noop if there is nothing to clear
@@ -186,7 +190,7 @@ namespace Outkeep.Caching
         /// <inheritdoc />
         public Task RefreshAsync()
         {
-            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
+            _flags.State.UtcLastAccessed = _clock.UtcNow;
 
             return _flags.WriteStateAsync();
         }
@@ -194,11 +198,11 @@ namespace Outkeep.Caching
         /// <inheritdoc />
         public ValueTask<CachePulse> PollAsync(Guid tag)
         {
-            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
+            _flags.State.UtcLastAccessed = _clock.UtcNow;
 
             if (tag == _state.State.Tag)
             {
-                return new ValueTask<CachePulse>(_promise.Task.WithDefaultOnTimeout(new CachePulse(_state.State.Tag, null), _context.Options.ReactivePollingTimeout));
+                return new ValueTask<CachePulse>(_promise.Task.WithDefaultOnTimeout(new CachePulse(_state.State.Tag, null), _options.ReactivePollingTimeout));
             }
 
             return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));

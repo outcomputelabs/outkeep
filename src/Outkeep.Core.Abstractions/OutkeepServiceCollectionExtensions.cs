@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Quality-of-life extensions for <see cref="IServiceCollection"/>.
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public static class OutkeepServiceCollectionExtensions
     {
         /// <summary>
         /// Adds <typeparamref name="T"/> as an <see cref="IHostedService"/> to the <see cref="IServiceCollection"/> if it is not yet present.

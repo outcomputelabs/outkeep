@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Outkeep.Core
+namespace Outkeep
 {
     /// <summary>
     /// Default implementation of <see cref="ISystemClock"/> using <see cref="DateTimeOffset.UtcNow"/>.
