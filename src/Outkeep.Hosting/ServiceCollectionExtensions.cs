@@ -1,4 +1,5 @@
-﻿using Orleans.Runtime;
+﻿using Microsoft.Extensions.Hosting;
+using Orleans.Runtime;
 using Outkeep;
 using Outkeep.Core;
 using Outkeep.Grains;
@@ -22,6 +23,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IAttributeToFactoryMapper<WeakActivationStateAttribute>, WeakActivationStateAttributeMapper>();
 
             // add default memory resource governor
+            services
+                .AddSingleton<MemoryResourceGovernor>()
+                .AddSingleton<IHostedService>(sp => sp.GetService<MemoryResourceGovernor>())
+                .AddSingletonNamedService<IResourceGovernor<ActivityState>>(OutkeepProviderNames.OutkeepMemoryResourceGovernor, (sp, name) => sp.GetService<MemoryResourceGovernor>());
+
             services.AddSingletonNamedService<IResourceGovernor<ActivityState>, MemoryResourceGovernor>(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
 
             services

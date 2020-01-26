@@ -57,7 +57,10 @@ namespace Outkeep.Grains.Governance.Memory
 
         private void TickGovern(object state)
         {
-            // todo: do some governing here
+            if (_monitor.IsUnderPressure)
+            {
+                // todo: do some governing here
+            }
         }
 
         #region Disposable
