@@ -1,4 +1,5 @@
 ﻿using Outkeep.Grains;
+using Outkeep.Grains.Governance;
 
 namespace Orleans.Hosting
 {
