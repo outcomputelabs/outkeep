@@ -44,7 +44,6 @@ namespace Outkeep.Grains.Tests
             public void Configure(ISiloHostBuilder hostBuilder)
             {
                 hostBuilder
-                    .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
                     .ConfigureApplicationParts(apm =>
                     {
                         apm.AddApplicationPart(typeof(EchoGrain).Assembly).WithReferences();
@@ -52,12 +51,15 @@ namespace Outkeep.Grains.Tests
                     })
                     .ConfigureServices((context, services) =>
                     {
-                        services
-                            .Configure<CacheGrainOptions>(options =>
-                            {
-                                options.ReactivePollingTimeout = TimeSpan.FromSeconds(5);
-                            });
+                        services.AddCoreServices();
+
+                        // override the reactive polling timeout to make timed tests faster
+                        services.Configure<CacheGrainOptions>(options =>
+                        {
+                            options.ReactivePollingTimeout = TimeSpan.FromSeconds(5);
+                        });
                     })
+                    .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
                     .UseServiceProviderFactory(services =>
                     {
                         var provider = services.BuildServiceProvider();

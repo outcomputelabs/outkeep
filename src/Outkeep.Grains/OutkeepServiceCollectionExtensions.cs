@@ -1,14 +1,13 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Orleans.Runtime;
-using Outkeep;
 using Outkeep.Caching;
 using Outkeep.Governance;
 using Outkeep.Governance.Memory;
-using Outkeep.Hosting;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Outkeep
 {
-    public static class ServiceCollectionExtensions
+    public static class OutkeepServiceCollectionExtensions
     {
         /// <summary>
         /// Adds the Outkeep core services that are independant of hosting platform.
@@ -31,7 +30,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingletonNamedService<IResourceGovernor<ActivityState>, MemoryResourceGovernor>(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
 
             services
-                .AddHostedService<OutkeepServerHostedService>()
                 .AddSingleton<ISystemClock, SystemClock>();
 
             services

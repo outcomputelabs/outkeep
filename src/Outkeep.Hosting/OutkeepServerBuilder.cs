@@ -39,12 +39,6 @@ namespace Outkeep.Hosting
                     configure(context, silo);
                 }
             });
-
-            // wire up the outkeep hosted service last to ensure it boots up after orleans
-            builder.ConfigureServices((context, services) =>
-            {
-                services.AddHostedService<OutkeepServerHostedService>();
-            });
         }
 
         public IOutkeepServerBuilder ConfigureOutkeep(Action<HostBuilderContext, IOutkeepServerBuilder> configure)
