@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Concurrency;
+using Outkeep.Grains.Echo;
 using Outkeep.Grains.Properties;
 using System;
 using System.Threading.Tasks;

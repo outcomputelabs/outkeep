@@ -1,6 +1,7 @@
 ﻿using Moq;
 using Orleans;
 using Outkeep.Grains.Caching;
+using Outkeep.Grains.Echo;
 using System;
 using Xunit;
 
