@@ -4,6 +4,7 @@ using Orleans;
 using Orleans.Concurrency;
 using Outkeep.Core;
 using Outkeep.Grains;
+using Outkeep.Grains.Caching;
 using System;
 using System.Threading.Tasks;
 using Xunit;
