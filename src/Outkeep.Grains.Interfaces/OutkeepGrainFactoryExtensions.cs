@@ -6,7 +6,7 @@ namespace Orleans
     /// <summary>
     /// Quality-of-life extension methods for <see cref="IGrainFactory"/>.
     /// </summary>
-    public static class GrainFactoryExtensions
+    public static class OutkeepGrainFactoryExtensions
     {
         /// <summary>
         /// Gets a proxy to the <see cref="ICacheGrain"/> with the given key.
