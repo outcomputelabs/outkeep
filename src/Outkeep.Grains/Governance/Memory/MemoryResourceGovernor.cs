@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans;
-using Orleans.Runtime;
 using Outkeep.Properties;
 using System;
 using System.Collections.Concurrent;
@@ -29,7 +28,7 @@ namespace Outkeep.Governance.Memory
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        private readonly ConcurrentDictionary<GrainReference, ActivityState> _registry = new ConcurrentDictionary<GrainReference, ActivityState>();
+        private readonly ConcurrentDictionary<IGrainControlExtension, ActivityState> _registry = new ConcurrentDictionary<IGrainControlExtension, ActivityState>();
         private SafeTimer? _timer;
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -51,21 +50,21 @@ namespace Outkeep.Governance.Memory
             return Task.CompletedTask;
         }
 
-        public Task EnlistAsync(GrainReference subject, ActivityState state)
+        public Task EnlistAsync(IGrainControlExtension subject, ActivityState state)
         {
             _registry[subject] = state;
 
             return Task.CompletedTask;
         }
 
-        public Task LeaveAsync(GrainReference subject)
+        public Task LeaveAsync(IGrainControlExtension subject)
         {
             _registry.TryRemove(subject, out _);
 
             return Task.CompletedTask;
         }
 
-        private readonly List<GrainReference>[] _buckets = Enumerable.Range(1, 3).Select(x => new List<GrainReference>()).ToArray();
+        private readonly List<IGrainControlExtension>[] _buckets = Enumerable.Range(1, 3).Select(x => new List<IGrainControlExtension>()).ToArray();
 
         private readonly List<Task> _deactivations = new List<Task>();
 
@@ -114,7 +113,12 @@ namespace Outkeep.Governance.Memory
                 {
                     if (quota-- == 0) break;
 
-                    _deactivations.Add(bucket[i].AsReference<IGrainControlExtension>().DeactivateOnIdleAsync());
+                    var entry = bucket[i];
+
+                    if (_registry.TryRemove(entry, out _))
+                    {
+                        _deactivations.Add(entry.DeactivateOnIdleAsync());
+                    }
                 }
             }
 

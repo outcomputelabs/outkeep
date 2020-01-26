@@ -1,12 +1,11 @@
-﻿using Orleans.Runtime;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Outkeep.Governance
 {
     public interface IResourceGovernor<in TState>
     {
-        Task EnlistAsync(GrainReference subject, TState state);
+        Task EnlistAsync(IGrainControlExtension subject, TState state);
 
-        Task LeaveAsync(GrainReference subject);
+        Task LeaveAsync(IGrainControlExtension subject);
     }
 }

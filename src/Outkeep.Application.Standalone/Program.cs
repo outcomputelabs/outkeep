@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Orleans.Statistics;
 using Outkeep.Caching;
 using Outkeep.Core;
+using Outkeep.Governance.Memory;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -57,6 +58,16 @@ namespace Outkeep.Application.Standalone
                     outkeep.ConfigureSilo(silo =>
                     {
                         silo.UsePerfCounterEnvironmentStatistics();
+                    });
+
+                    outkeep.Configure<MemoryGovernanceOptions>(options =>
+                    {
+                        options.LowMemoryBytesThreshold = 1;
+                    });
+
+                    outkeep.ConfigureServices(services =>
+                    {
+                        services.AddNullGrainStorage(OutkeepProviderNames.OutkeepCache);
                     });
                 })
                 .UseConsoleTitle()

@@ -51,8 +51,6 @@ namespace Outkeep.Grains.Tests
                     })
                     .ConfigureServices((context, services) =>
                     {
-                        services.AddCoreServices();
-
                         // override the reactive polling timeout to make timed tests faster
                         services.Configure<CacheGrainOptions>(options =>
                         {
