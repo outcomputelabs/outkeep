@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans.Runtime;
+using Outkeep.Governance;
 using Outkeep.Grains.Properties;
 using System;
 

@@ -1,5 +1,5 @@
 ﻿using Orleans.Runtime;
-using Outkeep.Grains.Governance;
+using Outkeep.Governance;
 using System;
 using System.Threading.Tasks;
 

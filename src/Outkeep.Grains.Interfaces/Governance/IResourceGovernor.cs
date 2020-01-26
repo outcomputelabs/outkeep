@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     public interface IResourceGovernor<in TState>
     {

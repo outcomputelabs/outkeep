@@ -1,7 +1,7 @@
 ﻿using Orleans;
 using System.Threading.Tasks;
 
-namespace Outkeep.Grains.Echo
+namespace Outkeep.HealthChecks
 {
     /// <summary>
     /// Interface for the echo test grain.

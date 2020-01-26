@@ -2,8 +2,8 @@
 using Moq;
 using Orleans;
 using Orleans.Concurrency;
+using Outkeep.Caching;
 using Outkeep.Core;
-using Outkeep.Grains.Caching;
 using System;
 using System.Threading.Tasks;
 using Xunit;

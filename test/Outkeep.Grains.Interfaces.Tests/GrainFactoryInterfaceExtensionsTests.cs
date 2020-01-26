@@ -1,7 +1,7 @@
 ﻿using Moq;
 using Orleans;
-using Outkeep.Grains.Caching;
-using Outkeep.Grains.Echo;
+using Outkeep.Caching;
+using Outkeep.HealthChecks;
 using System;
 using Xunit;
 

@@ -2,6 +2,7 @@
 using Orleans.Runtime;
 using Outkeep;
 using Outkeep.Core;
+using Outkeep.Governance;
 using Outkeep.Grains;
 using Outkeep.Grains.Governance;
 using Outkeep.Grains.Governance.Memory;

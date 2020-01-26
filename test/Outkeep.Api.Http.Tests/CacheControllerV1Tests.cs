@@ -4,7 +4,7 @@ using Moq;
 using Orleans;
 using Orleans.Concurrency;
 using Outkeep.Api.Http.Controllers.V1;
-using Outkeep.Grains.Caching;
+using Outkeep.Caching;
 using System;
 using System.IO;
 using System.Linq;

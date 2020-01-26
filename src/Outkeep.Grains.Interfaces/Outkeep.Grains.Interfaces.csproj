@@ -11,7 +11,7 @@
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <Nullable>enable</Nullable>
-    <RootNamespace>Outkeep.Grains</RootNamespace>
+    <RootNamespace>Outkeep</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

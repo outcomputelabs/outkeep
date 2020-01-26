@@ -1,7 +1,7 @@
 ﻿using Orleans.Concurrency;
 using System;
 
-namespace Outkeep.Grains.Caching
+namespace Outkeep.Caching
 {
     [Immutable]
     public readonly struct CachePulse : IEquatable<CachePulse>

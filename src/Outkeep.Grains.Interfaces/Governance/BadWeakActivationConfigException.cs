@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     [Serializable]
     public class BadWeakActivationConfigException : OutkeepException
@@ -16,7 +16,7 @@ namespace Outkeep.Grains.Governance
         {
         }
 
-        public BadWeakActivationConfigException(string message, System.Exception innerException)
+        public BadWeakActivationConfigException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
