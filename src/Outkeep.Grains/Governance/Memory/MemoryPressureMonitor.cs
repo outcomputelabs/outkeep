@@ -7,9 +7,9 @@ namespace Outkeep.Governance.Memory
     public class MemoryPressureMonitor : IMemoryPressureMonitor
     {
         private readonly IHostEnvironmentStatistics _stats;
-        private readonly MemoryPressureOptions _options;
+        private readonly MemoryGovernanceOptions _options;
 
-        public MemoryPressureMonitor(IHostEnvironmentStatistics stats, IOptions<MemoryPressureOptions> options)
+        public MemoryPressureMonitor(IHostEnvironmentStatistics stats, IOptions<MemoryGovernanceOptions> options)
         {
             _stats = stats ?? throw new ArgumentNullException(nameof(stats));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));

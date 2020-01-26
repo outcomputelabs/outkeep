@@ -125,6 +125,15 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempting to deactivate {Count} grains out of {Total} in response to memory pressure.
+        /// </summary>
+        internal static string Log_AttemptingToDeactivate_X_GrainsOutOf_X_InResponseToMemoryPressure {
+            get {
+                return ResourceManager.GetString("Log_AttemptingToDeactivate_X_GrainsOutOf_X_InResponseToMemoryPressure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Cache Director Grain Service has encountered an error.
         /// </summary>
         internal static string Log_CachedDirectorGrainServiceError {
@@ -166,6 +175,15 @@ namespace Outkeep.Properties {
         internal static string Log_Echo_X {
             get {
                 return ResourceManager.GetString("Log_Echo_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to deactivate one or more target grains.
+        /// </summary>
+        internal static string Log_FailedToDeactivateOneOrMoreTargetGrains {
+            get {
+                return ResourceManager.GetString("Log_FailedToDeactivateOneOrMoreTargetGrains", resourceCulture);
             }
         }
     }
