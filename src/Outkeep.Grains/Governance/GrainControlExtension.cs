@@ -1,9 +1,8 @@
 ﻿using Orleans.Runtime;
-using Outkeep.Governance;
 using System;
 using System.Threading.Tasks;
 
-namespace Outkeep.Grains
+namespace Outkeep.Governance
 {
     public class GrainControlExtension : IGrainControlExtension
     {

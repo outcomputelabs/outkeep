@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Concurrency;
-using Outkeep.Grains.Properties;
-using Outkeep.HealthChecks;
+using Outkeep.Properties;
 using System;
 using System.Threading.Tasks;
 
-namespace Outkeep.Grains
+namespace Outkeep.HealthChecks
 {
     /// <summary>
     /// Grain that eachoes messages back to the caller.

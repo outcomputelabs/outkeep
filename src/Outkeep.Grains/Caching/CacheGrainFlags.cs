@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 
-namespace Outkeep.Grains
+namespace Outkeep.Caching
 {
     [ProtoContract]
     internal class CacheGrainFlags

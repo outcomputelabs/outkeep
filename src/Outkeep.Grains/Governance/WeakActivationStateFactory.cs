@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans.Runtime;
-using Outkeep.Governance;
-using Outkeep.Grains.Properties;
+using Outkeep.Properties;
 using System;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     public class WeakActivationStateFactory : IWeakActivationStateFactory
     {

@@ -1,6 +1,4 @@
-﻿using Outkeep.Governance;
-
-namespace Outkeep.Grains.Governance
+﻿namespace Outkeep.Governance
 {
     public class ActivityState : IWeakActivationFactor
     {

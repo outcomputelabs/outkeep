@@ -5,7 +5,7 @@ using Outkeep.Core;
 using Outkeep.Core.Caching;
 using System;
 
-namespace Outkeep.Grains
+namespace Outkeep.Caching
 {
     /// <summary>
     /// This class groups together static dependencies for the cache grain in order to reduce memory footprint for each instance.

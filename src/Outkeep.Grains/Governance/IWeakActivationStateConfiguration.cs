@@ -1,4 +1,4 @@
-﻿namespace Outkeep.Grains.Governance
+﻿namespace Outkeep.Governance
 {
     public interface IWeakActivationStateConfiguration
     {

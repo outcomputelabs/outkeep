@@ -1,13 +1,11 @@
 ﻿using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
-using Outkeep.Caching;
 using Outkeep.Governance;
-using Outkeep.Grains.Governance;
 using System;
 using System.Threading.Tasks;
 
-namespace Outkeep.Grains
+namespace Outkeep.Caching
 {
     [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain
@@ -115,8 +113,8 @@ namespace Outkeep.Grains
         {
             var now = _context.Clock.UtcNow;
             return
-                (_state.State.AbsoluteExpiration.HasValue && _state.State.AbsoluteExpiration <= now) ||
-                (_state.State.SlidingExpiration.HasValue && _flags.State.UtcLastAccessed.Add(_state.State.SlidingExpiration.Value) <= now);
+                _state.State.AbsoluteExpiration.HasValue && _state.State.AbsoluteExpiration <= now ||
+                _state.State.SlidingExpiration.HasValue && _flags.State.UtcLastAccessed.Add(_state.State.SlidingExpiration.Value) <= now;
         }
 
         /// <summary>

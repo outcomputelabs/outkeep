@@ -3,7 +3,7 @@ using Orleans.Timers;
 using Outkeep.Core;
 using Outkeep.Core.Caching;
 
-namespace Outkeep.Grains
+namespace Outkeep.Caching
 {
     public interface ICacheGrainContext
     {

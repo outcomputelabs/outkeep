@@ -4,7 +4,7 @@ using Orleans.Runtime;
 using System;
 using System.Reflection;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     public class WeakActivationStateAttributeMapper : IAttributeToFactoryMapper<WeakActivationStateAttribute>
     {

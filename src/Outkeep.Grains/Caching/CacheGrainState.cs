@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Outkeep.Grains
+namespace Outkeep.Caching
 {
     [ProtoContract]
     internal class CacheGrainState

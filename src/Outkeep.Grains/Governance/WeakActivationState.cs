@@ -1,11 +1,10 @@
 ﻿using Orleans;
 using Orleans.Runtime;
-using Outkeep.Governance;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     /// <summary>
     /// Default implementation of <see cref="IWeakActivationState{T}"/>.

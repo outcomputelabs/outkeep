@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     /// <summary>
     /// Lets grains inform an associated resource governor about their activity state to allow prioritized deactivation upon low resources.

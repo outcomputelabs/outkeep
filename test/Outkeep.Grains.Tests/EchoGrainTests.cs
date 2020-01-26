@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
+using Outkeep.HealthChecks;
 using System;
 using System.Threading.Tasks;
 using Xunit;

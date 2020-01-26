@@ -5,6 +5,8 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.TestingHost;
+using Outkeep.Caching;
+using Outkeep.HealthChecks;
 using System;
 using System.Collections.Concurrent;
 
@@ -56,7 +58,7 @@ namespace Outkeep.Grains.Tests
                                 options.Capacity = 1000;
                             })
                             .AddSystemClock()
-                            .AddCacheGrainContext()
+                            .AddSingleton<ICacheGrainContext, CacheGrainContext>()
                             .Configure<CacheGrainOptions>(options =>
                             {
                                 options.ReactivePollingTimeout = TimeSpan.FromSeconds(5);

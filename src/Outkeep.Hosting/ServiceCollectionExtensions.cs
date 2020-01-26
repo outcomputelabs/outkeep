@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Orleans.Runtime;
 using Outkeep;
+using Outkeep.Caching;
 using Outkeep.Core;
 using Outkeep.Governance;
-using Outkeep.Grains;
-using Outkeep.Grains.Governance;
-using Outkeep.Grains.Governance.Memory;
+using Outkeep.Governance.Memory;
 using Outkeep.Hosting;
 
 namespace Microsoft.Extensions.DependencyInjection

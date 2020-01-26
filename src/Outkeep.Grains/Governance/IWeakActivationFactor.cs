@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     /// <summary>
     /// Marker interface for weak activation factors.

@@ -1,9 +1,8 @@
-﻿using Orleans.Runtime;
-using Outkeep.Grains.Properties;
+﻿using Outkeep.Properties;
 using System;
 using System.Threading.Tasks;
 
-namespace Outkeep.Grains
+namespace Orleans.Runtime
 {
     /// <summary>
     /// A rudimentary wrapper that batches reads and writes to the orleans state in a reentrancy safe manner.

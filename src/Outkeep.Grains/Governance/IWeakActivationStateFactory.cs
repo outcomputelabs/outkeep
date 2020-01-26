@@ -1,6 +1,6 @@
 ﻿using Orleans.Runtime;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     public interface IWeakActivationStateFactory
     {

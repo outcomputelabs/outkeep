@@ -1,7 +1,7 @@
 ﻿using Orleans;
 using System;
 
-namespace Outkeep.Grains.Governance
+namespace Outkeep.Governance
 {
     [AttributeUsage(AttributeTargets.Parameter)]
     public class WeakActivationStateAttribute : Attribute, IFacetMetadata, IWeakActivationStateConfiguration

@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Orleans;
 using Outkeep.Core.Governance;
-using Outkeep.Governance;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Outkeep.Grains.Governance.Memory
+namespace Outkeep.Governance.Memory
 {
     public sealed class MemoryResourceGovernor : IHostedService, IResourceGovernor<ActivityState>, IDisposable
     {
