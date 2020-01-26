@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime;
+using System;
 using System.Reflection;
 
 namespace Outkeep.Grains.Governance
@@ -11,6 +12,8 @@ namespace Outkeep.Grains.Governance
 
         public Factory<IGrainActivationContext, object> GetFactory(ParameterInfo parameter, WeakActivationStateAttribute metadata)
         {
+            if (parameter is null) throw new ArgumentNullException(nameof(parameter));
+
             // todo: cache this allocation
             var types = parameter.ParameterType.GetGenericArguments();
 
