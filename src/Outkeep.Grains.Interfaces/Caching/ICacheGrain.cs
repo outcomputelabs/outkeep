@@ -1,10 +1,9 @@
 ﻿using Orleans;
 using Orleans.Concurrency;
-using Outkeep.Grains.Caching;
 using System;
 using System.Threading.Tasks;
 
-namespace Outkeep.Grains
+namespace Outkeep.Grains.Caching
 {
     /// <summary>
     /// Interface for grains that provide basic distributed caching features.

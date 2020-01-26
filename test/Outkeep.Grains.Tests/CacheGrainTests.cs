@@ -5,6 +5,7 @@ using Orleans.Concurrency;
 using Orleans.Runtime;
 using Orleans.Storage;
 using Outkeep.Core.Caching;
+using Outkeep.Grains.Caching;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
