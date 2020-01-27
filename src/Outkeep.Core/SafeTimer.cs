@@ -1,5 +1,5 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,41 +7,32 @@ namespace Outkeep
 {
     /// <summary>
     /// A rudimentary non-reentrant timer.
+    /// This timer skips ticks if a prior tick is still running.
     /// </summary>
     public sealed class SafeTimer : IDisposable
     {
+        private readonly ILogger _logger;
         private readonly Func<object?, Task> _callback;
-        private readonly TimeSpan _period;
         private readonly Timer _timer;
 
-        public SafeTimer(Func<object?, Task> callback, object? state, TimeSpan dueTime, TimeSpan period)
+        public SafeTimer(ILogger<SafeTimer> logger, Func<object?, Task> callback, object? state, TimeSpan dueTime, TimeSpan period)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _callback = callback ?? throw new ArgumentNullException(nameof(callback));
-            _period = period;
 
-            // initialize the timer without ticking
-            _timer = new Timer(Tick, state, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
-
-            // schedule the first tick
-            Schedule(dueTime);
+            _timer = new Timer(Tick, state, dueTime, period);
         }
 
-        private void Schedule(TimeSpan wait)
-        {
-            _timer.Change(wait, Timeout.InfiniteTimeSpan);
-        }
+        private int _running;
 
-        [SuppressMessage("Major Bug", "S3168:\"async\" methods should not return \"void\"")]
-        private async void Tick(object? state)
+        private void Tick(object? state)
         {
-            try
-            {
-                await _callback(state).ConfigureAwait(false);
-            }
-            finally
-            {
-                Schedule(_period);
-            }
+            // skip the tick if the previous one is still running
+            // otherwise flag the timer as running
+            if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
+
+            // run this tick and unflag the timer at the end
+            _callback(state).ContinueWith(t => _running = 0, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         }
 
         #region Disposable

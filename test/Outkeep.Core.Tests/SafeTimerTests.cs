@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Outkeep.Core.Tests
@@ -7,16 +6,13 @@ namespace Outkeep.Core.Tests
     public class SafeTimerTests
     {
         [Fact]
-        public void ThrowsOnNullCallback()
+        public void ThrowsOnNullLogger()
         {
-            // arrange
-            Func<object?, Task>? callback = null;
-
             // act
-            Assert.Throws<ArgumentNullException>(nameof(callback), () =>
+            Assert.Throws<ArgumentNullException>("logger", () =>
             {
                 // act
-                new SafeTimer(callback!, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+                new SafeTimer(null!, null!, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
             });
         }
     }
