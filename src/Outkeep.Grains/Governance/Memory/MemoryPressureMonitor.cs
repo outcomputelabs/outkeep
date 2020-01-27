@@ -27,7 +27,7 @@ namespace Outkeep.Governance.Memory
                 }
 
                 // memory is under pressure if below the low bytes threshold
-                if (_options.LowMemoryBytesThreshold.HasValue && available.Value < _options.LowMemoryBytesThreshold.Value)
+                if (available.Value < _options.LowMemoryBytesThreshold)
                 {
                     return true;
                 }
@@ -40,7 +40,7 @@ namespace Outkeep.Governance.Memory
                 }
 
                 // memory is under pressure if ratio is below the threshold
-                if (_options.LowMemoryThreshold.HasValue && available.Value / total.Value < _options.LowMemoryThreshold)
+                if ((available.Value / total.Value) < _options.LowMemoryThreshold)
                 {
                     return true;
                 }

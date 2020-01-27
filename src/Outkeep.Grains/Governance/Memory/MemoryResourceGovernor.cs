@@ -33,8 +33,7 @@ namespace Outkeep.Governance.Memory
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            // todo: move the timespans to options
-            _timer = new SafeTimer(TickGovern, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+            _timer = new SafeTimer(TickGovern, null, _options.ActivationCollectionInterval, _options.ActivationCollectionInterval);
 
             return Task.CompletedTask;
         }
