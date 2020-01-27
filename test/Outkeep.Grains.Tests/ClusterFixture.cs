@@ -68,7 +68,9 @@ namespace Outkeep.Grains.Tests
                         services.AddMemoryResourceGovernor(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
 
                         // add other services
-                        services.AddSingleton<ISystemClock, SystemClock>();
+                        services
+                            .AddSingleton<ISystemClock, SystemClock>()
+                            .AddSafeTimer();
                     })
                     .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
                     .UseServiceProviderFactory(services =>

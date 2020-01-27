@@ -86,13 +86,13 @@ namespace Outkeep.Core.Tests
             var count = 0;
 
             // act
-            using (var timer = new SafeTimer(NullLogger<SafeTimer>.Instance, _ => { throw new InvalidOperationException(); }, null, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(100)))
+            using (var timer = new SafeTimer(NullLogger<SafeTimer>.Instance, _ => { count += 1; throw new InvalidOperationException(); }, null, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(100)))
             {
                 await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
             }
 
             // assert
-            Assert.Equal(0, count);
+            Assert.Equal(10, count);
         }
     }
 }
