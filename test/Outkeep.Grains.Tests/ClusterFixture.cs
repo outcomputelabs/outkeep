@@ -4,8 +4,10 @@ using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Runtime;
 using Orleans.TestingHost;
 using Outkeep.Caching;
+using Outkeep.Governance;
 using Outkeep.HealthChecks;
 using System;
 using System.Collections.Concurrent;
@@ -56,6 +58,10 @@ namespace Outkeep.Grains.Tests
                         {
                             options.ReactivePollingTimeout = TimeSpan.FromSeconds(5);
                         });
+
+                        // add weak activation facet
+                        services.AddSingleton<IWeakActivationStateFactory, WeakActivationStateFactory>();
+                        services.AddSingleton<IAttributeToFactoryMapper<WeakActivationStateAttribute>, WeakActivationStateAttributeMapper>();
                     })
                     .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
                     .UseServiceProviderFactory(services =>
