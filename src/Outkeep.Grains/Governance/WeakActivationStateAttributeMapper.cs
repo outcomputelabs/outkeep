@@ -14,10 +14,7 @@ namespace Outkeep.Governance
         {
             if (parameter is null) throw new ArgumentNullException(nameof(parameter));
 
-            // todo: cache this allocation
             var types = parameter.ParameterType.GetGenericArguments();
-
-            // todo: cache this allocation
             var genericCreate = _create.MakeGenericMethod(types);
 
             return context => Create(context, genericCreate, metadata);
@@ -27,7 +24,6 @@ namespace Outkeep.Governance
         {
             var factory = context.ActivationServices.GetRequiredService<IWeakActivationStateFactory>();
 
-            // todo: pool this array allocation
             var args = new object[] { context, config };
             return genericCreate.Invoke(factory, args);
         }
