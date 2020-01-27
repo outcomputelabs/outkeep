@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Outkeep.Core.Tests
@@ -26,6 +28,22 @@ namespace Outkeep.Core.Tests
                 // act
                 new SafeTimer(NullLogger<SafeTimer>.Instance, null!, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
             });
+        }
+
+        [Fact]
+        public async Task TicksOnce()
+        {
+            // arrange
+            var count = 0;
+
+            // act
+            using (var timer = new SafeTimer(NullLogger<SafeTimer>.Instance, _ => { count += 1; return Task.CompletedTask; }, null, TimeSpan.FromMilliseconds(100), Timeout.InfiniteTimeSpan))
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            }
+
+            // assert
+            Assert.Equal(1, count);
         }
     }
 }
