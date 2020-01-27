@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Orleans;
 using Outkeep.Properties;
 using System;
 using System.Collections.Concurrent;
@@ -18,14 +17,12 @@ namespace Outkeep.Governance.Memory
         private readonly MemoryGovernanceOptions _options;
         private readonly ILogger _logger;
         private readonly IMemoryPressureMonitor _monitor;
-        private readonly IGrainFactory _factory;
 
-        public MemoryResourceGovernor(IOptions<MemoryGovernanceOptions> options, ILogger<MemoryResourceGovernor> logger, IMemoryPressureMonitor monitor, IGrainFactory factory)
+        public MemoryResourceGovernor(IOptions<MemoryGovernanceOptions> options, ILogger<MemoryResourceGovernor> logger, IMemoryPressureMonitor monitor)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
-            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
         private readonly ConcurrentDictionary<IGrainControlExtension, ActivityState> _registry = new ConcurrentDictionary<IGrainControlExtension, ActivityState>();
