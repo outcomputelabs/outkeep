@@ -61,12 +61,9 @@ namespace Outkeep.Governance.Memory
             return Task.CompletedTask;
         }
 
-        private readonly List<IWeakActivationExtension>[] _buckets = Enumerable.Range(1, 3).Select(x => new List<IWeakActivationExtension>()).ToArray();
-
         private readonly List<Task> _deactivations = new List<Task>();
 
         [SuppressMessage("Critical Code Smell", "S1215:\"GC.Collect\" should not be called")]
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
         private async Task TickGovern(object? state)
         {
             // quick break for no pressure
@@ -82,6 +79,21 @@ namespace Outkeep.Governance.Memory
             // quick break for nothing to deactivate or invalid ratio
             if (quota <= 0) return;
             _logger.LogInformation(Resources.Log_AttemptingToDeactivate_X_GrainsOutOf_X_InResponseToMemoryPressure, quota, count);
+
+            // apply deactivation rules
+            await DeactivateByPriorityAsync(quota).ConfigureAwait(false);
+
+            // test to see if we can do without this
+            GC.Collect();
+        }
+
+        private readonly List<IWeakActivationExtension>[] _buckets = Enumerable.Range(1, 3).Select(x => new List<IWeakActivationExtension>()).ToArray();
+
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
+        private async Task<long> DeactivateByPriorityAsync(long quota)
+        {
+            // quick path for quota complete
+            if (quota <= 0) return quota;
 
             // deactivate subjects by priority
             foreach (var entry in _registry)
@@ -134,8 +146,7 @@ namespace Outkeep.Governance.Memory
             }
             _deactivations.Clear();
 
-            // test to see if we can do without this
-            GC.Collect();
+            return quota;
         }
 
         #region Disposable
