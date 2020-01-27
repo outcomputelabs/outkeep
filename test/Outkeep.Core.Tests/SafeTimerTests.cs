@@ -45,5 +45,37 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(1, count);
         }
+
+        [Fact]
+        public async Task TicksMany()
+        {
+            // arrange
+            var count = 0;
+
+            // act
+            using (var timer = new SafeTimer(NullLogger<SafeTimer>.Instance, _ => { count += 1; return Task.CompletedTask; }, null, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(100)))
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            }
+
+            // assert
+            Assert.Equal(10, count);
+        }
+
+        [Fact]
+        public async Task TicksNone()
+        {
+            // arrange
+            var count = 0;
+
+            // act
+            using (var timer = new SafeTimer(NullLogger<SafeTimer>.Instance, _ => { count += 1; return Task.CompletedTask; }, null, Timeout.InfiniteTimeSpan, TimeSpan.FromMilliseconds(100)))
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            }
+
+            // assert
+            Assert.Equal(0, count);
+        }
     }
 }
