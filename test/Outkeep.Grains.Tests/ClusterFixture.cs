@@ -8,6 +8,7 @@ using Orleans.Runtime;
 using Orleans.TestingHost;
 using Outkeep.Caching;
 using Outkeep.Governance;
+using Outkeep.Governance.Memory;
 using Outkeep.HealthChecks;
 using System;
 using System.Collections.Concurrent;
@@ -62,6 +63,12 @@ namespace Outkeep.Grains.Tests
                         // add weak activation facet
                         services.AddSingleton<IWeakActivationStateFactory, WeakActivationStateFactory>();
                         services.AddSingleton<IAttributeToFactoryMapper<WeakActivationStateAttribute>, WeakActivationStateAttributeMapper>();
+
+                        // add memory resource governor
+                        services.AddMemoryResourceGovernor(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
+
+                        // add other services
+                        services.AddSingleton<ISystemClock, SystemClock>();
                     })
                     .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
                     .UseServiceProviderFactory(services =>
