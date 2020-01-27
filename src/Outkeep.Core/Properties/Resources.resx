@@ -219,6 +219,12 @@
   <data name="Log_StartingOvercapacityCompactionWithSizeOf_X" xml:space="preserve">
     <value>Starting overcapacity compaction with current size of {Size}</value>
   </data>
+  <data name="Log_TimerTickHasFaulted" xml:space="preserve">
+    <value>A timer tick has faulted</value>
+  </data>
+  <data name="Log_TimerTickWasCancelled" xml:space="preserve">
+    <value>A timer tick was cancelled</value>
+  </data>
   <data name="Log_WroteCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes" xml:space="preserve">
     <value>Wrote cache file {Path} for key {Key} with value size of {Size} bytes</value>
   </data>

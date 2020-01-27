@@ -18,20 +18,22 @@ namespace Outkeep.Governance.Memory
         private readonly MemoryGovernanceOptions _options;
         private readonly ILogger _logger;
         private readonly IMemoryPressureMonitor _monitor;
+        private readonly ISafeTimerFactory _timers;
 
-        public MemoryResourceGovernor(IOptions<MemoryGovernanceOptions> options, ILogger<MemoryResourceGovernor> logger, IMemoryPressureMonitor monitor)
+        public MemoryResourceGovernor(IOptions<MemoryGovernanceOptions> options, ILogger<MemoryResourceGovernor> logger, IMemoryPressureMonitor monitor, ISafeTimerFactory timers)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+            _timers = timers ?? throw new ArgumentNullException(nameof(timers));
         }
 
         private readonly ConcurrentDictionary<IWeakActivationExtension, ActivityState> _registry = new ConcurrentDictionary<IWeakActivationExtension, ActivityState>();
-        private SafeTimer? _timer;
+        private IDisposable? _timer;
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new SafeTimer(TickGovern, null, _options.ActivationCollectionInterval, _options.ActivationCollectionInterval);
+            _timer = _timers.Create(_ => TickGovern(), null, _options.ActivationCollectionInterval, _options.ActivationCollectionInterval);
 
             return Task.CompletedTask;
         }
@@ -64,7 +66,7 @@ namespace Outkeep.Governance.Memory
         private readonly List<Task> _deactivations = new List<Task>();
 
         [SuppressMessage("Critical Code Smell", "S1215:\"GC.Collect\" should not be called")]
-        private async Task TickGovern(object? state)
+        private async Task TickGovern()
         {
             // quick break for no pressure
             if (!_monitor.IsUnderPressure) return;

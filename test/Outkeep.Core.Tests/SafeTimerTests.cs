@@ -77,5 +77,21 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(0, count);
         }
+
+        [Fact]
+        public async Task TicksOnError()
+        {
+            // arrange
+            var count = 0;
+
+            // act
+            using (var timer = new SafeTimer(NullLogger<SafeTimer>.Instance, _ => { throw new InvalidOperationException(); }, null, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(100)))
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+            }
+
+            // assert
+            Assert.Equal(0, count);
+        }
     }
 }

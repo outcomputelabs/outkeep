@@ -368,6 +368,24 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A timer tick has faulted.
+        /// </summary>
+        internal static string Log_TimerTickHasFaulted {
+            get {
+                return ResourceManager.GetString("Log_TimerTickHasFaulted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A timer tick was cancelled.
+        /// </summary>
+        internal static string Log_TimerTickWasCancelled {
+            get {
+                return ResourceManager.GetString("Log_TimerTickWasCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wrote cache file {Path} for key {Key} with value size of {Size} bytes.
         /// </summary>
         internal static string Log_WroteCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes {

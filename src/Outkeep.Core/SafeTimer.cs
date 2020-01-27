@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Outkeep.Properties;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,7 +33,38 @@ namespace Outkeep
             if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
 
             // run this tick and unflag the timer at the end
-            _callback(state).ContinueWith(t => _running = 0, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+            _callback(state)
+                .ContinueWith(t =>
+                {
+                    if (t.IsCanceled)
+                    {
+                        Log.TickCancelled(_logger, t.Exception);
+                    }
+                    else if (t.IsFaulted)
+                    {
+                        Log.TickFaulted(_logger, t.Exception);
+                    }
+
+                    _running = 0;
+                },
+                CancellationToken.None,
+                TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Default);
+        }
+
+        private static class Log
+        {
+            public static void TickCancelled(ILogger logger, Exception exception) =>
+                _tickCancelled(logger, exception);
+
+            private static readonly Action<ILogger, Exception> _tickCancelled =
+                LoggerMessage.Define(LogLevel.Warning, new EventId(1), Resources.Log_TimerTickWasCancelled);
+
+            public static void TickFaulted(ILogger logger, Exception exception) =>
+                _tickFaulted(logger, exception);
+
+            private static readonly Action<ILogger, Exception> _tickFaulted =
+                LoggerMessage.Define(LogLevel.Warning, new EventId(2), Resources.Log_TimerTickHasFaulted);
         }
 
         #region Disposable
