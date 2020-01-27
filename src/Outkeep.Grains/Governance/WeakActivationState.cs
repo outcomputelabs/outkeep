@@ -47,7 +47,6 @@ namespace Outkeep.Governance
 
             if (_enlisted)
             {
-                // todo: add a check to prevent a redundant call when the grain is deactivated from the resource governor
                 return _governor.LeaveAsync(_context.GrainInstance.AsReference<IGrainControlExtension>());
             }
 
