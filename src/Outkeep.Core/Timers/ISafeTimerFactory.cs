@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Outkeep
+namespace Outkeep.Timers
 {
     public interface ISafeTimerFactory
     {

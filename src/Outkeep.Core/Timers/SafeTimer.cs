@@ -4,13 +4,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Outkeep
+namespace Outkeep.Timers
 {
     /// <summary>
     /// A rudimentary non-reentrant timer.
     /// This timer skips ticks if a prior tick is still running.
     /// </summary>
-    public sealed class SafeTimer : IDisposable
+    internal sealed class SafeTimer : IDisposable
     {
         private readonly ILogger _logger;
         private readonly Func<object?, Task> _callback;

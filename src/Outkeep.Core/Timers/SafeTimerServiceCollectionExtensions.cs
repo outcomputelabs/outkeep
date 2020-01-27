@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Outkeep.Timers;
 
-namespace Outkeep
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class SafeTimerServiceCollectionExtensions
     {
