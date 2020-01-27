@@ -39,7 +39,7 @@ namespace Outkeep.Core
                 })
                 .ConfigureSilo(silo =>
                 {
-                    silo.AddGrainExtension<IGrainControlExtension, GrainControlExtension>();
+                    silo.AddGrainExtension<IWeakActivationExtension, GrainControlExtension>();
                 });
         }
     }

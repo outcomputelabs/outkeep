@@ -30,7 +30,7 @@ namespace Outkeep.Governance
         public Task EnlistAsync()
         {
             _enlisted = true;
-            return _governor.EnlistAsync(_context.GrainInstance.AsReference<IGrainControlExtension>(), State);
+            return _governor.EnlistAsync(_context.GrainInstance.AsReference<IWeakActivationExtension>(), State);
         }
 
         public void Participate(IGrainLifecycle lifecycle)
@@ -47,7 +47,7 @@ namespace Outkeep.Governance
 
             if (_enlisted)
             {
-                return _governor.LeaveAsync(_context.GrainInstance.AsReference<IGrainControlExtension>());
+                return _governor.LeaveAsync(_context.GrainInstance.AsReference<IWeakActivationExtension>());
             }
 
             return Task.CompletedTask;

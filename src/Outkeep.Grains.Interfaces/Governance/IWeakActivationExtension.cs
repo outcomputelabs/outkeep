@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Governance
 {
-    public interface IGrainControlExtension : IGrainExtension
+    public interface IWeakActivationExtension : IGrainExtension
     {
         Task DeactivateOnIdleAsync();
     }

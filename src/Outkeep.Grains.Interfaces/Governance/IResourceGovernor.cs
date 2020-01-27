@@ -4,8 +4,8 @@ namespace Outkeep.Governance
 {
     public interface IResourceGovernor<in TState>
     {
-        Task EnlistAsync(IGrainControlExtension subject, TState state);
+        Task EnlistAsync(IWeakActivationExtension subject, TState state);
 
-        Task LeaveAsync(IGrainControlExtension subject);
+        Task LeaveAsync(IWeakActivationExtension subject);
     }
 }

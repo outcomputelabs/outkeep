@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Orleans;
 using Outkeep.Properties;
 using System;
 using System.Collections.Concurrent;
@@ -25,7 +26,7 @@ namespace Outkeep.Governance.Memory
             _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         }
 
-        private readonly ConcurrentDictionary<IGrainControlExtension, ActivityState> _registry = new ConcurrentDictionary<IGrainControlExtension, ActivityState>();
+        private readonly ConcurrentDictionary<IWeakActivationExtension, ActivityState> _registry = new ConcurrentDictionary<IWeakActivationExtension, ActivityState>();
         private SafeTimer? _timer;
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -46,21 +47,21 @@ namespace Outkeep.Governance.Memory
             return Task.CompletedTask;
         }
 
-        public Task EnlistAsync(IGrainControlExtension subject, ActivityState state)
+        public Task EnlistAsync(IWeakActivationExtension subject, ActivityState state)
         {
             _registry[subject] = state;
 
             return Task.CompletedTask;
         }
 
-        public Task LeaveAsync(IGrainControlExtension subject)
+        public Task LeaveAsync(IWeakActivationExtension subject)
         {
             _registry.TryRemove(subject, out _);
 
             return Task.CompletedTask;
         }
 
-        private readonly List<IGrainControlExtension>[] _buckets = Enumerable.Range(1, 3).Select(x => new List<IGrainControlExtension>()).ToArray();
+        private readonly List<IWeakActivationExtension>[] _buckets = Enumerable.Range(1, 3).Select(x => new List<IWeakActivationExtension>()).ToArray();
 
         private readonly List<Task> _deactivations = new List<Task>();
 
@@ -113,7 +114,7 @@ namespace Outkeep.Governance.Memory
 
                     if (_registry.TryRemove(entry, out _))
                     {
-                        _deactivations.Add(entry.DeactivateOnIdleAsync());
+                        _deactivations.Add(entry.AsReference<IWeakActivationExtension>().DeactivateOnIdleAsync());
                     }
                 }
             }
