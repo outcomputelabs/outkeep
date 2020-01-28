@@ -24,5 +24,21 @@ namespace Outkeep.Core.Tests
             // assert
             Assert.Equal(value, builder.BuildServiceProvider(null!, null!).GetService<IOptions<FakeOptions>>().Value.Value);
         }
+
+        [Fact]
+        public void ConfigureServicesConfiguresServices()
+        {
+            // arrange
+            var builder = new FakeOutkeepServerBuilder();
+
+            // act
+            builder.ConfigureServices(services =>
+            {
+                services.AddSingleton<IFakeService, FakeService>();
+            });
+
+            // assert
+            Assert.IsType<FakeService>(builder.BuildServiceProvider(null!, null!).GetService<IFakeService>());
+        }
     }
 }
