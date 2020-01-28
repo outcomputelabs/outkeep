@@ -21,5 +21,26 @@ namespace Outkeep.Grains.Tests
             // assert
             Assert.False(result);
         }
+
+        [Fact]
+        public void IsUnderPressureReturnsTrueWhenAvailableMemoryFallsBelowThreshold()
+        {
+            // arrange
+            var stats = new FakeHostEnvironmentStatistics
+            {
+                AvailableMemory = 1000
+            };
+            var options = new MemoryGovernanceOptions
+            {
+                LowMemoryBytesThreshold = 1200
+            };
+            var monitor = new MemoryPressureMonitor(stats, Options.Create(options));
+
+            // act
+            var result = monitor.IsUnderPressure;
+
+            // assert
+            Assert.True(result);
+        }
     }
 }
