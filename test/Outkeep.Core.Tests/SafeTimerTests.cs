@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
+using Outkeep.Core.Tests.Fakes;
+using Outkeep.Properties;
 using Outkeep.Timers;
 using System;
 using System.Threading;
@@ -93,6 +95,73 @@ namespace Outkeep.Core.Tests
 
             // assert
             Assert.Equal(10, count);
+        }
+
+        [Fact]
+        public async Task LogsOnImmediateCancellation()
+        {
+            // arrange
+            var exception = new OperationCanceledException();
+            var logger = new FakeLogger<SafeTimer>();
+
+            // act
+            using (var timer = new SafeTimer(logger, _ => throw exception, null, TimeSpan.Zero, Timeout.InfiniteTimeSpan))
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
+            }
+
+            // assert
+            Assert.Single(logger.Output, Resources.Log_TimerTickWasCancelled);
+        }
+
+        [Fact]
+        public async Task LogsOnDelayedCancellation()
+        {
+            // arrange
+            var logger = new FakeLogger<SafeTimer>();
+
+            // act
+            using (var timer = new SafeTimer(logger, _ => Task.FromCanceled(new CancellationToken(true)), null, TimeSpan.Zero, Timeout.InfiniteTimeSpan))
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
+            }
+
+            // assert
+            Assert.Single(logger.Output, Resources.Log_TimerTickWasCancelled);
+        }
+
+        [Fact]
+        public async Task LogsOnImmediateFault()
+        {
+            // arrange
+            var exception = new InvalidOperationException();
+            var logger = new FakeLogger<SafeTimer>();
+
+            // act
+            using (var timer = new SafeTimer(logger, _ => throw exception, null, TimeSpan.Zero, Timeout.InfiniteTimeSpan))
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
+            }
+
+            // assert
+            Assert.Single(logger.Output, Resources.Log_TimerTickHasFaulted);
+        }
+
+        [Fact]
+        public async Task LogsOnDelayedFault()
+        {
+            // arrange
+            var exception = new InvalidOperationException();
+            var logger = new FakeLogger<SafeTimer>();
+
+            // act
+            using (var timer = new SafeTimer(logger, _ => Task.FromException(exception), null, TimeSpan.Zero, Timeout.InfiniteTimeSpan))
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(100)).ConfigureAwait(false);
+            }
+
+            // assert
+            Assert.Single(logger.Output, Resources.Log_TimerTickHasFaulted);
         }
     }
 }

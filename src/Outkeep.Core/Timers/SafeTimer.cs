@@ -1,14 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using Outkeep.Properties;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Outkeep.Timers
 {
     /// <summary>
-    /// A rudimentary non-reentrant timer.
-    /// This timer skips ticks if a prior tick is still running.
+    /// A rudimentary non-reentrant timer that runs callbacks on the default scheduler.
+    /// This timer skips ticks if a prior tick is still running and will not delay the next tick.
     /// </summary>
     internal sealed class SafeTimer : IDisposable
     {
@@ -26,30 +27,32 @@ namespace Outkeep.Timers
 
         private int _running;
 
-        private void Tick(object? state)
+        [SuppressMessage("Major Bug", "S3168:\"async\" methods should not return \"void\"")]
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
+        private async void Tick(object? state)
         {
             // skip the tick if the previous one is still running
             // otherwise flag the timer as running
             if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
 
-            // run this tick and unflag the timer at the end
-            _callback(state)
-                .ContinueWith(t =>
-                {
-                    if (t.IsCanceled)
-                    {
-                        Log.TickCancelled(_logger, t.Exception);
-                    }
-                    else if (t.IsFaulted)
-                    {
-                        Log.TickFaulted(_logger, t.Exception);
-                    }
-
-                    _running = 0;
-                },
-                CancellationToken.None,
-                TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default);
+            // run the synchronous portion of the callback
+            try
+            {
+                await _callback(state).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException ex)
+            {
+                Log.TickCancelled(_logger, ex);
+            }
+            catch (Exception ex)
+            {
+                Log.TickFaulted(_logger, ex);
+            }
+            finally
+            {
+                // allow the next tick to run
+                _running = 0;
+            }
         }
 
         private static class Log
