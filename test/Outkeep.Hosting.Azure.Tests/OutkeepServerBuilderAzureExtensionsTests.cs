@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Outkeep.Hosting.Azure.Tests
 {
-    public class OutkeepServerBuilderExtensionsTests
+    public class OutkeepServerBuilderAzureExtensionsTests
     {
         [Fact]
         public void UseAzure()
