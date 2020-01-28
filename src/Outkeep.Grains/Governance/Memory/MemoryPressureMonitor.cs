@@ -40,7 +40,7 @@ namespace Outkeep.Governance.Memory
                 }
 
                 // memory is under pressure if ratio is below the threshold
-                if ((available.Value / total.Value) < _options.LowMemoryThreshold)
+                if (((double)available.Value / total.Value) < _options.LowMemoryThreshold)
                 {
                     return true;
                 }
