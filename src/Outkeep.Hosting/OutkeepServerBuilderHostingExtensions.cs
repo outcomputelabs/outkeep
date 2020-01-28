@@ -7,7 +7,7 @@ using Outkeep.Governance.Memory;
 
 namespace Outkeep.Core
 {
-    public static class OutkeepServerBuilderExtensions
+    public static class OutkeepServerBuilderHostingExtensions
     {
         public static IOutkeepServerBuilder AddCoreServices(this IOutkeepServerBuilder builder)
         {

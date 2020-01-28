@@ -8,7 +8,7 @@ using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
 
 namespace Outkeep.Hosting.Tests
 {
-    public class OutkeepServerBuilderExtensionsTests
+    public class OutkeepServerBuilderHostingExtensionsTests
     {
         private class MyOptions
         {
