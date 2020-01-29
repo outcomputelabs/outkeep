@@ -16,8 +16,8 @@ namespace Outkeep.Governance
             var named = !string.IsNullOrWhiteSpace(config.ResourceGovernorName);
 
             var governor = named
-                ? context.ActivationServices.GetServiceByName<IResourceGovernor<TState>>(config.ResourceGovernorName)
-                : context.ActivationServices.GetService<IResourceGovernor<TState>>();
+                ? context.ActivationServices.GetServiceByName<IResourceGovernor>(config.ResourceGovernorName)
+                : context.ActivationServices.GetService<IResourceGovernor>();
 
             if (governor is null)
             {

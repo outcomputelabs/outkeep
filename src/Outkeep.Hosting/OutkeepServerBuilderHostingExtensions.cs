@@ -24,7 +24,7 @@ namespace Outkeep.Core
                     // add default memory resource governor
                     services.AddMemoryResourceGovernor(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
 
-                    services.AddSingletonNamedService<IResourceGovernor<ActivityState>, MemoryResourceGovernor>(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
+                    services.AddSingletonNamedService<IResourceGovernor, MemoryResourceGovernor>(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
 
                     services
                         .AddSingleton<ISystemClock, SystemClock>();

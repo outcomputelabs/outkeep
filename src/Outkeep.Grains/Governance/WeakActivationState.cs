@@ -13,9 +13,9 @@ namespace Outkeep.Governance
         where TState : IWeakActivationFactor, new()
     {
         private readonly IGrainActivationContext _context;
-        private readonly IResourceGovernor<TState> _governor;
+        private readonly IResourceGovernor _governor;
 
-        public WeakActivationState(IGrainActivationContext context, IResourceGovernor<TState> governor)
+        public WeakActivationState(IGrainActivationContext context, IResourceGovernor governor)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _governor = governor ?? throw new ArgumentNullException(nameof(governor));
@@ -23,13 +23,10 @@ namespace Outkeep.Governance
             State = new TState();
         }
 
-        private bool _enlisted;
-
         public TState State { get; }
 
         public Task EnlistAsync()
         {
-            _enlisted = true;
             return _governor.EnlistAsync(_context.GrainInstance.AsReference<IWeakActivationExtension>(), State);
         }
 
@@ -45,12 +42,7 @@ namespace Outkeep.Governance
                 return Task.CompletedTask;
             }
 
-            if (_enlisted)
-            {
-                return _governor.LeaveAsync(_context.GrainInstance.AsReference<IWeakActivationExtension>());
-            }
-
-            return Task.CompletedTask;
+            return _governor.LeaveAsync(_context.GrainInstance.AsReference<IWeakActivationExtension>());
         }
     }
 }

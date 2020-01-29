@@ -9,6 +9,7 @@ using Orleans.TestingHost;
 using Outkeep.Caching;
 using Outkeep.Governance;
 using Outkeep.Governance.Memory;
+using Outkeep.Grains.Tests.Fakes;
 using Outkeep.HealthChecks;
 using System;
 using System.Collections.Concurrent;
@@ -66,6 +67,9 @@ namespace Outkeep.Grains.Tests
 
                         // add memory resource governor
                         services.AddMemoryResourceGovernor(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
+
+                        // add test resource governor
+                        services.AddSingletonNamedService<IResourceGovernor, FakeResourceGovernor>("WeakActivationTestGovernor");
 
                         // add other services
                         services

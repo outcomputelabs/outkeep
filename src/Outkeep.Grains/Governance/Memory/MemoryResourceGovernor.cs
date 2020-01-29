@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Governance.Memory
 {
-    public sealed class MemoryResourceGovernor : IHostedService, IResourceGovernor<ActivityState>, IDisposable
+    public sealed class MemoryResourceGovernor : IHostedService, IResourceGovernor, IDisposable
     {
         private readonly MemoryGovernanceOptions _options;
         private readonly ILogger _logger;
@@ -50,9 +50,13 @@ namespace Outkeep.Governance.Memory
             return Task.CompletedTask;
         }
 
-        public Task EnlistAsync(IWeakActivationExtension subject, ActivityState state)
+        public Task EnlistAsync(IWeakActivationExtension subject, IWeakActivationFactor factor)
         {
-            _registry[subject] = state;
+            _registry[subject] = factor switch
+            {
+                ActivityState state => state,
+                _ => throw new NotSupportedException()
+            };
 
             return Task.CompletedTask;
         }

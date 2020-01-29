@@ -18,7 +18,7 @@ namespace Outkeep.Governance.Memory
                 .AddSingleton<IMemoryPressureMonitor, MemoryPressureMonitor>()
                 .AddSingleton<MemoryResourceGovernor>()
                 .AddSingleton<IHostedService>(sp => sp.GetService<MemoryResourceGovernor>())
-                .AddSingletonNamedService<IResourceGovernor<ActivityState>>(name, (sp, name) => sp.GetService<MemoryResourceGovernor>())
+                .AddSingletonNamedService<IResourceGovernor>(name, (sp, name) => sp.GetService<MemoryResourceGovernor>())
                 .AddOptions<MemoryGovernanceOptions>()
                 .ValidateDataAnnotations();
 
