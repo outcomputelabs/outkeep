@@ -33,11 +33,32 @@ namespace Outkeep.Grains.Tests
             Assert.NotNull(factor);
             Assert.Equal(1, factor!.FakeProperty);
         }
+
+        [Fact]
+        public async Task DeactivatingUnregistersFromGovernor()
+        {
+            // arrange
+            var grain = _fixture.Cluster.GrainFactory.GetGrain<IWeakActivationTestGrain>(Guid.NewGuid());
+
+            // act - wake up the grain
+            await grain.NoopAsync().ConfigureAwait(false);
+
+            // act - put the grain to sleep
+            await grain.SleepAsync().ConfigureAwait(false);
+
+            // act - wait for orleans to sleep the grain
+            await Task.Delay(1000).ConfigureAwait(false);
+
+            // assert
+            var governor = (FakeResourceGovernor)_fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IResourceGovernor>("WeakActivationTestGovernor");
+            Assert.False(governor.Registrations.TryGetValue(grain.AsReference<IWeakActivationExtension>(), out _));
+        }
     }
 
     public interface IWeakActivationTestGrain : IGrainWithGuidKey
     {
         Task NoopAsync();
+        Task SleepAsync();
     }
 
     public class WeakActivationTestGrain : Grain, IWeakActivationTestGrain
@@ -56,5 +77,11 @@ namespace Outkeep.Grains.Tests
         }
 
         public Task NoopAsync() => Task.CompletedTask;
+
+        public Task SleepAsync()
+        {
+            DeactivateOnIdle();
+            return Task.CompletedTask;
+        }
     }
 }

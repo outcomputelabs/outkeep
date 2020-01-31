@@ -26,7 +26,9 @@ namespace Outkeep.Governance
                     : new BadWeakActivationConfigException(Resources.Exception_NoDefaultResourceGovernorFoundForGrainType_X.Format(context.GrainType.FullName));
             }
 
-            return new WeakActivationState<TState>(context, governor);
+            var state = new WeakActivationState<TState>(context, governor);
+            state.Participate(context.ObservableLifecycle);
+            return state;
         }
     }
 }

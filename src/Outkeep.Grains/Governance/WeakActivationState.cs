@@ -9,11 +9,12 @@ namespace Outkeep.Governance
     /// <summary>
     /// Default implementation of <see cref="IWeakActivationState{T}"/>.
     /// </summary>
-    internal sealed class WeakActivationState<TState> : IWeakActivationState<TState>, ILifecycleParticipant<IGrainLifecycle>
+    internal sealed class WeakActivationState<TState> : IWeakActivationState<TState>, ILifecycleParticipant<IGrainLifecycle>, ILifecycleObserver
         where TState : IWeakActivationFactor, new()
     {
         private readonly IGrainActivationContext _context;
         private readonly IResourceGovernor _governor;
+        private bool _enlisted;
 
         public WeakActivationState(IGrainActivationContext context, IResourceGovernor governor)
         {
@@ -27,20 +28,23 @@ namespace Outkeep.Governance
 
         public Task EnlistAsync()
         {
+            _enlisted = true;
             return _governor.EnlistAsync(_context.GrainInstance.AsReference<IWeakActivationExtension>(), State);
         }
 
         public void Participate(IGrainLifecycle lifecycle)
         {
-            lifecycle.Subscribe(GetType().FullName, GrainLifecycleStage.Last, OnLast);
+            lifecycle.Subscribe(GrainLifecycleStage.SetupState, this);
         }
 
-        private Task OnLast(CancellationToken cancellationToken)
+        public Task OnStart(CancellationToken ct)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return Task.CompletedTask;
-            }
+            return Task.CompletedTask;
+        }
+
+        public Task OnStop(CancellationToken ct)
+        {
+            if (!_enlisted) return Task.CompletedTask;
 
             return _governor.LeaveAsync(_context.GrainInstance.AsReference<IWeakActivationExtension>());
         }
