@@ -34,7 +34,7 @@ namespace Outkeep.Governance.Memory
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = _timers.Create(_ => TickGovern(), null, _options.ActivationCollectionInterval, _options.ActivationCollectionInterval);
+            _timer = _timers.Create(_ => TickGovern(), null, _options.WeakActivationCollectionInterval, _options.WeakActivationCollectionInterval);
 
             return Task.CompletedTask;
         }

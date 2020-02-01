@@ -26,9 +26,9 @@ namespace Outkeep.Governance.Memory
         public double GrainDeactivationRatio { get; set; } = 0.1;
 
         /// <summary>
-        /// Interval at which activations will be collected.
+        /// Interval at which weak activations will be collected.
         /// </summary>
         [Range(typeof(TimeSpan), "00:00:00.001", "24.00:00:00")]
-        public TimeSpan ActivationCollectionInterval { get; set; } = TimeSpan.FromSeconds(1);
+        public TimeSpan WeakActivationCollectionInterval { get; set; } = TimeSpan.FromSeconds(1);
     }
 }
