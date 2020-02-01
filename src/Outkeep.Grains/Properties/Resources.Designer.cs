@@ -186,5 +186,23 @@ namespace Outkeep.Properties {
                 return ResourceManager.GetString("Log_FailedToDeactivateOneOrMoreTargetGrains", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to deactivate target grain {GrainReference}.
+        /// </summary>
+        internal static string Log_FailedToDeactivateTargetGrain_X {
+            get {
+                return ResourceManager.GetString("Log_FailedToDeactivateTargetGrain_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to deactivate target grain {GrainReference} after {MaxAttempts} attempts. Will not retry..
+        /// </summary>
+        internal static string Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry {
+            get {
+                return ResourceManager.GetString("Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry", resourceCulture);
+            }
+        }
     }
 }

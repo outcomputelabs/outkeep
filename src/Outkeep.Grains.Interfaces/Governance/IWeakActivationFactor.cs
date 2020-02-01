@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Outkeep.Governance
 {
@@ -6,7 +7,7 @@ namespace Outkeep.Governance
     /// Marker interface for weak activation factors.
     /// </summary>
     [SuppressMessage("Design", "CA1040:Avoid empty interfaces")]
-    public interface IWeakActivationFactor
+    public interface IWeakActivationFactor : IComparable<IWeakActivationFactor>
     {
     }
 }

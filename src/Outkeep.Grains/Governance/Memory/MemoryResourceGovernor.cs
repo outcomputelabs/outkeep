@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Orleans;
 using Outkeep.Properties;
 using Outkeep.Timers;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -29,7 +27,7 @@ namespace Outkeep.Governance.Memory
             _timers = timers ?? throw new ArgumentNullException(nameof(timers));
         }
 
-        private readonly ConcurrentDictionary<IWeakActivationExtension, ActivityState> _registry = new ConcurrentDictionary<IWeakActivationExtension, ActivityState>();
+        private readonly ConcurrentDictionary<IWeakActivationExtension, Entry> _registry = new ConcurrentDictionary<IWeakActivationExtension, Entry>();
         private IDisposable? _timer;
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -52,11 +50,10 @@ namespace Outkeep.Governance.Memory
 
         public Task EnlistAsync(IWeakActivationExtension subject, IWeakActivationFactor factor)
         {
-            _registry[subject] = factor switch
-            {
-                ActivityState state => state,
-                _ => throw new NotSupportedException()
-            };
+            if (subject is null) throw new ArgumentNullException(nameof(subject));
+            if (factor is null) throw new ArgumentNullException(nameof(factor));
+
+            _registry[subject] = new Entry(factor);
 
             return Task.CompletedTask;
         }
@@ -67,8 +64,6 @@ namespace Outkeep.Governance.Memory
 
             return Task.CompletedTask;
         }
-
-        private readonly List<Task> _deactivations = new List<Task>();
 
         [SuppressMessage("Critical Code Smell", "S1215:\"GC.Collect\" should not be called")]
         private async Task TickGovern()
@@ -94,66 +89,41 @@ namespace Outkeep.Governance.Memory
             GC.Collect();
         }
 
-        private readonly List<IWeakActivationExtension>[] _buckets = Enumerable.Range(1, 3).Select(x => new List<IWeakActivationExtension>()).ToArray();
-
         [SuppressMessage("Design", "CA1031:Do not catch general exception types")]
-        private async Task<long> DeactivateByPriorityAsync(long quota)
+        private async Task DeactivateByPriorityAsync(int quota)
         {
             // quick path for quota complete
-            if (quota <= 0) return quota;
+            if (quota <= 0) return;
 
             // deactivate subjects by priority
-            foreach (var entry in _registry)
+            foreach (var entry in _registry.OrderBy(x => x.Value.Factor).Take(quota))
             {
-                switch (entry.Value.Priority)
+                bool deactivated;
+                try
                 {
-                    case ActivityPriority.Low:
-                        _buckets[0].Add(entry.Key);
-                        break;
-
-                    case ActivityPriority.Normal:
-                        _buckets[1].Add(entry.Key);
-                        break;
-
-                    case ActivityPriority.High:
-                        _buckets[2].Add(entry.Key);
-                        break;
+                    await entry.Key.DeactivateOnIdleAsync().ConfigureAwait(false);
+                    deactivated = true;
                 }
-            }
-
-            for (var b = 0; b < _buckets.Length; ++b)
-            {
-                var bucket = _buckets[b];
-
-                for (var i = 0; i < bucket.Count; ++i)
+                catch (Exception ex)
                 {
-                    if (quota-- == 0) break;
+                    Log.FailedToDeactivateGrain(_logger, entry.Key, ex);
+                    deactivated = false;
+                }
 
-                    var entry = bucket[i];
-
-                    if (_registry.TryRemove(entry, out _))
+                if (deactivated)
+                {
+                    _registry.TryRemove(entry.Key, out _);
+                }
+                else
+                {
+                    entry.Value.DeactivationAttempts += 1;
+                    if (entry.Value.DeactivationAttempts >= _options.MaxGrainDeactivationAttempts)
                     {
-                        _deactivations.Add(entry.AsReference<IWeakActivationExtension>().DeactivateOnIdleAsync());
+                        Log.FailedToDeactivateGrainWillNotRetry(_logger, entry.Key, entry.Value.DeactivationAttempts);
+                        _registry.TryRemove(entry.Key, out _);
                     }
                 }
             }
-
-            try
-            {
-                await Task.WhenAll(_deactivations).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, Resources.Log_FailedToDeactivateOneOrMoreTargetGrains);
-            }
-
-            for (var b = 0; b < _buckets.Length; ++b)
-            {
-                _buckets[b].Clear();
-            }
-            _deactivations.Clear();
-
-            return quota;
         }
 
         #region Disposable
@@ -179,5 +149,31 @@ namespace Outkeep.Governance.Memory
         }
 
         #endregion Disposable
+
+        private static class Log
+        {
+            public static void FailedToDeactivateGrain(ILogger logger, IWeakActivationExtension target, Exception exception) =>
+                FailedToDeactivateGrainAction(logger, target, exception);
+
+            private static readonly Action<ILogger, IWeakActivationExtension, Exception> FailedToDeactivateGrainAction =
+                LoggerMessage.Define<IWeakActivationExtension>(LogLevel.Error, new EventId(1, nameof(FailedToDeactivateGrain)), Resources.Log_FailedToDeactivateTargetGrain_X);
+
+            public static void FailedToDeactivateGrainWillNotRetry(ILogger logger, IWeakActivationExtension target, int attempts) =>
+                FailedToDeactivateGrainWillNotRetryAction(logger, target, attempts, null!);
+
+            private static readonly Action<ILogger, IWeakActivationExtension, int, Exception> FailedToDeactivateGrainWillNotRetryAction =
+                LoggerMessage.Define<IWeakActivationExtension, int>(LogLevel.Warning, new EventId(2, nameof(FailedToDeactivateGrainWillNotRetry)), Resources.Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry);
+        }
+
+        private class Entry
+        {
+            public Entry(IWeakActivationFactor factor)
+            {
+                Factor = factor ?? throw new ArgumentNullException(nameof(factor));
+            }
+
+            public IWeakActivationFactor Factor { get; }
+            public int DeactivationAttempts { get; set; }
+        }
     }
 }

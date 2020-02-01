@@ -30,5 +30,11 @@ namespace Outkeep.Governance.Memory
         /// </summary>
         [Range(typeof(TimeSpan), "00:00:00.001", "24.00:00:00")]
         public TimeSpan WeakActivationCollectionInterval { get; set; } = TimeSpan.FromSeconds(1);
+
+        /// <summary>
+        /// Maximum number of times to attempt deactivation of an individual grain.
+        /// </summary>
+        [Range(1, int.MaxValue)]
+        public int MaxGrainDeactivationAttempts { get; set; } = 3;
     }
 }

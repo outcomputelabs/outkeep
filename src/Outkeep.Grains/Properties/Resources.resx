@@ -159,4 +159,10 @@
   <data name="Log_FailedToDeactivateOneOrMoreTargetGrains" xml:space="preserve">
     <value>Failed to deactivate one or more target grains</value>
   </data>
+  <data name="Log_FailedToDeactivateTargetGrain_X" xml:space="preserve">
+    <value>Failed to deactivate target grain {GrainReference}</value>
+  </data>
+  <data name="Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry" xml:space="preserve">
+    <value>Failed to deactivate target grain {GrainReference} after {MaxAttempts} attempts. Will not retry.</value>
+  </data>
 </root>

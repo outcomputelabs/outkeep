@@ -2,8 +2,8 @@
 {
     public enum ActivityPriority
     {
-        Low,
-        Normal,
-        High
+        Low = 1000,
+        Normal = 2000,
+        High = 3000
     }
 }
