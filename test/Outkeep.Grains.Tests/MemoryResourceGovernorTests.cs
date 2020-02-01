@@ -62,5 +62,27 @@ namespace Outkeep.Grains.Tests
             // assert - nothing to test yet
             Assert.True(true);
         }
+
+        [Fact]
+        public async Task TickNoopsWhenNothingToDeactivate()
+        {
+            // arrange
+            var options = new MemoryGovernanceOptions();
+            var monitor = new FakeMemoryPressureMonitor
+            {
+                IsUnderPressure = true
+            };
+            var timerFactory = new FakeSafeTimerFactory();
+
+            using var governor = new MemoryResourceGovernor(Options.Create(options), NullLogger<MemoryResourceGovernor>.Instance, monitor, timerFactory);
+            await governor.StartAsync(default).ConfigureAwait(false);
+            var timer = Assert.Single(timerFactory.Timers);
+
+            // act - tick the governing timer
+            await timer.Callback(null).ConfigureAwait(false);
+
+            // assert - nothing to test yet
+            Assert.True(true);
+        }
     }
 }
