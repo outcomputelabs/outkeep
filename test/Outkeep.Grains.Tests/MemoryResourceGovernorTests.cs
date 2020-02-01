@@ -23,26 +23,22 @@ namespace Outkeep.Grains.Tests
             var timerFactory = new FakeSafeTimerFactory();
 
             // act
-            using (var governor = new MemoryResourceGovernor(Options.Create(options), NullLogger<MemoryResourceGovernor>.Instance, monitor, timerFactory))
-            {
-                await governor.StartAsync(default).ConfigureAwait(false);
+            using var governor = new MemoryResourceGovernor(Options.Create(options), NullLogger<MemoryResourceGovernor>.Instance, monitor, timerFactory);
 
-                // assert - timer was scheduled
-                var timer = Assert.Single(timerFactory.Timers);
-                Assert.NotNull(timer.Callback);
-                Assert.Null(timer.State);
-                Assert.Equal(weakActivationCollectionInterval, timer.DueTime);
-                Assert.Equal(weakActivationCollectionInterval, timer.Period);
+            await governor.StartAsync(default).ConfigureAwait(false);
 
-                // act
-                await governor.StopAsync(default).ConfigureAwait(false);
+            // assert - timer was scheduled
+            var timer = Assert.Single(timerFactory.Timers);
+            Assert.NotNull(timer.Callback);
+            Assert.Null(timer.State);
+            Assert.Equal(weakActivationCollectionInterval, timer.DueTime);
+            Assert.Equal(weakActivationCollectionInterval, timer.Period);
 
-                // assert - timer was disposed
-                Assert.Empty(timerFactory.Timers);
-            }
+            // act
+            await governor.StopAsync(default).ConfigureAwait(false);
 
-            // assert
-            Assert.True(true);
+            // assert - timer was disposed
+            Assert.Empty(timerFactory.Timers);
         }
     }
 }
