@@ -40,5 +40,27 @@ namespace Outkeep.Grains.Tests
             // assert - timer was disposed
             Assert.Empty(timerFactory.Timers);
         }
+
+        [Fact]
+        public async Task TickNoopsWhenNotUnderPressure()
+        {
+            // arrange
+            var options = new MemoryGovernanceOptions();
+            var monitor = new FakeMemoryPressureMonitor
+            {
+                IsUnderPressure = false
+            };
+            var timerFactory = new FakeSafeTimerFactory();
+
+            using var governor = new MemoryResourceGovernor(Options.Create(options), NullLogger<MemoryResourceGovernor>.Instance, monitor, timerFactory);
+            await governor.StartAsync(default).ConfigureAwait(false);
+            var timer = Assert.Single(timerFactory.Timers);
+
+            // act - tick the governing timer
+            await timer.Callback(null).ConfigureAwait(false);
+
+            // assert - nothing to test yet
+            Assert.True(true);
+        }
     }
 }
