@@ -65,6 +65,14 @@ namespace Outkeep.Governance.Memory
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Checks if the given subject is enlisted.
+        /// </summary>
+        public bool IsEnlisted(IWeakActivationExtension subject)
+        {
+            return _registry.ContainsKey(subject);
+        }
+
         [SuppressMessage("Critical Code Smell", "S1215:\"GC.Collect\" should not be called")]
         private async Task TickGovern()
         {

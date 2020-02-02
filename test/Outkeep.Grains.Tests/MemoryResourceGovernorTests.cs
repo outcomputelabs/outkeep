@@ -246,5 +246,45 @@ namespace Outkeep.Grains.Tests
             Mock.Get(mediumActivation).Verify(x => x.DeactivateOnIdleAsync());
             Mock.Get(highActivation).Verify(x => x.DeactivateOnIdleAsync());
         }
+
+        [Fact]
+        public async Task TickQuitsAfterThreshold()
+        {
+            // arrange
+            var options = new MemoryGovernanceOptions
+            {
+                GrainDeactivationRatio = 1,
+                MaxGrainDeactivationAttempts = 3
+            };
+            var monitor = new FakeMemoryPressureMonitor
+            {
+                IsUnderPressure = true
+            };
+            var timerFactory = new FakeSafeTimerFactory();
+
+            using var governor = new MemoryResourceGovernor(Options.Create(options), NullLogger<MemoryResourceGovernor>.Instance, monitor, timerFactory);
+            await governor.StartAsync(default).ConfigureAwait(false);
+            var timer = Assert.Single(timerFactory.Timers);
+
+            // arrange - enlist faulty target for deactivation
+            var activation = Mock.Of<IWeakActivationExtension>(x => x.DeactivateOnIdleAsync() == Task.FromException(new Exception()));
+            var factor = new ActivityState { Priority = ActivityPriority.Low };
+            await governor.EnlistAsync(activation, factor).ConfigureAwait(false);
+
+            // assert - activation is registered
+            Assert.True(governor.IsEnlisted(activation));
+
+            // act - tick the governing timer
+            for (var i = 0; i < options.MaxGrainDeactivationAttempts + 1; ++i)
+            {
+                await timer.Callback(null).ConfigureAwait(false);
+            }
+
+            // assert - deactivation was attempted up to amount of times
+            Mock.Get(activation).Verify(x => x.DeactivateOnIdleAsync(), Times.Exactly(options.MaxGrainDeactivationAttempts));
+
+            // assert - activation is no longer enlisted
+            Assert.False(governor.IsEnlisted(activation));
+        }
     }
 }
