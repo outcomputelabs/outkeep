@@ -55,7 +55,7 @@ namespace Outkeep.Grains.Tests
 
             // assert
             var result = Assert.Throws<BadWeakActivationConfigException>(action);
-            Assert.Equal(Resources.Exception_NoDefaultResourceGovernorFoundForGrainType_X.Format(typeof(object).FullName!), result.Message);
+            Assert.Equal(Resources.Exception_NoResourceGovernorNamed_X_FoundForGrainType_X.Format(OutkeepProviderNames.OutkeepDefault, typeof(object).FullName!), result.Message);
         }
 
         [Fact]
@@ -93,7 +93,8 @@ namespace Outkeep.Grains.Tests
             {
                 GrainType = typeof(object),
                 ActivationServices = new ServiceCollection()
-                    .AddSingleton<IResourceGovernor>(governor)
+                    .AddSingleton(typeof(IKeyedServiceCollection<,>), typeof(KeyedServiceCollection<,>))
+                    .AddSingletonNamedService<IResourceGovernor>(OutkeepProviderNames.OutkeepDefault, (sp, name) => governor)
                     .BuildServiceProvider(),
                 ObservableLifecycle = lifecycle
             };
