@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Orleans.Runtime;
+using Outkeep;
+using Outkeep.Governance;
+using Outkeep.Governance.Memory;
 using System;
 
-namespace Outkeep.Governance.Memory
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MemoryResourceGovernorServiceCollectionExtensions
     {
