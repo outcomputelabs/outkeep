@@ -34,7 +34,7 @@ namespace Outkeep.Grains.Tests
                 .GetAsync();
 
             // assert
-            Assert.Null(result.Value.Value);
+            Assert.Null(result.Value);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace Outkeep.Grains.Tests
 
             // assert
             Assert.Equal(Guid.Empty, result.Tag);
-            Assert.Null(result.Value.Value);
+            Assert.Null(result.Value);
 
             // act
             var repeat = await grain.GetAsync();
@@ -88,7 +88,7 @@ namespace Outkeep.Grains.Tests
             var result = await grain.GetAsync();
 
             // assert
-            Assert.Equal(value, result.Value.Value);
+            Assert.Equal(value, result.Value);
             Assert.NotEqual(Guid.Empty, result.Tag);
 
             // wait for the cache director to expire the entry and complete the expired task
@@ -99,7 +99,7 @@ namespace Outkeep.Grains.Tests
 
             // assert
             Assert.Equal(Guid.Empty, result.Tag);
-            Assert.Null(result.Value.Value);
+            Assert.Null(result.Value);
 
             // act
             var repeat = await grain.GetAsync();
@@ -140,7 +140,7 @@ namespace Outkeep.Grains.Tests
             // assert - the initial pulse should be empty
             Assert.True(watch1.Elapsed < TimeSpan.FromSeconds(1));
             Assert.Equal(Guid.Empty, result1.Tag);
-            Assert.Null(result1.Value.Value);
+            Assert.Null(result1.Value);
 
             // act - this waits till timeout to return an empty pulse with the same tag as input
             var watch2 = Stopwatch.StartNew();
@@ -150,7 +150,7 @@ namespace Outkeep.Grains.Tests
             // assert - the delayed pulse return the same tag and no value
             Assert.True(watch2.Elapsed >= options.ReactivePollingTimeout);
             Assert.Equal(result1.Tag, result2.Tag);
-            Assert.Null(result2.Value.Value);
+            Assert.Null(result2.Value);
 
             // act - this issues another long-poll but does not wait
             var watch3 = Stopwatch.StartNew();
@@ -169,7 +169,7 @@ namespace Outkeep.Grains.Tests
             Assert.True(watch3.Elapsed < TimeSpan.FromSeconds(1));
             Assert.NotEqual(Guid.Empty, result3.Tag);
             Assert.NotEqual(result2.Tag, result3.Tag);
-            Assert.Equal(value3, result3.Value.Value);
+            Assert.Equal(value3, result3.Value);
 
             // act - access the value again to update the accessed timestamp
             await grain.PollAsync(Guid.NewGuid()).ConfigureAwait(false);
@@ -177,7 +177,7 @@ namespace Outkeep.Grains.Tests
             // act - long poll the value again to test the empty pulse response
             var result5 = await grain.PollAsync(result3.Tag);
             Assert.Equal(result3.Tag, result5.Tag);
-            Assert.Null(result5.Value.Value);
+            Assert.Null(result5.Value);
         }
     }
 }

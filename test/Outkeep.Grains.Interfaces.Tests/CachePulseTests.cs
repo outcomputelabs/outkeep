@@ -14,7 +14,7 @@ namespace Outkeep.Grains.Interfaces.Tests
 
             // assert
             Assert.Equal(Guid.Empty, pulse.Tag);
-            Assert.Null(pulse.Value.Value);
+            Assert.Null(pulse.Value);
         }
     }
 }

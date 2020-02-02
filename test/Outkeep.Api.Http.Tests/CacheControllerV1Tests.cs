@@ -34,7 +34,7 @@ namespace Outkeep.Api.Http.Tests
             // arrange
             var key = Guid.NewGuid().ToString();
             byte[]? value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(Guid.NewGuid(), new Immutable<byte[]?>(value))));
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(Guid.NewGuid(), value)));
             var controller = new CacheController(factory);
 
             // act
