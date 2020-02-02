@@ -37,22 +37,11 @@ namespace Outkeep.Caching
         {
             RegisterTimer(TickMaintenanceAsyncDelegate, this, _options.MaintenancePeriod, _options.MaintenancePeriod);
 
-            // see if we have state to recover
-            Task recoveryTask;
-            if (_state.State.Value is null)
-            {
-                // there is nothing to recover
-                recoveryTask = Task.CompletedTask;
-            }
-            else if (IsExpired())
-            {
-                // the state has expired so remove it early
-                recoveryTask = ClearAllStateAsync();
-            }
-            else
-            {
-                recoveryTask = Task.CompletedTask;
-            }
+            // remove expired state
+            var recoveryTask =
+                _state.State.Value != null && IsExpired()
+                ? ResetAsync()
+                : Task.CompletedTask;
 
             // enroll as a weak activation
             _activity.State.Priority = ActivityPriority.Normal;
