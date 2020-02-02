@@ -6,9 +6,9 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Runtime;
 using Orleans.TestingHost;
+using Orleans.Timers;
 using Outkeep.Caching;
 using Outkeep.Governance;
-using Outkeep.Governance.Memory;
 using Outkeep.Grains.Tests.Fakes;
 using Outkeep.HealthChecks;
 using System;
@@ -70,6 +70,11 @@ namespace Outkeep.Grains.Tests
 
                         // add test resource governor
                         services.AddSingletonNamedService<IResourceGovernor, FakeResourceGovernor>("WeakActivationTestGovernor");
+
+                        // add test timer registry
+                        services
+                            .AddSingleton<FakeTimerRegistry>()
+                            .AddSingleton<ITimerRegistry>(sp => sp.GetService<FakeTimerRegistry>());
 
                         // add other services
                         services

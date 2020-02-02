@@ -5,6 +5,7 @@ using Orleans.Concurrency;
 using Orleans.Runtime;
 using Orleans.Storage;
 using Outkeep.Caching;
+using Outkeep.Grains.Tests.Fakes;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -20,6 +21,23 @@ namespace Outkeep.Grains.Tests
         public CacheGrainTests(ClusterFixture fixture)
         {
             _fixture = fixture ?? throw new ArgumentNullException(nameof(fixture));
+        }
+
+        [Fact]
+        public async Task RegistersMaintenanceTimer()
+        {
+            // arrange
+            var grain = _fixture.Cluster.GrainFactory.GetGrain<ICacheGrain>(Guid.NewGuid().ToString());
+
+            // act
+            await grain.GetAsync();
+
+            // assert
+            var options = _fixture.PrimarySiloServiceProvider.GetRequiredService<IOptions<CacheOptions>>().Value;
+            var timers = _fixture.PrimarySiloServiceProvider.GetRequiredService<FakeTimerRegistry>();
+            var timer = Assert.Single(timers.EnumerateEntries(), x => x.Grain.AsReference<ICacheGrain>().Equals(grain));
+            Assert.Equal(options.MaintenancePeriod, timer.DueTime);
+            Assert.Equal(options.MaintenancePeriod, timer.Period);
         }
 
         [Fact]
@@ -91,8 +109,13 @@ namespace Outkeep.Grains.Tests
             Assert.Equal(value, result.Value);
             Assert.NotEqual(Guid.Empty, result.Tag);
 
-            // wait for the cache director to expire the entry and complete the expired task
+            // wait enough for expiration
             await Task.Delay(2000).ConfigureAwait(false);
+
+            // tick the maintenance timer
+            await Assert.Single(_fixture.PrimarySiloServiceProvider.GetRequiredService<FakeTimerRegistry>().EnumerateEntries(), x => x.Grain.AsReference<ICacheGrain>().Equals(grain))
+                .TickAsync()
+                .ConfigureAwait(false);
 
             // act
             result = await grain.GetAsync();
