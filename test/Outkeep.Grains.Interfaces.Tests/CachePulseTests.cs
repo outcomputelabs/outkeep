@@ -80,5 +80,20 @@ namespace Outkeep.Grains.Interfaces.Tests
             Assert.True(left == right);
             Assert.False(left != right);
         }
+
+        [Fact]
+        public void GetsHashCode()
+        {
+            // arrange
+            var tag = Guid.NewGuid();
+            var value = Guid.NewGuid().ToByteArray();
+            var pulse = new CachePulse(tag, value);
+
+            // act
+            var result = pulse.GetHashCode();
+
+            // assert
+            Assert.Equal(HashCode.Combine(tag, value), result);
+        }
     }
 }
