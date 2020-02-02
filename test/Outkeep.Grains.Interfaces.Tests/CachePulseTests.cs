@@ -95,5 +95,41 @@ namespace Outkeep.Grains.Interfaces.Tests
             // assert
             Assert.Equal(HashCode.Combine(tag, value), result);
         }
+
+        [Fact]
+        public void NoneReturnsExpectedValues()
+        {
+            // act
+            var pulse = CachePulse.None;
+
+            // assert
+            Assert.Equal(Guid.Empty, pulse.Tag);
+            Assert.Null(pulse.Value);
+        }
+
+        [Fact]
+        public void RandomNullReturnsExpectedValues()
+        {
+            // act
+            var pulse = CachePulse.RandomNull();
+
+            // assert
+            Assert.NotEqual(Guid.Empty, pulse.Tag);
+            Assert.Null(pulse.Value);
+        }
+
+        [Fact]
+        public void RandomReturnsExpectedValues()
+        {
+            // arrange
+            var value = Guid.NewGuid().ToByteArray();
+
+            // act
+            var pulse = CachePulse.Random(value);
+
+            // assert
+            Assert.NotEqual(Guid.Empty, pulse.Tag);
+            Assert.Equal(value, pulse.Value);
+        }
     }
 }
