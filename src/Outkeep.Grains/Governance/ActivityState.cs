@@ -8,9 +8,17 @@ namespace Outkeep.Governance
 
         public int CompareTo(IWeakActivationFactor other)
         {
-            return other is ActivityState activity
-                ? Priority.CompareTo(activity.Priority)
-                : throw new InvalidOperationException();
+            return other switch
+            {
+                // a defined value is always greater than null
+                null => 1,
+
+                // apply comparison rules
+                ActivityState activity => Priority.CompareTo(activity.Priority),
+
+                // this factor only supports comparing against the same factor type
+                _ => throw new InvalidOperationException()
+            };
         }
 
         public override bool Equals(object obj)
