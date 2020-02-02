@@ -24,6 +24,22 @@ namespace Outkeep.Grains.Tests
         }
 
         [Fact]
+        public void DoesNotEqualNull()
+        {
+            // arrange
+            var state = new ActivityState
+            {
+                Priority = ActivityPriority.Normal
+            };
+
+            // act
+            var result = state.Equals(null!);
+
+            // assert
+            Assert.False(result);
+        }
+
+        [Fact]
         public void EqualsSameValue()
         {
             // arrange
