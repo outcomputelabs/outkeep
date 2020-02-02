@@ -56,7 +56,7 @@ namespace Outkeep.Grains.Tests
         }
 
         [Fact]
-        public async Task DoesNotLoadExpiredItemFromStorage()
+        public async Task DoesNotLoadAbsoluteExpiredItemFromStorage()
         {
             // arrange
             var key = Guid.NewGuid().ToString();
@@ -73,6 +73,46 @@ namespace Outkeep.Grains.Tests
                 SlidingExpiration = null
             });
             await storage.WriteStateAsync(grainType, reference, state).ConfigureAwait(false);
+
+            // act
+            var result = await grain.GetAsync();
+
+            // assert
+            Assert.Equal(Guid.Empty, result.Tag);
+            Assert.Null(result.Value);
+
+            // act
+            var repeat = await grain.GetAsync();
+
+            // assert
+            Assert.Equal(result.Tag, repeat.Tag);
+            Assert.Equal(result.Value, repeat.Value);
+        }
+
+        [Fact]
+        public async Task DoesNotLoadSlidingExpiredItemFromStorage()
+        {
+            // arrange
+            var key = Guid.NewGuid().ToString();
+            var grain = _fixture.PrimarySiloServiceProvider.GetRequiredService<IGrainFactory>().GetCacheGrain(key);
+            var storage = _fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IGrainStorage>(OutkeepProviderNames.OutkeepCache);
+            var reference = (GrainReference)grain;
+            var grainType = $"{typeof(CacheGrain).FullName},{typeof(CacheGrain).Namespace}";
+
+            var state = new GrainState<CacheGrainState>(new CacheGrainState
+            {
+                Tag = Guid.NewGuid(),
+                Value = Guid.NewGuid().ToByteArray(),
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddDays(1),
+                SlidingExpiration = TimeSpan.FromMinutes(1)
+            });
+            await storage.WriteStateAsync($"{grainType}.State", reference, state).ConfigureAwait(false);
+
+            var flags = new GrainState<CacheGrainFlags>(new CacheGrainFlags
+            {
+                UtcLastAccessed = DateTime.UtcNow.AddMinutes(-2)
+            });
+            await storage.WriteStateAsync($"{grainType}.Flags", reference, flags).ConfigureAwait(false);
 
             // act
             var result = await grain.GetAsync();
