@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -34,12 +35,20 @@ namespace Outkeep.Grains.Tests
             Assert.Same(services, result);
 
             var provider = services.BuildServiceProvider();
+
             var governor = provider.GetServiceByName<IResourceGovernor>(OutkeepProviderNames.OutkeepDefault);
             Assert.NotNull(governor);
             Assert.IsType<MemoryResourceGovernor>(governor);
 
             var options = provider.GetService<IOptions<MemoryGovernanceOptions>>().Value;
             Assert.Equal(123, options.LowMemoryBytesThreshold);
+
+            var monitor = provider.GetService<IMemoryPressureMonitor>();
+            Assert.NotNull(monitor);
+            Assert.IsType<MemoryPressureMonitor>(monitor);
+
+            var hosted = provider.GetService<IHostedService>();
+            Assert.Same(governor, hosted);
         }
     }
 }
