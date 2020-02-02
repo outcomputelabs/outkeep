@@ -286,5 +286,34 @@ namespace Outkeep.Grains.Tests
             // assert - activation is no longer enlisted
             Assert.False(governor.IsEnlisted(activation));
         }
+
+        [Fact]
+        public void EnlistAsyncThrowsOnNullSubject()
+        {
+            // arrange
+            var options = Options.Create(new MemoryGovernanceOptions());
+            var logger = NullLogger<MemoryResourceGovernor>.Instance;
+            var monitor = new FakeMemoryPressureMonitor();
+            var timers = new FakeSafeTimerFactory();
+            using var governor = new MemoryResourceGovernor(options, logger, monitor, timers);
+
+            // assert
+            Assert.ThrowsAsync<ArgumentNullException>("subject", () => governor.EnlistAsync(null!, null!));
+        }
+
+        [Fact]
+        public void EnlistAsyncThrowsOnNullFactor()
+        {
+            // arrange
+            var options = Options.Create(new MemoryGovernanceOptions());
+            var logger = NullLogger<MemoryResourceGovernor>.Instance;
+            var monitor = new FakeMemoryPressureMonitor();
+            var timers = new FakeSafeTimerFactory();
+            using var governor = new MemoryResourceGovernor(options, logger, monitor, timers);
+
+            // assert
+            var subject = new FakeWeakActivationExtension();
+            Assert.ThrowsAsync<ArgumentNullException>("factor", () => governor.EnlistAsync(subject, null!));
+        }
     }
 }
