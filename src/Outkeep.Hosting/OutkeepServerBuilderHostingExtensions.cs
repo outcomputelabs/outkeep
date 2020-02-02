@@ -30,7 +30,7 @@ namespace Outkeep.Core
                         .AddSingleton<ISystemClock, SystemClock>();
 
                     services
-                        .AddOptions<CacheGrainOptions>()
+                        .AddOptions<CacheOptions>()
                         .ValidateDataAnnotations();
                 })
                 .ConfigureSilo(silo =>

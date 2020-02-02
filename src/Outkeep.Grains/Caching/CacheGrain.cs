@@ -11,14 +11,14 @@ namespace Outkeep.Caching
     [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain
     {
-        private readonly CacheGrainOptions _options;
+        private readonly CacheOptions _options;
         private readonly ISystemClock _clock;
         private readonly IPersistentState<CacheGrainState> _state;
         private readonly IPersistentState<CacheGrainFlags> _flags;
         private readonly IWeakActivationState<ActivityState> _activity;
 
         public CacheGrain(
-            IOptions<CacheGrainOptions> options,
+            IOptions<CacheOptions> options,
             ISystemClock clock,
             [PersistentState("State", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainState> state,
             [PersistentState("Flags", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainFlags> flags,

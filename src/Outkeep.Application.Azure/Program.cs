@@ -38,7 +38,7 @@ namespace Outkeep.Application.Azure
                 })
                 .UseOutkeepServer((context, outkeep) =>
                 {
-                    outkeep.Configure<CacheGrainOptions>(options =>
+                    outkeep.Configure<CacheOptions>(options =>
                     {
                         options.ReactivePollingTimeout = context.Configuration.GetValue<TimeSpan>("Outkeep:DistributedCaching:ReactivePollingTimeout");
                     });

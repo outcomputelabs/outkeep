@@ -130,7 +130,7 @@ namespace Outkeep.Grains.Tests
             var key = Guid.NewGuid().ToString();
             var tag = Guid.NewGuid();
             var grain = _fixture.Cluster.GrainFactory.GetCacheGrain(key);
-            var options = _fixture.PrimarySiloServiceProvider.GetRequiredService<IOptions<CacheGrainOptions>>().Value;
+            var options = _fixture.PrimarySiloServiceProvider.GetRequiredService<IOptions<CacheOptions>>().Value;
 
             // act - this returns the current pulse with no delay
             var watch1 = Stopwatch.StartNew();

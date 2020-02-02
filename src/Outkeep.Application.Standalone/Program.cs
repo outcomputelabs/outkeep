@@ -45,7 +45,7 @@ namespace Outkeep.Application.Standalone
                 })
                 .UseOutkeepServer((context, outkeep) =>
                 {
-                    outkeep.Configure<CacheGrainOptions>(options =>
+                    outkeep.Configure<CacheOptions>(options =>
                     {
                         context.Configuration.GetSection("Outkeep:DistributedCaching").Bind(options);
                     });
