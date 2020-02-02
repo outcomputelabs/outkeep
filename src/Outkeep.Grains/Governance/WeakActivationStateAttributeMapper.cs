@@ -13,6 +13,7 @@ namespace Outkeep.Governance
         public Factory<IGrainActivationContext, object> GetFactory(ParameterInfo parameter, WeakActivationStateAttribute metadata)
         {
             if (parameter is null) throw new ArgumentNullException(nameof(parameter));
+            if (metadata is null) throw new ArgumentNullException(nameof(metadata));
 
             var types = parameter.ParameterType.GetGenericArguments();
             var genericCreate = _create.MakeGenericMethod(types);
