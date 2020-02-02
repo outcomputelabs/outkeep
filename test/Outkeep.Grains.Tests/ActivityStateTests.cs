@@ -61,6 +61,29 @@ namespace Outkeep.Grains.Tests
         }
 
         [Fact]
+        public void DoesNotEqualDifferentValue()
+        {
+            // arrange
+            var low = new ActivityState
+            {
+                Priority = ActivityPriority.Low
+            };
+            var normal = new ActivityState
+            {
+                Priority = ActivityPriority.Normal
+            };
+            var high = new ActivityState
+            {
+                Priority = ActivityPriority.High
+            };
+
+            // act and assert
+            Assert.False(low.Equals(normal));
+            Assert.False(low.Equals(high));
+            Assert.False(normal.Equals(high));
+        }
+
+        [Fact]
         public void GetHashCodeReturnsHashCode()
         {
             // arrange
