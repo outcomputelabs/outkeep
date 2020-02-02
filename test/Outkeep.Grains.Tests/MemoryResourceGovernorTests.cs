@@ -128,7 +128,7 @@ namespace Outkeep.Grains.Tests
         }
 
         [Fact]
-        public async Task TickClearsOnPriority()
+        public async Task TickClearsOnPriority1()
         {
             // arrange
             var options = new MemoryGovernanceOptions
@@ -165,6 +165,86 @@ namespace Outkeep.Grains.Tests
             Mock.Get(lowActivation).Verify(x => x.DeactivateOnIdleAsync());
             Mock.Get(mediumActivation).VerifyNoOtherCalls();
             Mock.Get(highActivation).VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task TickClearsOnPriority2()
+        {
+            // arrange
+            var options = new MemoryGovernanceOptions
+            {
+                GrainDeactivationRatio = 0.6
+            };
+            var monitor = new FakeMemoryPressureMonitor
+            {
+                IsUnderPressure = true
+            };
+            var timerFactory = new FakeSafeTimerFactory();
+
+            using var governor = new MemoryResourceGovernor(Options.Create(options), NullLogger<MemoryResourceGovernor>.Instance, monitor, timerFactory);
+            await governor.StartAsync(default).ConfigureAwait(false);
+            var timer = Assert.Single(timerFactory.Timers);
+
+            // arrange - enlist targets for deactivation
+            var lowActivation = Mock.Of<IWeakActivationExtension>();
+            var lowFactor = new ActivityState { Priority = ActivityPriority.Low };
+            await governor.EnlistAsync(lowActivation, lowFactor).ConfigureAwait(false);
+
+            var mediumActivation = Mock.Of<IWeakActivationExtension>();
+            var mediumFactor = new ActivityState { Priority = ActivityPriority.Normal };
+            await governor.EnlistAsync(mediumActivation, mediumFactor).ConfigureAwait(false);
+
+            var highActivation = Mock.Of<IWeakActivationExtension>();
+            var highFactor = new ActivityState { Priority = ActivityPriority.High };
+            await governor.EnlistAsync(highActivation, highFactor).ConfigureAwait(false);
+
+            // act - tick the governing timer
+            await timer.Callback(null).ConfigureAwait(false);
+
+            // assert - nothing to test yet
+            Mock.Get(lowActivation).Verify(x => x.DeactivateOnIdleAsync());
+            Mock.Get(mediumActivation).Verify(x => x.DeactivateOnIdleAsync());
+            Mock.Get(highActivation).VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task TickClearsOnPriority3()
+        {
+            // arrange
+            var options = new MemoryGovernanceOptions
+            {
+                GrainDeactivationRatio = 0.9
+            };
+            var monitor = new FakeMemoryPressureMonitor
+            {
+                IsUnderPressure = true
+            };
+            var timerFactory = new FakeSafeTimerFactory();
+
+            using var governor = new MemoryResourceGovernor(Options.Create(options), NullLogger<MemoryResourceGovernor>.Instance, monitor, timerFactory);
+            await governor.StartAsync(default).ConfigureAwait(false);
+            var timer = Assert.Single(timerFactory.Timers);
+
+            // arrange - enlist targets for deactivation
+            var lowActivation = Mock.Of<IWeakActivationExtension>();
+            var lowFactor = new ActivityState { Priority = ActivityPriority.Low };
+            await governor.EnlistAsync(lowActivation, lowFactor).ConfigureAwait(false);
+
+            var mediumActivation = Mock.Of<IWeakActivationExtension>();
+            var mediumFactor = new ActivityState { Priority = ActivityPriority.Normal };
+            await governor.EnlistAsync(mediumActivation, mediumFactor).ConfigureAwait(false);
+
+            var highActivation = Mock.Of<IWeakActivationExtension>();
+            var highFactor = new ActivityState { Priority = ActivityPriority.High };
+            await governor.EnlistAsync(highActivation, highFactor).ConfigureAwait(false);
+
+            // act - tick the governing timer
+            await timer.Callback(null).ConfigureAwait(false);
+
+            // assert - nothing to test yet
+            Mock.Get(lowActivation).Verify(x => x.DeactivateOnIdleAsync());
+            Mock.Get(mediumActivation).Verify(x => x.DeactivateOnIdleAsync());
+            Mock.Get(highActivation).Verify(x => x.DeactivateOnIdleAsync());
         }
     }
 }

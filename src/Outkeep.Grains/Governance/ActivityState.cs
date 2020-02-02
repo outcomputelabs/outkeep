@@ -8,8 +8,8 @@ namespace Outkeep.Governance
 
         public int CompareTo(IWeakActivationFactor other)
         {
-            return other is ActivityState
-                ? Priority.CompareTo(Priority)
+            return other is ActivityState activity
+                ? Priority.CompareTo(activity.Priority)
                 : throw new InvalidOperationException();
         }
 
