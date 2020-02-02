@@ -45,7 +45,8 @@ namespace Outkeep.Grains.Tests
             var context = new FakeGrainActivationContext()
             {
                 GrainType = typeof(object),
-                ActivationServices = new FakeServiceProvider()
+                ActivationServices = new ServiceCollection()
+                    .BuildServiceProvider()
             };
             var config = new FakeWeakActivationStateConfiguration();
 
@@ -65,7 +66,8 @@ namespace Outkeep.Grains.Tests
             var context = new FakeGrainActivationContext()
             {
                 GrainType = typeof(object),
-                ActivationServices = new FakeServiceProvider()
+                ActivationServices = new ServiceCollection()
+                    .BuildServiceProvider()
             };
             var config = new FakeWeakActivationStateConfiguration
             {
@@ -90,7 +92,9 @@ namespace Outkeep.Grains.Tests
             var context = new FakeGrainActivationContext()
             {
                 GrainType = typeof(object),
-                ActivationServices = new FakeServiceProvider((typeof(IResourceGovernor), () => governor)),
+                ActivationServices = new ServiceCollection()
+                    .AddSingleton<IResourceGovernor>(governor)
+                    .BuildServiceProvider(),
                 ObservableLifecycle = lifecycle
             };
             var config = new FakeWeakActivationStateConfiguration();
