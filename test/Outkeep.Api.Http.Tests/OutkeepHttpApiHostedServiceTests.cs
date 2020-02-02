@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Orleans;
-using Outkeep.Core.Tcp;
+using Outkeep.Tcp;
 using System;
 using System.Threading.Tasks;
 using Xunit;

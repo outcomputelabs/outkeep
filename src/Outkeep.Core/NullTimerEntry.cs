@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Outkeep.Core
+namespace Outkeep
 {
     /// <summary>
     /// Holds timer information for the <see cref="NullTimerRegistry"/>.

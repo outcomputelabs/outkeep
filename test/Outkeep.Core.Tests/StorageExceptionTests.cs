@@ -1,4 +1,4 @@
-﻿using Outkeep.Core.Storage;
+﻿using Outkeep.Storage;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;

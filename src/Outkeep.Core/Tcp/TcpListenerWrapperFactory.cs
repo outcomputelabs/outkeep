@@ -1,4 +1,4 @@
-﻿namespace Outkeep.Core.Tcp
+﻿namespace Outkeep.Tcp
 {
     /// <summary>
     /// Default implementation of <see cref="ITcpListenerWrapperFactory"/>.

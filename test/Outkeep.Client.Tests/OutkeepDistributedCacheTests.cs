@@ -2,8 +2,7 @@
 using Moq;
 using Orleans;
 using Orleans.Concurrency;
-using Outkeep.Core;
-using Outkeep.Interfaces;
+using Outkeep.Caching;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -18,8 +17,8 @@ namespace Outkeep.Client.Tests
             var key = Guid.NewGuid().ToString();
             var tag = Guid.NewGuid();
             var value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(tag, new Immutable<byte[]?>(value))));
-            var clock = NullClock.Default;
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(tag, value)));
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             var result = await cache.GetAsync(key).ConfigureAwait(false);
@@ -33,8 +32,8 @@ namespace Outkeep.Client.Tests
         {
             var key = Guid.NewGuid().ToString();
             var value = Guid.NewGuid().ToByteArray();
-            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(Guid.NewGuid(), new Immutable<byte[]?>(value))));
-            var clock = NullClock.Default;
+            var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).GetAsync() == new ValueTask<CachePulse>(new CachePulse(Guid.NewGuid(), value)));
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             var result = cache.Get(key);
@@ -48,7 +47,7 @@ namespace Outkeep.Client.Tests
         {
             var key = Guid.NewGuid().ToString();
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).RefreshAsync() == Task.CompletedTask);
-            var clock = NullClock.Default;
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             await cache.RefreshAsync(key).ConfigureAwait(false);
@@ -61,7 +60,7 @@ namespace Outkeep.Client.Tests
         {
             var key = Guid.NewGuid().ToString();
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).RefreshAsync() == Task.CompletedTask);
-            var clock = NullClock.Default;
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             cache.Refresh(key);
@@ -74,7 +73,7 @@ namespace Outkeep.Client.Tests
         {
             var key = Guid.NewGuid().ToString();
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).RemoveAsync() == Task.CompletedTask);
-            var clock = NullClock.Default;
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             await cache.RemoveAsync(key).ConfigureAwait(false);
@@ -87,7 +86,7 @@ namespace Outkeep.Client.Tests
         {
             var key = Guid.NewGuid().ToString();
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).RemoveAsync() == Task.CompletedTask);
-            var clock = NullClock.Default;
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             cache.Remove(key);
@@ -103,7 +102,7 @@ namespace Outkeep.Client.Tests
             var absoluteExpiration = DateTimeOffset.UtcNow.AddHours(1);
             var slidingExpiration = TimeSpan.FromMinutes(1);
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(new Immutable<byte[]?>(value), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
-            var clock = NullClock.Default;
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             var options = new DistributedCacheEntryOptions
@@ -146,7 +145,7 @@ namespace Outkeep.Client.Tests
             var value = Guid.NewGuid().ToByteArray();
             var slidingExpiration = TimeSpan.FromMinutes(1);
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(new Immutable<byte[]?>(value), null, slidingExpiration) == Task.CompletedTask);
-            var clock = NullClock.Default;
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             var options = new DistributedCacheEntryOptions
@@ -166,7 +165,7 @@ namespace Outkeep.Client.Tests
             var absoluteExpiration = DateTimeOffset.UtcNow.AddHours(1);
             var slidingExpiration = TimeSpan.FromMinutes(1);
             var factory = Mock.Of<IGrainFactory>(x => x.GetGrain<ICacheGrain>(key, null).SetAsync(new Immutable<byte[]?>(value), absoluteExpiration, slidingExpiration) == Task.CompletedTask);
-            var clock = NullClock.Default;
+            var clock = new NullClock();
             var cache = new OutkeepDistributedCache(factory, clock);
 
             var options = new DistributedCacheEntryOptions

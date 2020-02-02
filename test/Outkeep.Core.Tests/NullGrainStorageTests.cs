@@ -1,4 +1,4 @@
-﻿using Outkeep.Core.Storage;
+﻿using Outkeep.Storage;
 using System.Threading.Tasks;
 using Xunit;
 

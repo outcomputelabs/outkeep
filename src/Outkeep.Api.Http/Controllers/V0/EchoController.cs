@@ -2,7 +2,6 @@
 using Orleans;
 using Orleans.Runtime;
 using Outkeep.Api.Http.Models.V0;
-using Outkeep.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;

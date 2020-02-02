@@ -1,7 +1,7 @@
 ﻿using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Storage;
-using Outkeep.Core.Storage;
+using Outkeep.Storage;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Outkeep.Core
+namespace Outkeep
 {
     /// <summary>
     /// The general exception class for outkeep related exceptions.

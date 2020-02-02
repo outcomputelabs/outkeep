@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Orleans.Hosting;
 using System;
 
-namespace Outkeep.Core
+namespace Outkeep
 {
     public static class OutkeepServerBuilderExtensions
     {
@@ -22,6 +23,14 @@ namespace Outkeep.Core
             if (configure is null) throw new ArgumentNullException(nameof(configure));
 
             return builder.ConfigureServices((context, services) => configure(services));
+        }
+
+        public static IOutkeepServerBuilder ConfigureSilo(this IOutkeepServerBuilder builder, Action<ISiloBuilder> configure)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (configure == null) throw new ArgumentNullException(nameof(configure));
+
+            return builder.ConfigureSilo((context, silo) => configure(silo));
         }
     }
 }

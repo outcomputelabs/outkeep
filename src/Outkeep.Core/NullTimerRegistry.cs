@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
-namespace Outkeep.Core
+namespace Outkeep
 {
     /// <summary>
     /// Implements an <see cref="ITimerRegistry"/> that does nothing on its own and instead allows access to the registered timers for manual invocation.

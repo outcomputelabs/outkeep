@@ -17,6 +17,17 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        public async Task WithDefaultOnTimeoutThrowsNegativeTimeout()
+        {
+            // arrange
+            var task = Task.FromResult(1);
+            var timeout = TimeSpan.FromSeconds(-1);
+
+            // act and assert
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(nameof(timeout), () => task!.WithDefaultOnTimeout(0, timeout)).ConfigureAwait(false);
+        }
+
+        [Fact]
         public void WithDefaultOnTimeoutReturnsCompletedTask()
         {
             // arrange

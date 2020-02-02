@@ -4,7 +4,13 @@ using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Runtime;
 using Orleans.TestingHost;
+using Orleans.Timers;
+using Outkeep.Caching;
+using Outkeep.Governance;
+using Outkeep.Grains.Tests.Fakes;
+using Outkeep.HealthChecks;
 using System;
 using System.Collections.Concurrent;
 
@@ -42,7 +48,6 @@ namespace Outkeep.Grains.Tests
             public void Configure(ISiloHostBuilder hostBuilder)
             {
                 hostBuilder
-                    .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
                     .ConfigureApplicationParts(apm =>
                     {
                         apm.AddApplicationPart(typeof(EchoGrain).Assembly).WithReferences();
@@ -50,18 +55,33 @@ namespace Outkeep.Grains.Tests
                     })
                     .ConfigureServices((context, services) =>
                     {
+                        // override the reactive polling timeout to make timed tests faster
+                        services.Configure<CacheOptions>(options =>
+                        {
+                            options.ReactivePollingTimeout = TimeSpan.FromSeconds(5);
+                        });
+
+                        // add weak activation facet
+                        services.AddSingleton<IWeakActivationStateFactory, WeakActivationStateFactory>();
+                        services.AddSingleton<IAttributeToFactoryMapper<WeakActivationStateAttribute>, WeakActivationStateAttributeMapper>();
+
+                        // add memory resource governor
+                        services.AddMemoryResourceGovernor(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
+
+                        // add test resource governor
+                        services.AddSingletonNamedService<IResourceGovernor, FakeResourceGovernor>("WeakActivationTestGovernor");
+
+                        // add test timer registry
                         services
-                            .AddCacheDirector(options =>
-                            {
-                                options.Capacity = 1000;
-                            })
-                            .AddSystemClock()
-                            .AddCacheGrainContext()
-                            .Configure<CacheGrainOptions>(options =>
-                            {
-                                options.ReactivePollingTimeout = TimeSpan.FromSeconds(5);
-                            });
+                            .AddSingleton<FakeTimerRegistry>()
+                            .AddSingleton<ITimerRegistry>(sp => sp.GetService<FakeTimerRegistry>());
+
+                        // add other services
+                        services
+                            .AddSingleton<ISystemClock, SystemClock>()
+                            .AddSafeTimer();
                     })
+                    .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
                     .UseServiceProviderFactory(services =>
                     {
                         var provider = services.BuildServiceProvider();

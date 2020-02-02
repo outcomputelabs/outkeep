@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Outkeep.Core
+namespace Outkeep
 {
     /// <summary>
     /// Abstract calls to the system clock to ease testing.

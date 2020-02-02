@@ -11,6 +11,7 @@
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <Nullable>enable</Nullable>
+    <RootNamespace>Outkeep</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Outkeep.Interfaces\Outkeep.Interfaces.csproj" />
+    <ProjectReference Include="..\Outkeep.Grains.Interfaces\Outkeep.Grains.Interfaces.csproj" />
   </ItemGroup>
 
   <ItemGroup>

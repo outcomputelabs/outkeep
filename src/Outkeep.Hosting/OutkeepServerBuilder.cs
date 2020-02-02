@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Orleans.Hosting;
-using Outkeep.Core;
 using System;
 using System.Collections.Generic;
 using HostBuilderContext = Microsoft.Extensions.Hosting.HostBuilderContext;
@@ -39,12 +38,6 @@ namespace Outkeep.Hosting
                 {
                     configure(context, silo);
                 }
-            });
-
-            // wire up the outkeep hosted service last to ensure it boots up after orleans
-            builder.ConfigureServices((context, services) =>
-            {
-                services.AddHostedService<OutkeepServerHostedService>();
             });
         }
 

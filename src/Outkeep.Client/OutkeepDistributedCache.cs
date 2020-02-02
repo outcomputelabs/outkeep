@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Orleans;
 using Orleans.Concurrency;
-using Outkeep.Core;
-using Outkeep.Interfaces;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,8 +25,7 @@ namespace Outkeep.Client
 
         public async Task<byte[]?> GetAsync(string key, CancellationToken token = default)
         {
-            var result = await factory.GetCacheGrain(key).GetAsync().ConfigureAwait(false);
-            return result.Value.Value;
+            return (await factory.GetCacheGrain(key).GetAsync().ConfigureAwait(false)).Value;
         }
 
         public void Refresh(string key)

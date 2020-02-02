@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Outkeep.Core.Storage
+namespace Outkeep.Storage
 {
     /// <summary>
     /// The general exception class for outkeep related storage exceptions.

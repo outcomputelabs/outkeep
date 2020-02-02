@@ -1,8 +1,8 @@
 ﻿using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Storage;
-using Outkeep.Core.Storage;
 using Outkeep.Core.Tests.Fakes;
+using Outkeep.Storage;
 using System;
 using Xunit;
 

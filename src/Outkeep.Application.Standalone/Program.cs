@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Orleans.Statistics;
+using Outkeep.Caching;
 using Outkeep.Core;
-using Outkeep.Core.Caching;
-using Outkeep.Grains;
 using Serilog;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -45,19 +45,24 @@ namespace Outkeep.Application.Standalone
                 })
                 .UseOutkeepServer((context, outkeep) =>
                 {
-                    outkeep.Configure<CacheGrainOptions>(options =>
+                    outkeep.Configure<CacheOptions>(options =>
                     {
                         context.Configuration.GetSection("Outkeep:DistributedCaching").Bind(options);
                     });
-                    outkeep.Configure<CacheOptions>(options =>
-                    {
-                        options.Capacity = 1000000;
-                    });
-                    outkeep.AddNullGrainStorage(OutkeepProviderNames.OutkeepCache);
                     outkeep.UseStandaloneClustering();
                     outkeep.UseHttpApi(options =>
                     {
                         options.ApiUri = new Uri(context.Configuration["Outkeep:Http:ApiUri"]);
+                    });
+
+                    outkeep.ConfigureSilo(silo =>
+                    {
+                        silo.UsePerfCounterEnvironmentStatistics();
+                    });
+
+                    outkeep.ConfigureServices(services =>
+                    {
+                        services.AddNullGrainStorage(OutkeepProviderNames.OutkeepCache);
                     });
                 })
                 .UseConsoleTitle()

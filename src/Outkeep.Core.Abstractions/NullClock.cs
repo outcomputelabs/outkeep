@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Outkeep.Core
+namespace Outkeep
 {
     /// <summary>
     /// Implements a system clock that is fixed in time.
@@ -11,7 +11,5 @@ namespace Outkeep.Core
         /// Gets or sets the date and time that this clock will show.
         /// </summary>
         public DateTimeOffset UtcNow { get; set; } = DateTimeOffset.MinValue;
-
-        public static NullClock Default => new NullClock();
     }
 }

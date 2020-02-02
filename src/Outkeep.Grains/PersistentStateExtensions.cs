@@ -1,6 +1,4 @@
-﻿using Outkeep.Grains;
-
-namespace Orleans.Runtime
+﻿namespace Orleans.Runtime
 {
     public static class PersistentStateExtensions
     {

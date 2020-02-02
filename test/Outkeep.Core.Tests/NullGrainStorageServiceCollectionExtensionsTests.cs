@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Storage;
-using Outkeep.Core.Storage;
+using Outkeep.Storage;
 using System;
 using Xunit;
 

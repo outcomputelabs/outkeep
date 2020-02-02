@@ -1,4 +1,4 @@
-﻿namespace Outkeep.Core.Tcp
+﻿namespace Outkeep.Tcp
 {
     public interface ITcpListenerWrapperFactory
     {
