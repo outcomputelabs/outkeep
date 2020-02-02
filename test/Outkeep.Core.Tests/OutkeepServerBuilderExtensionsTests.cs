@@ -9,6 +9,18 @@ namespace Outkeep.Core.Tests
     public class OutkeepServerBuilderExtensionsTests
     {
         [Fact]
+        public void ConfigureThrowsOnNullBuilder()
+        {
+            Assert.Throws<ArgumentNullException>("builder", () => OutkeepServerBuilderExtensions.Configure<FakeOptions>(null!, options => { }));
+        }
+
+        [Fact]
+        public void ConfigureThrowsOnNullAction()
+        {
+            Assert.Throws<ArgumentNullException>("configure", () => OutkeepServerBuilderExtensions.Configure<FakeOptions>(new FakeOutkeepServerBuilder(), null!));
+        }
+
+        [Fact]
         public void ConfigureConfiguresServices()
         {
             // arrange
@@ -26,6 +38,18 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        public void ConfigureServicesThrowsOnNullBuilder()
+        {
+            Assert.Throws<ArgumentNullException>("builder", () => OutkeepServerBuilderExtensions.ConfigureServices(null!, services => { }));
+        }
+
+        [Fact]
+        public void ConfigureServicesThrowsOnNullAction()
+        {
+            Assert.Throws<ArgumentNullException>("configure", () => OutkeepServerBuilderExtensions.ConfigureServices(new FakeOutkeepServerBuilder(), null!));
+        }
+
+        [Fact]
         public void ConfigureServicesConfiguresServices()
         {
             // arrange
@@ -39,6 +63,18 @@ namespace Outkeep.Core.Tests
 
             // assert
             Assert.IsType<FakeService>(builder.BuildServiceProvider(null!, null!).GetService<IFakeService>());
+        }
+
+        [Fact]
+        public void ConfigureSiloThrowsOnNullBuilder()
+        {
+            Assert.Throws<ArgumentNullException>("builder", () => OutkeepServerBuilderExtensions.ConfigureSilo(null!, silo => { }));
+        }
+
+        [Fact]
+        public void ConfigureSiloThrowsOnNullAction()
+        {
+            Assert.Throws<ArgumentNullException>("configure", () => OutkeepServerBuilderExtensions.ConfigureSilo(new FakeOutkeepServerBuilder(), null!));
         }
     }
 }
