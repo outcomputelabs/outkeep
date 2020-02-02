@@ -1,4 +1,5 @@
 ﻿using Outkeep.Governance;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
@@ -57,6 +58,22 @@ namespace Outkeep.Grains.Tests
 
             // assert
             Assert.True(result);
+        }
+
+        [Fact]
+        public void GetHashCodeReturnsHashCode()
+        {
+            // arrange
+            var state = new ActivityState
+            {
+                Priority = ActivityPriority.Normal
+            };
+
+            // act
+            var result = state.GetHashCode();
+
+            // assert
+            Assert.Equal(HashCode.Combine(state.Priority), result);
         }
     }
 }
