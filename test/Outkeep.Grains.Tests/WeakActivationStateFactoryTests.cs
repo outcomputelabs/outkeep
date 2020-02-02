@@ -1,4 +1,5 @@
-﻿using Orleans.Runtime;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Orleans.Runtime;
 using Outkeep.Governance;
 using Outkeep.Grains.Tests.Fakes;
 using Outkeep.Properties;
@@ -93,6 +94,37 @@ namespace Outkeep.Grains.Tests
                 ObservableLifecycle = lifecycle
             };
             var config = new FakeWeakActivationStateConfiguration();
+
+            // act
+            var state = factory.Create<FakeWeakActivationFactor>(context, config);
+
+            // assert
+            Assert.NotNull(state);
+            var (observerName, stage, observer) = Assert.Single(lifecycle.Subscriptions);
+            Assert.Equal(typeof(WeakActivationState<FakeWeakActivationFactor>).FullName, observerName);
+            Assert.Equal(GrainLifecycleStage.SetupState, stage);
+            Assert.Same(state, observer);
+        }
+
+        [Fact]
+        public void CreatesNamedState()
+        {
+            // arrange
+            var factory = new WeakActivationStateFactory();
+            var lifecycle = new FakeGrainLifecycle();
+            var context = new FakeGrainActivationContext()
+            {
+                GrainType = typeof(object),
+                ActivationServices = new ServiceCollection()
+                    .AddSingleton(typeof(IKeyedServiceCollection<,>), typeof(KeyedServiceCollection<,>))
+                    .AddSingletonNamedService<IResourceGovernor>("FakeGovernor", (sp, name) => new FakeResourceGovernor())
+                    .BuildServiceProvider(),
+                ObservableLifecycle = lifecycle
+            };
+            var config = new FakeWeakActivationStateConfiguration
+            {
+                ResourceGovernorName = "FakeGovernor"
+            };
 
             // act
             var state = factory.Create<FakeWeakActivationFactor>(context, config);
