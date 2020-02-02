@@ -23,12 +23,12 @@ namespace Outkeep.Grains.Tests
         {
             // arrange
             var grain = _fixture.Cluster.GrainFactory.GetGrain<IWeakActivationTestGrain>(Guid.NewGuid());
+            var governor = (FakeResourceGovernor)_fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IResourceGovernor>("WeakActivationTestGovernor");
 
             // act
-            await grain.NoopAsync().ConfigureAwait(false);
+            await grain.EnlistAsync().ConfigureAwait(false);
 
             // assert
-            var governor = (FakeResourceGovernor)_fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IResourceGovernor>("WeakActivationTestGovernor");
             Assert.True(governor.Registrations.TryGetValue(grain.AsReference<IWeakActivationExtension>(), out var factor));
             Assert.NotNull(factor);
             Assert.Equal(1, factor!.FakeProperty);
@@ -53,12 +53,38 @@ namespace Outkeep.Grains.Tests
             var governor = (FakeResourceGovernor)_fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IResourceGovernor>("WeakActivationTestGovernor");
             Assert.False(governor.Registrations.TryGetValue(grain.AsReference<IWeakActivationExtension>(), out _));
         }
+
+        [Fact]
+        public async Task DeactivatingNoopsIfNotEnlisted()
+        {
+            // arrange
+            var grain = _fixture.Cluster.GrainFactory.GetGrain<IWeakActivationTestGrain>(Guid.NewGuid());
+            var governor = (FakeResourceGovernor)_fixture.PrimarySiloServiceProvider.GetRequiredServiceByName<IResourceGovernor>("WeakActivationTestGovernor");
+
+            // act - wake up the grain
+            await grain.NoopAsync().ConfigureAwait(false);
+
+            // assert - nothing was registered
+            Assert.False(governor.Registrations.TryGetValue(grain.AsReference<IWeakActivationExtension>(), out _));
+
+            // act - put the grain to sleep
+            await grain.SleepAsync().ConfigureAwait(false);
+
+            // act - wait for orleans to sleep the grain
+            await Task.Delay(1000).ConfigureAwait(false);
+
+            // assert - nothing was registered
+            Assert.False(governor.Registrations.TryGetValue(grain.AsReference<IWeakActivationExtension>(), out _));
+        }
     }
 
     public interface IWeakActivationTestGrain : IGrainWithGuidKey
     {
         Task NoopAsync();
+
         Task SleepAsync();
+
+        Task EnlistAsync();
     }
 
     public class WeakActivationTestGrain : Grain, IWeakActivationTestGrain
@@ -70,13 +96,13 @@ namespace Outkeep.Grains.Tests
             _state = state;
         }
 
-        public override Task OnActivateAsync()
+        public Task NoopAsync() => Task.CompletedTask;
+
+        public Task EnlistAsync()
         {
             _state.State.FakeProperty = 1;
             return _state.EnlistAsync();
         }
-
-        public Task NoopAsync() => Task.CompletedTask;
 
         public Task SleepAsync()
         {
