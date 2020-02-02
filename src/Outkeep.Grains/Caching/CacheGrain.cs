@@ -97,16 +97,6 @@ namespace Outkeep.Caching
             return Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync());
         }
 
-        private Task ClearAllStateAsync()
-        {
-            return Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync());
-        }
-
-        private Task WriteAllStateAsync()
-        {
-            return Task.WhenAll(_state.WriteStateAsync(), _flags.WriteStateAsync());
-        }
-
         private bool IsExpired()
         {
             var now = _clock.UtcNow;
@@ -178,7 +168,7 @@ namespace Outkeep.Caching
             _state.State.AbsoluteExpiration = absoluteExpiration;
             _state.State.SlidingExpiration = slidingExpiration;
             Publish();
-            return WriteAllStateAsync();
+            return Task.WhenAll(_state.WriteStateAsync(), _flags.WriteStateAsync());
         }
 
         /// <inheritdoc />
