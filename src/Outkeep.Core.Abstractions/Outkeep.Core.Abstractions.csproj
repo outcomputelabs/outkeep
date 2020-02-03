@@ -18,7 +18,7 @@
     <PackageIconUrl />
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cloud-Computing Distributed-Systems C# .NET Orleans Reactive Scalability Concurrency Caching</PackageTags>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Core abstractions library of Outkeep</Description>
   </PropertyGroup>
 
