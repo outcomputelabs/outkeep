@@ -10,6 +10,16 @@
     <NeutralLanguage>en-GB</NeutralLanguage>
     <RootNamespace>Outkeep</RootNamespace>
     <Nullable>enable</Nullable>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>Outcompute.Outkeep.Core.Abstractions</PackageId>
+    <Version>1.0.0-dev</Version>
+    <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
+    <PackageIcon>Logo.Outkeep.64x64.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Cloud-Computing Distributed-Systems C# .NET Orleans Reactive Scalability Concurrency Caching</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Core abstractions library of Outkeep</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +33,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\Logo.Outkeep.64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
