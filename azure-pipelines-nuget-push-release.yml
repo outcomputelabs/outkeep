@@ -1,8 +1,5 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
-trigger:
-- master
-
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -14,43 +11,11 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '2.x'
-
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
     version: '3.1.x'
 
-- task: SonarCloudPrepare@1
-  inputs:
-    SonarCloud: 'SonarCloud'
-    organization: 'outcompute'
-    scannerMode: 'MSBuild'
-    projectKey: 'outkeep'
-    projectName: 'Outkeep'
-    extraProperties: |
-      sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
-
 - task: DotNetCoreCLI@2
-  displayName: "Restore"
   inputs:
-    command: 'restore'
-    feedsToUse: 'select'
-
-- task: DotNetCoreCLI@2
-  displayName: "Build"
-  inputs:
-    command: 'build'
-    arguments: '--no-restore --configuration $(buildConfiguration)'
-
-- task: DotNetCoreCLI@2
-  displayName: "Test"
-  inputs:
-    command: 'test'
-    arguments: '--no-build /p:CollectCoverage=true /p:CoverletOutput=coverage.opencover.xml /p:CoverletOutputFormat=opencover --configuration $(buildConfiguration)'
-
-- task: SonarCloudAnalyze@1
-
-- task: SonarCloudPublish@1
-  inputs:
-    pollingTimeoutSec: '300'
+    command: 'pack'
+    packagesToPack: '**/*.csproj'
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: '$(ReleaseVersion)'
