@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <IsPackable>true</IsPackable>
-    <Version>1.0.0</Version>
+    <Version>1.0.0-dev</Version>
     <Authors>Jorge Candeias</Authors>
     <Company>Outcompute</Company>
     <Product>Outkeep</Product>
@@ -12,6 +12,14 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
     <Nullable>enable</Nullable>
+    <PackageId>Outcompute.Outkeep.Client</PackageId>
+    <Description>A direct cluster client for Outkeep</Description>
+    <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Logo.Outkeep.64x64.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Cloud-Computing Distributed-Systems C# .NET Orleans Reactive Scalability Concurrency Caching</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,6 +54,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\Logo.Outkeep.64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -23,6 +23,7 @@
     <PackageIconUrl />
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cloud-Computing Distributed-Systems C# .NET Orleans Reactive Scalability Concurrency Caching</PackageTags>
+    <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
