@@ -1,5 +1,4 @@
 ﻿using Outkeep;
-using Outkeep.Core;
 using Outkeep.Hosting;
 using System;
 
@@ -9,12 +8,15 @@ namespace Microsoft.Extensions.Hosting
     {
         private const string HostBuilderContextKey = nameof(OutkeepServerBuilder);
 
-        public static IHostBuilder UseOutkeepServer(this IHostBuilder builder, Action<IOutkeepServerBuilder> configure)
+        public static IHostBuilder UseOutkeepServer(this IHostBuilder builder, Action<IOutkeepServerBuilder>? configure)
         {
-            return builder.UseOutkeepServer((context, outkeep) => configure(outkeep));
+            return builder.UseOutkeepServer((context, outkeep) =>
+            {
+                configure?.Invoke(outkeep);
+            });
         }
 
-        public static IHostBuilder UseOutkeepServer(this IHostBuilder builder, Action<HostBuilderContext, IOutkeepServerBuilder> configure)
+        public static IHostBuilder UseOutkeepServer(this IHostBuilder builder, Action<HostBuilderContext, IOutkeepServerBuilder>? configure)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
@@ -30,7 +32,10 @@ namespace Microsoft.Extensions.Hosting
                 outkeep.AddCoreServices();
             }
 
-            outkeep.ConfigureOutkeep(configure);
+            if (configure != null)
+            {
+                outkeep.ConfigureOutkeep(configure);
+            }
 
             return builder;
         }
