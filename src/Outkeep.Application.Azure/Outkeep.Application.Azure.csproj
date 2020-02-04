@@ -7,7 +7,7 @@
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
+    <Version>1.0.0-dev</Version>
     <Authors>Jorge Candeias</Authors>
     <Company>Outcompute</Company>
     <Product>Outkeep</Product>
@@ -16,6 +16,14 @@
     <NeutralLanguage>en-GB</NeutralLanguage>
     <UserSecretsId>e9e9ef0c-531b-4b37-93cf-4525e559687a</UserSecretsId>
     <Nullable>enable</Nullable>
+    <PackageId>Outcompute.Outkeep.Application.Azure</PackageId>
+    <Description>A pre-built Outkeep node for Microsoft Azure</Description>
+    <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Logo.Outkeep.64x64.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Cloud-Computing Distributed-Systems C# .NET Orleans Reactive Scalability Concurrency Caching</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,6 +52,10 @@
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\assets\Logo.Outkeep.64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 
