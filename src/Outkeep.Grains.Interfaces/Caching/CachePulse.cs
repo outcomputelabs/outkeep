@@ -58,13 +58,5 @@ namespace Outkeep.Caching
         /// Creates a new cache pulse with a random tag and the provided value.
         /// </summary>
         public static CachePulse Random(byte[]? value) => new CachePulse(Guid.NewGuid(), value);
-
-        /// <summary>
-        /// Returns the cache pulse information as a string.
-        /// </summary>
-        public override string ToString()
-        {
-            return $"(Tag = '{Tag}', Value = '{Value}')";
-        }
     }
 }

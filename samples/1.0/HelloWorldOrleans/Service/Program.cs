@@ -34,24 +34,25 @@ namespace Service
 
             // cache a value
             var value = Guid.NewGuid().ToByteArray();
-            logger.LogInformation("Setting Value {Value}", value);
+            logger.LogInformation("Setting value {Value}", value);
             await grain.SetAsync(value.AsImmutable(), null, null);
 
             // read the cached value
             var pulse = await grain.GetAsync();
-            logger.LogInformation("Received Pulse {Pulse}", pulse);
+            logger.LogInformation("Received pulse (Tag = {Tag}, Value = {Value})", pulse.Tag, pulse.Value);
 
             // wait for the next value
             var task = grain.PollAsync(pulse.Tag);
+            logger.LogInformation("Waiting for next pulse...");
 
             // set the next value
             value = Guid.NewGuid().ToByteArray();
-            logger.LogInformation("Setting Next Value {Value}", value);
+            logger.LogInformation("Setting next value {Value}", value);
             await grain.SetAsync(value.AsImmutable(), null, null);
 
             // verify the wait
             pulse = await task;
-            logger.LogInformation("Received Reactive Pulse {Pulse}", pulse);
+            logger.LogInformation("Received reactive pulse (Tag = {Tag}, Value = {Value})", pulse.Tag, pulse.Value);
 
             await host.WaitForShutdownAsync();
         }
