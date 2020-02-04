@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>Benchmarks.Program</StartupObject>
     <SonarQubeExclude>true</SonarQubeExclude>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
