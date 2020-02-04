@@ -49,6 +49,17 @@ steps:
     command: 'test'
     arguments: '--no-build /p:CollectCoverage=true /p:CoverletOutput=coverage.opencover.xml /p:CoverletOutputFormat=opencover --configuration $(buildConfiguration)'
 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/*.csproj'
+    nobuild: true
+    includesymbols: true
+    versioningScheme: 'byPrereleaseNumber'
+    majorVersion: '1'
+    minorVersion: '0'
+    patchVersion: '0'
+
 - task: SonarCloudAnalyze@1
 
 - task: SonarCloudPublish@1
