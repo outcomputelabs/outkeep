@@ -16,9 +16,12 @@ namespace Service
                 .CreateDefaultBuilder()
                 .UseOrleans(orleans =>
                 {
-                    orleans.UseLocalhostClustering();
+                    orleans
+                        .UseLocalhostClustering();
+
+                    orleans
+                        .AddOutkeep();
                 })
-                .UseOutkeepServer()
                 .UseConsoleLifetime()
                 .Build();
 

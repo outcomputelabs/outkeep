@@ -29,6 +29,9 @@ namespace Microsoft.Extensions.DependencyInjection
             // add the default system clock
             services.AddSingleton<ISystemClock, SystemClock>();
 
+            // add safe timers
+            services.AddSafeTimer();
+
             // add validation of cache options
             services.AddOptions<CacheOptions>().ValidateDataAnnotations();
 
