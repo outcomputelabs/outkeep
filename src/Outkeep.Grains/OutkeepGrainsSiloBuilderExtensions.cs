@@ -1,8 +1,6 @@
-﻿using Orleans;
-using Orleans.Hosting;
-using System;
+﻿using System;
 
-namespace Outkeep
+namespace Orleans.Hosting
 {
     public static class OutkeepGrainsSiloBuilderExtensions
     {
