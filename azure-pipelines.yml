@@ -55,7 +55,7 @@ steps:
   displayName: "Pack"
   inputs:
     command: 'pack'
-    packagesToPack: '**/*.csproj'
+    packagesToPack: 
     includesymbols: true
     versioningScheme: 'byPrereleaseNumber'
     majorVersion: '1'
