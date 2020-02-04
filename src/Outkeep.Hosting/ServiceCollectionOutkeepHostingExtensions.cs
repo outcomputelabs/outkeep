@@ -32,6 +32,9 @@ namespace Microsoft.Extensions.DependencyInjection
             // add safe timers
             services.AddSafeTimer();
 
+            // add the default caching storage provider
+            services.AddNullGrainStorage(OutkeepProviderNames.OutkeepCache);
+
             // add validation of cache options
             services.AddOptions<CacheOptions>().ValidateDataAnnotations();
 
