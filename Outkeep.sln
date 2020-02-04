@@ -21,6 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Hosting.Standalone"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1A4AAB70-E662-4055-9256-05A6C82F966F}"
 	ProjectSection(SolutionItems) = preProject
+		azure-pipelines-nuget-push-release.yml = azure-pipelines-nuget-push-release.yml
 		azure-pipelines.yml = azure-pipelines.yml
 		README.md = README.md
 	EndProjectSection

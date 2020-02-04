@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>1.0.0</Version>
+    <IsPackable>true</IsPackable>
+    <Version>1.0.0-dev</Version>
     <Authors>Jorge Candeias</Authors>
     <Company>Outcompute</Company>
     <Product>Outkeep</Product>
@@ -11,6 +12,14 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
     <Nullable>enable</Nullable>
+    <PackageId>Outcompute.Outkeep.Client</PackageId>
+    <Description>A direct cluster client for Outkeep</Description>
+    <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>Logo.Outkeep.64x64.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Cloud-Computing Distributed-Systems C# .NET Orleans Reactive Scalability Concurrency Caching</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +31,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.1" />
     <PackageReference Include="Microsoft.Orleans.Client" Version="3.0.2" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.2.0.14119">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.3.0.14607">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -45,6 +54,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\Logo.Outkeep.64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
