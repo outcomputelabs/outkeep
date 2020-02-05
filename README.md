@@ -3,6 +3,6 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=outkeep&metric=coverage)](https://sonarcloud.io/dashboard?id=outkeep)
 [![Gitter](https://badges.gitter.im/outcompute-labs/outkeep.svg)](https://gitter.im/outcompute-labs/outkeep?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-This project is in pre-alpha work-in-progress.
+This project is in alpha work-in-progress.
 
 Work items for promotion to alpha are tracked in the [Alpha Project](https://github.com/outcomputelabs/outkeep/projects/1).
