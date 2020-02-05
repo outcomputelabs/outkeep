@@ -1,7 +1,6 @@
-﻿using Orleans;
-using Outkeep.Caching;
+﻿using Outkeep.Caching;
 
-namespace Outkeep.Client
+namespace Orleans
 {
     public static class OrleansClientBuilderOutkeepExtensions
     {
