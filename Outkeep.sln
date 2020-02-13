@@ -54,6 +54,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Grains.Interfaces",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Grains.Interfaces.Tests", "test\Outkeep.Grains.Interfaces.Tests\Outkeep.Grains.Interfaces.Tests.csproj", "{BE39ACD8-6890-4981-B19F-D638BB70280A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Dashboard", "src\Outkeep.Dashboard\Outkeep.Dashboard.csproj", "{F7242681-1639-480E-8596-D22CD569AB90}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -144,6 +146,10 @@ Global
 		{BE39ACD8-6890-4981-B19F-D638BB70280A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE39ACD8-6890-4981-B19F-D638BB70280A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE39ACD8-6890-4981-B19F-D638BB70280A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7242681-1639-480E-8596-D22CD569AB90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7242681-1639-480E-8596-D22CD569AB90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7242681-1639-480E-8596-D22CD569AB90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7242681-1639-480E-8596-D22CD569AB90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
