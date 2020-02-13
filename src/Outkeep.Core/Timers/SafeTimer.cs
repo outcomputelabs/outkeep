@@ -61,13 +61,13 @@ namespace Outkeep.Timers
                 _tickCancelled(logger, exception);
 
             private static readonly Action<ILogger, Exception> _tickCancelled =
-                LoggerMessage.Define(LogLevel.Warning, new EventId(1), Resources.Log_TimerTickWasCancelled);
+                LoggerMessage.Define(LogLevel.Warning, new EventId(1, nameof(TickCancelled)), Resources.Log_TimerTickWasCancelled);
 
             public static void TickFaulted(ILogger logger, Exception exception) =>
                 _tickFaulted(logger, exception);
 
             private static readonly Action<ILogger, Exception> _tickFaulted =
-                LoggerMessage.Define(LogLevel.Warning, new EventId(2), Resources.Log_TimerTickHasFaulted);
+                LoggerMessage.Define(LogLevel.Warning, new EventId(2, nameof(TickFaulted)), Resources.Log_TimerTickHasFaulted);
         }
 
         #region Disposable
