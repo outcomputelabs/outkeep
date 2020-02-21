@@ -54,7 +54,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Grains.Interfaces",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Grains.Interfaces.Tests", "test\Outkeep.Grains.Interfaces.Tests\Outkeep.Grains.Interfaces.Tests.csproj", "{BE39ACD8-6890-4981-B19F-D638BB70280A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Dashboard", "src\Outkeep.Dashboard\Outkeep.Dashboard.csproj", "{F7242681-1639-480E-8596-D22CD569AB90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Outkeep.Dashboard", "src\Outkeep.Dashboard\Outkeep.Dashboard.csproj", "{F7242681-1639-480E-8596-D22CD569AB90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Outkeep.Dashboard.Core", "src\Outkeep.Dashboard.Core\Outkeep.Dashboard.Core.csproj", "{06FFB4DB-AC35-40C5-9A01-0FEA7B745F56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -150,6 +152,10 @@ Global
 		{F7242681-1639-480E-8596-D22CD569AB90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7242681-1639-480E-8596-D22CD569AB90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7242681-1639-480E-8596-D22CD569AB90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06FFB4DB-AC35-40C5-9A01-0FEA7B745F56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06FFB4DB-AC35-40C5-9A01-0FEA7B745F56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06FFB4DB-AC35-40C5-9A01-0FEA7B745F56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06FFB4DB-AC35-40C5-9A01-0FEA7B745F56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

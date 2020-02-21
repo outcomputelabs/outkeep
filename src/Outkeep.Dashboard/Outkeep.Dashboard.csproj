@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <StartupObject>Outkeep.Dashboard.Program</StartupObject>
+    <RazorLangVersion>3.0</RazorLangVersion>
+    <StartupObject></StartupObject>
     <PackageId>Outcompute.Outkeep.Dashboard</PackageId>
     <Authors>Jorge Candeias</Authors>
     <Company>Outcompute</Company>
@@ -17,6 +18,13 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cloud-Computing Distributed-Systems C# .NET Orleans Reactive Scalability Concurrency Caching</PackageTags>
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <AssemblyName>Outkeep.Dashboard</AssemblyName>
+    <RootNamespace>Outkeep.Dashboard</RootNamespace>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,14 +35,40 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.3.0.14607">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.4.0.15306">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Outkeep.Core.Abstractions\Outkeep.Core.Abstractions.csproj" />
+    <ProjectReference Include="..\Outkeep.Dashboard.Core\Outkeep.Dashboard.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

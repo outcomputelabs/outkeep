@@ -49,7 +49,10 @@ namespace Outkeep.Application.Standalone
                     {
                         context.Configuration.GetSection("Outkeep:DistributedCaching").Bind(options);
                     });
+
                     outkeep.UseStandaloneClustering();
+                    outkeep.UseOutkeepDashboard();
+
                     outkeep.UseHttpApi(options =>
                     {
                         options.ApiUri = new Uri(context.Configuration["Outkeep:Http:ApiUri"]);

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Outkeep.Application.Standalone.Properties {
+namespace Outkeep.Dashboard.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Outkeep.Application.Standalone.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Outkeep.Application.Standalone.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Outkeep.Dashboard.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,11 +61,38 @@ namespace Outkeep.Application.Standalone.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} - Silo: {1}, Gateway: {2}, HttpApi: {3}, Outkeep Dashboard: {4}.
+        ///   Looks up a localized string similar to Started Outkeep Dashboard.
         /// </summary>
-        internal static string Console_Title {
+        internal static string Log_StartedOutkeepDashboard {
             get {
-                return ResourceManager.GetString("Console_Title", resourceCulture);
+                return ResourceManager.GetString("Log_StartedOutkeepDashboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting Outkeep Dashboard.
+        /// </summary>
+        internal static string Log_StartingOutkeepDashboard {
+            get {
+                return ResourceManager.GetString("Log_StartingOutkeepDashboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stopped Outkeep Dashboard.
+        /// </summary>
+        internal static string Log_StoppedOutkeepDashboard {
+            get {
+                return ResourceManager.GetString("Log_StoppedOutkeepDashboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stopping Outkeep Dashboard.
+        /// </summary>
+        internal static string Log_StoppingOutkeepDashboard {
+            get {
+                return ResourceManager.GetString("Log_StoppingOutkeepDashboard", resourceCulture);
             }
         }
     }

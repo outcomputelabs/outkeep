@@ -24,7 +24,7 @@
     <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="3.0.2" />
     <PackageReference Include="Microsoft.Orleans.TestingHost" Version="3.0.2" />
     <PackageReference Include="Moq" Version="4.13.1" />
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.3.0.14607">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.4.0.15306">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
