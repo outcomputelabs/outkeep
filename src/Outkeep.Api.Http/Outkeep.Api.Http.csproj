@@ -17,7 +17,7 @@
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <PackageId>Outcompute.Outkeep.Api.Http</PackageId>
+    <PackageId>Outkeep.Api.Http</PackageId>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>Default HTTP API of Outkeep</Description>
     <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>

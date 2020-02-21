@@ -12,7 +12,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/outcomputelabs/outkeep</PackageProjectUrl>
     <Nullable>enable</Nullable>
-    <PackageId>Outcompute.Outkeep.Client</PackageId>
+    <PackageId>Outkeep.Client</PackageId>
     <Description>A direct cluster client for Outkeep</Description>
     <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <Nullable>enable</Nullable>
-    <PackageId>Outcompute.Outkeep.Hosting.Standalone</PackageId>
+    <PackageId>Outkeep.Hosting.Standalone</PackageId>
     <Description>Standalone hosting library of Outkeep</Description>
     <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

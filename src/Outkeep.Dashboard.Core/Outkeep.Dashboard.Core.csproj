@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
     <RootNamespace>Outkeep.Dashboard</RootNamespace>
-    <PackageId>Outcompute.Outkeep.Dashboard.Core</PackageId>
+    <PackageId>Outkeep.Dashboard.Core</PackageId>
     <Authors>Jorge Candeias</Authors>
     <Company>Outcompute</Company>
     <Product>Outkeep</Product>
@@ -18,6 +18,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Cloud-Computing Distributed-Systems C# .NET Orleans Reactive Scalability Concurrency Caching</PackageTags>
     <NeutralLanguage>en-GB</NeutralLanguage>
+    <Version>1.0.0-dev</Version>
   </PropertyGroup>
 
 

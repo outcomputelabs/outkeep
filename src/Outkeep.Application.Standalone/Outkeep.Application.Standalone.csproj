@@ -16,7 +16,7 @@
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
     <Nullable>enable</Nullable>
-    <PackageId>Outcompute.Outkeep.Application.Standalone</PackageId>
+    <PackageId>Outkeep.Application.Standalone</PackageId>
     <Description>A pre-built Outkeep node for standalone deployment</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Logo.Outkeep.64x64.png</PackageIcon>

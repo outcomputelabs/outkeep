@@ -16,7 +16,7 @@
     <NeutralLanguage>en-GB</NeutralLanguage>
     <UserSecretsId>e9e9ef0c-531b-4b37-93cf-4525e559687a</UserSecretsId>
     <Nullable>enable</Nullable>
-    <PackageId>Outcompute.Outkeep.Application.Azure</PackageId>
+    <PackageId>Outkeep.Application.Azure</PackageId>
     <Description>A pre-built Outkeep node for Microsoft Azure</Description>
     <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

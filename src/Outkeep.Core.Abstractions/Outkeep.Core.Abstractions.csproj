@@ -12,7 +12,7 @@
     <RootNamespace>Outkeep</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageId>Outcompute.Outkeep.Core.Abstractions</PackageId>
+    <PackageId>Outkeep.Core.Abstractions</PackageId>
     <Version>1.0.0-dev</Version>
     <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
     <PackageIcon>Logo.Outkeep.64x64.png</PackageIcon>

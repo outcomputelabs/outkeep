@@ -13,7 +13,7 @@
     <NeutralLanguage>en-GB</NeutralLanguage>
     <Nullable>enable</Nullable>
     <RootNamespace>Outkeep</RootNamespace>
-    <PackageId>Outcompute.Outkeep.Grains.Interfaces</PackageId>
+    <PackageId>Outkeep.Grains.Interfaces</PackageId>
     <Description>Grain interface library of Outkeep</Description>
     <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/outcomputelabs/outkeep</RepositoryUrl>
     <Nullable>enable</Nullable>
     <RootNamespace>Outkeep</RootNamespace>
-    <PackageId>Outcompute.Outkeep.Grains</PackageId>
+    <PackageId>Outkeep.Grains</PackageId>
     <Description>Grain implementation library for Outkeep</Description>
     <Copyright>© Outcompute Ltd. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
