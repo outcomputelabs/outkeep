@@ -5,7 +5,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionOutkeepDashboardExtensions
     {
-        public static IServiceCollection AddOutkeepDashboard(this IServiceCollection services, Action<OutkeepDashboardOptions> configure = null)
+        public static IServiceCollection AddOutkeepDashboard(this IServiceCollection services, Action<OutkeepDashboardOptions>? configure = null)
         {
             services
                 .AddHostedService<OutkeepDashboardService>()

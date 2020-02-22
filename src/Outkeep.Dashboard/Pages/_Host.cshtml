@@ -1,6 +1,9 @@
 ﻿@page "/"
+@using Microsoft.Extensions.Localization
+@using Outkeep.Dashboard.Properties
 @namespace Outkeep.Dashboard.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<App> Localizer
 @{
     Layout = null;
 }
@@ -10,10 +13,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Outkeep.Dashboard</title>
+    <title>@Localizer.GetString("Title_OutkeepDashboard")</title>
     <base href="~/" />
-    <link rel="stylesheet" href="_content/Outcompute.Outkeep.Dashboard.Core/css/bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" href="_content/Outcompute.Outkeep.Dashboard.Core/css/site.css" />
+    <link rel="stylesheet" href="_content/Outkeep.Dashboard.Core/css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="_content/Outkeep.Dashboard.Core/css/site.css" />
 </head>
 <body>
     <app>
@@ -22,12 +25,12 @@
 
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
-            An error has occurred. This application may no longer respond until reloaded.
+            @Localizer.GetString("Message_AppError_Production")
         </environment>
         <environment include="Development">
-            An unhandled exception has occurred. See browser dev tools for details.
+            @Localizer.GetString("Message_AppError_Development")
         </environment>
-        <a href="" class="reload">Reload</a>
+        <a href="" class="reload">@Localizer["Action_Reload"]</a>
         <a class="dismiss">🗙</a>
     </div>
 

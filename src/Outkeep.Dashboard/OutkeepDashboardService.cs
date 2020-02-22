@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Outkeep.Dashboard.Data;
 using Outkeep.Dashboard.Properties;
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,6 +35,10 @@ namespace Outkeep.Dashboard
                         services.AddRazorPages();
                         services.AddServerSideBlazor();
                         services.AddSingleton<WeatherForecastService>();
+                        services.AddLocalization(options =>
+                        {
+                            options.ResourcesPath = "Resources";
+                        });
                     });
 
                     web.Configure((context, app) =>
@@ -52,6 +58,20 @@ namespace Outkeep.Dashboard
                         }
 
                         app.UseHttpsRedirection();
+
+                        app.UseRequestLocalization(options =>
+                        {
+                            options.DefaultRequestCulture = new RequestCulture("en");
+                            options.SupportedCultures = new[]
+                            {
+                                CultureInfo.GetCultureInfo("en")
+                            };
+                            options.SupportedUICultures = new[]
+                            {
+                                CultureInfo.GetCultureInfo("en")
+                            };
+                        });
+
                         app.UseStaticFiles();
 
                         app.UseRouting();

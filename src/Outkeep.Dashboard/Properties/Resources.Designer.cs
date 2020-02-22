@@ -22,7 +22,7 @@ namespace Outkeep.Dashboard.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Outkeep.Dashboard.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Outkeep.Dashboard.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Outkeep.Dashboard.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Outkeep.Dashboard.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Started Outkeep Dashboard.
         /// </summary>
-        internal static string Log_StartedOutkeepDashboard {
+        public static string Log_StartedOutkeepDashboard {
             get {
                 return ResourceManager.GetString("Log_StartedOutkeepDashboard", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Outkeep.Dashboard.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Starting Outkeep Dashboard.
         /// </summary>
-        internal static string Log_StartingOutkeepDashboard {
+        public static string Log_StartingOutkeepDashboard {
             get {
                 return ResourceManager.GetString("Log_StartingOutkeepDashboard", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace Outkeep.Dashboard.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Stopped Outkeep Dashboard.
         /// </summary>
-        internal static string Log_StoppedOutkeepDashboard {
+        public static string Log_StoppedOutkeepDashboard {
             get {
                 return ResourceManager.GetString("Log_StoppedOutkeepDashboard", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace Outkeep.Dashboard.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Stopping Outkeep Dashboard.
         /// </summary>
-        internal static string Log_StoppingOutkeepDashboard {
+        public static string Log_StoppingOutkeepDashboard {
             get {
                 return ResourceManager.GetString("Log_StoppingOutkeepDashboard", resourceCulture);
             }
