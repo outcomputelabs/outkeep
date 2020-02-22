@@ -51,7 +51,10 @@ namespace Outkeep.Application.Standalone
                     });
 
                     outkeep.UseStandaloneClustering();
-                    outkeep.UseOutkeepDashboard();
+                    outkeep.UseOutkeepDashboard(options =>
+                    {
+                        options.Brand = $"{nameof(Outkeep)} {nameof(Standalone)}";
+                    });
 
                     outkeep.UseHttpApi(options =>
                     {

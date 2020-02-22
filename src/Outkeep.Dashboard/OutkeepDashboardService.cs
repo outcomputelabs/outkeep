@@ -19,11 +19,11 @@ namespace Outkeep.Dashboard
         private readonly ILogger _logger;
         private readonly IHost _host;
 
-        public OutkeepDashboardService(ILogger<OutkeepDashboardService> logger, IOptions<OutkeepDashboardOptions> dashboardOptions)
+        public OutkeepDashboardService(ILogger<OutkeepDashboardService> logger, IServiceProvider provider)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            if (dashboardOptions?.Value is null) throw new ArgumentNullException(nameof(dashboardOptions));
+            var dashboardOptions = provider.GetRequiredService<IOptions<OutkeepDashboardOptions>>().Value;
 
             _host = Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(web =>
@@ -83,7 +83,12 @@ namespace Outkeep.Dashboard
                         });
                     });
 
-                    web.UseUrls(dashboardOptions.Value.Url.ToString());
+                    web.UseUrls(dashboardOptions.Url.ToString());
+                })
+                .ConfigureServices(services =>
+                {
+                    // add passthrough services
+                    services.AddTransient(_ => provider.GetService<IOptions<OutkeepDashboardOptions>>());
                 })
                 .Build();
         }
