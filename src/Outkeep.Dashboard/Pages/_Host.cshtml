@@ -13,7 +13,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@Localizer.GetString("Title_OutkeepDashboard")</title>
+    <title>@Localizer["Title_OutkeepDashboard"]</title>
     <base href="~/" />
     <link rel="stylesheet" href="_content/Outkeep.Dashboard.Core/css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="_content/Outkeep.Dashboard.Core/css/site.css" />
@@ -25,10 +25,10 @@
 
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
-            @Localizer.GetString("Message_AppError_Production")
+            @Localizer["Message_AppError_Production"]
         </environment>
         <environment include="Development">
-            @Localizer.GetString("Message_AppError_Development")
+            @Localizer["Message_AppError_Development"]
         </environment>
         <a href="" class="reload">@Localizer["Action_Reload"]</a>
         <a class="dismiss">🗙</a>

@@ -1,5 +1,5 @@
 ﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Outkeep.Dashboard</a>
+    <a class="navbar-brand" href="">@Localizer["Brand"]</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -26,6 +26,10 @@
 </div>
 
 @code {
+
+    [Inject]
+    public IStringLocalizer<NavMenu> Localizer { get; set; } = null!;
+
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
