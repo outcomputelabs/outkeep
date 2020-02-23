@@ -38,6 +38,9 @@ namespace Microsoft.Extensions.DependencyInjection
             // add validation of cache options
             services.AddOptions<CacheOptions>().ValidateDataAnnotations();
 
+            // add the cache activation context
+            services.AddCacheActivationContext();
+
             return services;
         }
     }
