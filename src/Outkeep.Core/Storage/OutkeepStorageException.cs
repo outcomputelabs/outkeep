@@ -8,21 +8,21 @@ namespace Outkeep.Storage
     /// Outkeep extensions can derive from this class or an appropriate base class for their own storage exceptions.
     /// </summary>
     [Serializable]
-    public class StorageException : OutkeepException
+    public class OutkeepStorageException : OutkeepException
     {
-        public StorageException()
+        public OutkeepStorageException()
         {
         }
 
-        public StorageException(string message) : base(message)
+        public OutkeepStorageException(string message) : base(message)
         {
         }
 
-        public StorageException(string message, Exception innerException) : base(message, innerException)
+        public OutkeepStorageException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
-        protected StorageException(SerializationInfo serializationInfo, StreamingContext streamingContext)
+        protected OutkeepStorageException(SerializationInfo serializationInfo, StreamingContext streamingContext)
             : base(serializationInfo, streamingContext)
         {
         }

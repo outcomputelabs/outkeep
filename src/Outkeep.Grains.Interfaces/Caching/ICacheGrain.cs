@@ -33,6 +33,7 @@ namespace Outkeep.Caching
         /// <summary>
         /// Long polls the grain for changes to the cache item.
         /// </summary>
+        [AlwaysInterleave]
         ValueTask<CachePulse> PollAsync(Guid tag);
     }
 }

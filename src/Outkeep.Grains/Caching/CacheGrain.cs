@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Orleans;
+﻿using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
 using Outkeep.Governance;
@@ -8,24 +7,20 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Caching
 {
-    [Reentrant]
     internal class CacheGrain : Grain, ICacheGrain
     {
-        private readonly CacheOptions _options;
-        private readonly ISystemClock _clock;
+        private readonly ICacheActivationContext _context;
         private readonly IPersistentState<CacheGrainState> _state;
         private readonly IPersistentState<CacheGrainFlags> _flags;
         private readonly IWeakActivationState<ActivityState> _activity;
 
         public CacheGrain(
-            IOptions<CacheOptions> options,
-            ISystemClock clock,
+            ICacheActivationContext context,
             [PersistentState("State", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainState> state,
             [PersistentState("Flags", OutkeepProviderNames.OutkeepCache)] IPersistentState<CacheGrainFlags> flags,
             [WeakActivationState(OutkeepProviderNames.OutkeepMemoryResourceGovernor)] IWeakActivationState<ActivityState> activity)
         {
-            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-            _clock = clock ?? throw new ArgumentNullException(nameof(clock));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _state = state?.AsConflater() ?? throw new ArgumentNullException(nameof(state));
             _flags = flags?.AsConflater() ?? throw new ArgumentNullException(nameof(flags));
             _activity = activity ?? throw new ArgumentNullException(nameof(activity));
@@ -33,21 +28,22 @@ namespace Outkeep.Caching
 
         private TaskCompletionSource<CachePulse> _promise = new TaskCompletionSource<CachePulse>();
 
-        public override Task OnActivateAsync()
-        {
-            RegisterTimer(TickMaintenanceAsyncDelegate, this, _options.MaintenancePeriod, _options.MaintenancePeriod);
+        private string GrainKey => this.GetPrimaryKeyString();
 
-            // remove expired state
-            var recoveryTask =
-                _state.State.Value != null && IsExpired()
-                ? ResetAsync()
-                : Task.CompletedTask;
+        public override async Task OnActivateAsync()
+        {
+            // check if the recovered state has expired between activations
+            if (IsExpired())
+            {
+                await RemoveAsync().ConfigureAwait(true);
+            }
 
             // enroll as a weak activation
             _activity.State.Priority = ActivityPriority.Normal;
-            var enlistTask = _activity.EnlistAsync();
+            await _activity.EnlistAsync().ConfigureAwait(true);
 
-            return Task.WhenAll(recoveryTask, enlistTask);
+            // start the maintenance schedule
+            RegisterTimer(TickMaintenanceAsyncDelegate, this, _context.Options.MaintenancePeriod, _context.Options.MaintenancePeriod);
         }
 
         /// <summary>
@@ -62,44 +58,25 @@ namespace Outkeep.Caching
         {
             var self = (CacheGrain)state;
 
-            // check if there is any content to evaluate
-            if (self._state.State.Tag == Guid.Empty)
-            {
-                return Task.CompletedTask;
-            }
-
             // check if the content has expired
             if (self.IsExpired())
             {
-                return self.ResetAsync();
+                return self.RemoveAsync();
             }
 
-            // save the flags if they have changed
-            if (self._flags.State.HasChanged)
+            // save control flags if changed
+            if (self._flags.State.UtcLastAccessed != self._flags.State.PersistedUtcLastAccessed)
             {
-                self._flags.State.HasChanged = false;
+                self._flags.State.PersistedUtcLastAccessed = self._flags.State.UtcLastAccessed;
                 return self._flags.WriteStateAsync();
             }
 
             return Task.CompletedTask;
         }
 
-        private Task ResetAsync()
-        {
-            // clear and publish the state
-            _state.State.Tag = Guid.Empty;
-            _state.State.Value = null;
-            _state.State.AbsoluteExpiration = null;
-            _state.State.SlidingExpiration = null;
-            Publish();
-
-            // attempt to remove stored state as well
-            return Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync());
-        }
-
         private bool IsExpired()
         {
-            var now = _clock.UtcNow;
+            var now = _context.Clock.UtcNow;
             return
                 _state.State.AbsoluteExpiration.HasValue && _state.State.AbsoluteExpiration <= now ||
                 _state.State.SlidingExpiration.HasValue && _flags.State.UtcLastAccessed.Add(_state.State.SlidingExpiration.Value) <= now;
@@ -108,88 +85,97 @@ namespace Outkeep.Caching
         /// <summary>
         /// Publishes the current cache content to any pending reactive requests.
         /// </summary>
-        private void Publish(bool success = true)
+        private void Publish()
         {
-            if (success)
-            {
-                _promise.TrySetResult(new CachePulse(_state.State.Tag, _state.State.Value));
-            }
-            else
-            {
-                _promise.TrySetCanceled();
-            }
-
+            _promise.TrySetResult(new CachePulse(_state.State.Tag, _state.State.Value));
             _promise = new TaskCompletionSource<CachePulse>();
-        }
-
-        /// <inheritdoc />
-        public ValueTask<CachePulse> GetAsync()
-        {
-            _flags.State.UtcLastAccessed = _clock.UtcNow;
-
-            return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));
         }
 
         /// <inheritdoc />
         public Task RemoveAsync()
         {
-            DeactivateOnIdle();
-            return ResetAsync();
+            // removing the cache item is equivalent to setting it to null and vice-versa
+            return SetAsync(new Immutable<byte[]?>(), null, null);
         }
 
         /// <inheritdoc />
-        public Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
+        public async Task SetAsync(Immutable<byte[]?> value, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration)
         {
-            // check if there is anything to set at all
-            // setting null content is equivalent to clearing
-            if (value.Value is null)
+            // check if there is anything to set at all - setting null content is equivalent to clearing
+            // also check if the input has already expired
+            // if either then we clear the current state
+            var now = _context.Clock.UtcNow;
+            if (value.Value is null || (absoluteExpiration.HasValue && absoluteExpiration.Value <= now))
             {
-                // noop if there is nothing to clear
-                if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
+                // clear the state
+                _state.State.Value = default;
+                _state.State.Tag = default;
+                _state.State.AbsoluteExpiration = default;
+                _state.State.SlidingExpiration = default;
 
-                return ResetAsync();
+                // propagate the change to reactive requesters
+                Publish();
+
+                // attempt to clear the state from storage
+                await Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync()).ConfigureAwait(true);
+
+                // unregister from the cache registry last
+                await _context.CacheRegistry.UnregisterAsync(GrainKey).ConfigureAwait(true);
             }
-
-            // check if the input has already expired
-            var now = _clock.UtcNow;
-            if (absoluteExpiration.HasValue && absoluteExpiration.Value <= now)
+            else
             {
-                // noop if there is nothing to clear
-                if (_state.State.Tag == Guid.Empty) return Task.CompletedTask;
+                // register on cache registry first
+                await _context.CacheRegistry.RegisterAsync(GrainKey, value.Value.Length).ConfigureAwait(true);
 
-                return ResetAsync();
+                // now we can accept the new data
+                _state.State.Tag = Guid.NewGuid();
+                _state.State.Value = value.Value;
+                _state.State.AbsoluteExpiration = absoluteExpiration;
+                _state.State.SlidingExpiration = slidingExpiration;
+
+                // start measuring sliding expiration from this point onwards
+                _flags.State.UtcLastAccessed = now;
+
+                // propagate the change to reactive requesters
+                Publish();
+
+                // attempt to write state to storage while saving control flags
+                await Task.WhenAll(_state.WriteStateAsync(), _flags.WriteStateAsync()).ConfigureAwait(true);
             }
-
-            _flags.State.UtcLastAccessed = now;
-
-            // update subs and lazy save everything
-            _state.State.Tag = Guid.NewGuid();
-            _state.State.Value = value.Value;
-            _state.State.AbsoluteExpiration = absoluteExpiration;
-            _state.State.SlidingExpiration = slidingExpiration;
-            Publish();
-            return Task.WhenAll(_state.WriteStateAsync(), _flags.WriteStateAsync());
         }
 
         /// <inheritdoc />
-        public Task RefreshAsync()
+        public ValueTask<CachePulse> GetAsync()
         {
-            _flags.State.UtcLastAccessed = _clock.UtcNow;
+            // delay the sliding expiration
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
 
-            return _flags.WriteStateAsync();
+            return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));
         }
 
         /// <inheritdoc />
         public ValueTask<CachePulse> PollAsync(Guid tag)
         {
-            _flags.State.UtcLastAccessed = _clock.UtcNow;
+            // delay the sliding expiration
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
 
+            // if the caller already has the latest state then return a promise for the next state
             if (tag == _state.State.Tag)
             {
-                return new ValueTask<CachePulse>(_promise.Task.WithDefaultOnTimeout(new CachePulse(_state.State.Tag, null), _options.ReactivePollingTimeout));
+                return new ValueTask<CachePulse>(_promise.Task.WithDefaultOnTimeout(new CachePulse(_state.State.Tag, null), _context.Options.ReactivePollingTimeout));
             }
 
+            // if the caller is outdated then return the latest state right now
             return new ValueTask<CachePulse>(new CachePulse(_state.State.Tag, _state.State.Value));
+        }
+
+        /// <inheritdoc />
+        public Task RefreshAsync()
+        {
+            // delay the sliding expiration
+            _flags.State.UtcLastAccessed = _context.Clock.UtcNow;
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -6,23 +6,10 @@ namespace Outkeep.Caching
     [ProtoContract]
     internal class CacheGrainFlags
     {
-        private DateTimeOffset _utcLastAccessed;
-
         [ProtoMember(1)]
-        public DateTimeOffset UtcLastAccessed
-        {
-            get
-            {
-                return _utcLastAccessed;
-            }
-            set
-            {
-                _utcLastAccessed = value;
-                HasChanged = true;
-            }
-        }
+        public DateTimeOffset UtcLastAccessed { get; set; }
 
-        [ProtoIgnore]
-        public bool HasChanged { get; set; }
+        [ProtoMember(2)]
+        public DateTimeOffset PersistedUtcLastAccessed { get; set; }
     }
 }

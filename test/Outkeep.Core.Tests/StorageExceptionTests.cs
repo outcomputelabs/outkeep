@@ -12,7 +12,7 @@ namespace Outkeep.Core.Tests
         public void Constructs()
         {
             // act
-            var exception = new StorageException();
+            var exception = new OutkeepStorageException();
 
             // assert
             Assert.NotNull(exception.Message);
@@ -26,7 +26,7 @@ namespace Outkeep.Core.Tests
             var message = "Some Message";
 
             // act
-            var exception = new StorageException(message);
+            var exception = new OutkeepStorageException(message);
 
             // assert
             Assert.Equal(message, exception.Message);
@@ -41,7 +41,7 @@ namespace Outkeep.Core.Tests
             var inner = new InvalidOperationException();
 
             // act
-            var exception = new StorageException(message, inner);
+            var exception = new OutkeepStorageException(message, inner);
 
             // assert
             Assert.Equal(message, exception.Message);
@@ -54,7 +54,7 @@ namespace Outkeep.Core.Tests
             // arrange
             var message = "Some Message";
             var inner = new InvalidOperationException();
-            var exception = new StorageException(message, inner);
+            var exception = new OutkeepStorageException(message, inner);
             var formatter = new BinaryFormatter();
 
             // act
@@ -67,7 +67,7 @@ namespace Outkeep.Core.Tests
             }
 
             // assert
-            var result = Assert.IsType<StorageException>(obj);
+            var result = Assert.IsType<OutkeepStorageException>(obj);
             Assert.Equal(message, result.Message);
             Assert.IsType<InvalidOperationException>(result.InnerException);
         }

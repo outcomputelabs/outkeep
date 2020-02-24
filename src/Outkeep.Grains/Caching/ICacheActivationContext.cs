@@ -8,5 +8,7 @@
         CacheOptions Options { get; }
 
         ISystemClock Clock { get; }
+
+        ICacheRegistry CacheRegistry { get; }
     }
 }
