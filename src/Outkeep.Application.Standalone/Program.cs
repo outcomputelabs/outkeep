@@ -58,7 +58,7 @@ namespace Outkeep.Application.Standalone
 
                     outkeep.UseHttpApi(options =>
                     {
-                        options.ApiUri = new Uri(context.Configuration["Outkeep:Http:ApiUri"]);
+                        context.Configuration.Bind("Outkeep:Http", options);
                     });
 
                     outkeep.ConfigureSilo(silo =>

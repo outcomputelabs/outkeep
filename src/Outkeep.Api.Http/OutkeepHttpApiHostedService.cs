@@ -46,6 +46,14 @@ namespace Outkeep.Api.Http
                 })
                 .ConfigureWebHostDefaults(web =>
                 {
+                    web.ConfigureKestrel(options =>
+                    {
+                        if (_options.MaxRequestBodySize.HasValue)
+                        {
+                            options.Limits.MaxRequestBodySize = _options.MaxRequestBodySize;
+                        }
+                    });
+
                     web.ConfigureServices(services =>
                     {
                         services.AddControllers();

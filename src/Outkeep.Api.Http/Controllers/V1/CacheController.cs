@@ -58,7 +58,7 @@ namespace Outkeep.Api.Http.Controllers.V1
         /// </summary>
         /// <param name="key">The key to identify the value with</param>
         /// <param name="absoluteExpiration">The absolute date and time at which the value will expire</param>
-        /// <param name="slidingExpiration">The sliding time span at which the value will expire if not accessed</param>
+        /// <param name="slidingExpirationSeconds">The sliding number of seconds at which the value will expire if not accessed</param>
         /// <param name="value">The value to cache</param>
         /// <returns></returns>
         [HttpPut]
@@ -68,17 +68,19 @@ namespace Outkeep.Api.Http.Controllers.V1
         public Task<ActionResult> SetAsync(
             [Required] [MaxLength(128)] string key,
             DateTimeOffset? absoluteExpiration,
-            TimeSpan? slidingExpiration,
+            [Range(0, 365 * 24 * 60 * 60)] double? slidingExpirationSeconds,
             [Required] IFormFile value)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
             if (value == null) throw new ArgumentNullException(nameof(value));
 
+            TimeSpan? slidingExpiration = slidingExpirationSeconds.HasValue ? TimeSpan.FromSeconds(slidingExpirationSeconds.Value) : (TimeSpan?)null;
+
             return InnerSetAsync(key, absoluteExpiration, slidingExpiration, value);
         }
 
         /// <summary>
-        /// Inner Async block for <see cref="SetAsync(string, DateTimeOffset?, TimeSpan?, IFormFile)"/>
+        /// Inner Async block for <see cref="SetAsync(string, DateTimeOffset?, double?, IFormFile)" />
         /// </summary>
         private async Task<ActionResult> InnerSetAsync(string key, DateTimeOffset? absoluteExpiration, TimeSpan? slidingExpiration, IFormFile value)
         {

@@ -58,7 +58,7 @@ namespace Outkeep.Api.Http.Tests
             var controller = new CacheController(factory);
 
             var file = Mock.Of<IFormFile>(x => x.OpenReadStream() == new MemoryStream(value) && x.Length == value.Length);
-            var result = await controller.SetAsync(key, absoluteExpiration, slidingExpiration, file).ConfigureAwait(false);
+            var result = await controller.SetAsync(key, absoluteExpiration, slidingExpiration.TotalSeconds, file).ConfigureAwait(false);
 
             Mock.Get(factory).VerifyAll();
             Assert.IsType<OkResult>(result);

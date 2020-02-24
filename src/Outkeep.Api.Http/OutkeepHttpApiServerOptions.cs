@@ -19,5 +19,7 @@ namespace Outkeep.Api.Http
         /// </summary>
         [Required]
         public string Title { get; set; } = nameof(Outkeep);
+
+        public long? MaxRequestBodySize { get; set; }
     }
 }

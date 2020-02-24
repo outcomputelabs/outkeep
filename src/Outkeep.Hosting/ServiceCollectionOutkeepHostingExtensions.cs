@@ -41,6 +41,9 @@ namespace Microsoft.Extensions.DependencyInjection
             // add the cache activation context
             services.AddCacheActivationContext();
 
+            // add the cache registry
+            services.AddCacheRegistry();
+
             return services;
         }
     }
