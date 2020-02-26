@@ -69,4 +69,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Registry\" />
+  </ItemGroup>
+
 </Project>

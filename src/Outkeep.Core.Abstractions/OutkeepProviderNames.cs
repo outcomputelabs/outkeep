@@ -13,5 +13,9 @@
         /// Identifies the built-in memory resource governor.
         /// </summary>
         public const string OutkeepMemoryResourceGovernor = nameof(OutkeepMemoryResourceGovernor);
+
+        public const string DefaultStorageName = "Default";
+
+        public const string DefaultRegistryName = "Default";
     }
 }
