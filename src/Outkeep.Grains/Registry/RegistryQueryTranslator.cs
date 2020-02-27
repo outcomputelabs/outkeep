@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading;
 
 namespace Outkeep.Registry
 {
@@ -16,20 +15,18 @@ namespace Outkeep.Registry
 
         public string Translate(Expression expression)
         {
-            if (Interlocked.CompareExchange(ref _builder, new StringBuilder(), null) == null)
-            {
-                try
-                {
-                    Visit(expression);
-                    return _builder.ToString();
-                }
-                finally
-                {
-                    _builder = null;
-                }
-            }
+            _builder = new StringBuilder();
 
-            throw new InvalidOperationException("Only one translation is allowed at a time.");
+            try
+            {
+                Visit(expression);
+
+                return _builder.ToString();
+            }
+            finally
+            {
+                _builder = null;
+            }
         }
 
         private static Expression StripQuotes(Expression expression)
