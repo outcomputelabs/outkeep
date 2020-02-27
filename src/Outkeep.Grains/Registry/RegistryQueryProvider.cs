@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.ObjectPool;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -8,11 +9,11 @@ namespace Outkeep.Registry
     internal class RegistryQueryProvider<TState> : IRegistryQueryProvider<TState>
         where TState : new()
     {
-        public readonly RegistryQueryTranslator _translator;
+        public readonly ObjectPool<RegistryQueryTranslator> _translators;
 
-        public RegistryQueryProvider(RegistryQueryTranslator translator)
+        public RegistryQueryProvider(ObjectPool<RegistryQueryTranslator> translators)
         {
-            _translator = translator ?? throw new ArgumentNullException(nameof(translator));
+            _translators = translators ?? throw new ArgumentNullException(nameof(translators));
         }
 
         public IQueryable CreateQuery(Expression expression)
@@ -61,7 +62,15 @@ namespace Outkeep.Registry
 
         public string GetQueryText(Expression expression)
         {
-            return _translator.Translate(expression);
+            var translator = _translators.Get();
+            try
+            {
+                return translator.Translate(expression);
+            }
+            finally
+            {
+                _translators.Return(translator);
+            }
         }
     }
 }
