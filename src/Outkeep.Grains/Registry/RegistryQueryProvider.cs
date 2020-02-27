@@ -5,11 +5,20 @@ using System.Reflection;
 
 namespace Outkeep.Registry
 {
-    public class RegistryQueryProvider<TState> : IQueryProvider
+    internal class RegistryQueryProvider<TState> : IRegistryQueryProvider<TState>
         where TState : new()
     {
+        public readonly RegistryQueryTranslator _translator;
+
+        public RegistryQueryProvider(RegistryQueryTranslator translator)
+        {
+            _translator = translator ?? throw new ArgumentNullException(nameof(translator));
+        }
+
         public IQueryable CreateQuery(Expression expression)
         {
+            if (expression is null) throw new ArgumentNullException(nameof(expression));
+
             var elementType = TypeSystem.GetElementType(expression.Type);
 
             try
@@ -47,12 +56,12 @@ namespace Outkeep.Registry
 
         private TResult InnerExecute<TResult>(Expression expression)
         {
-            throw new NotSupportedException();
+            throw new NotImplementedException();
         }
 
         public string GetQueryText(Expression expression)
         {
-            throw new NotImplementedException();
+            return _translator.Translate(expression);
         }
     }
 }

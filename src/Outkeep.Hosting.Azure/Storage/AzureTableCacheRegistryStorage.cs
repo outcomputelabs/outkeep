@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Microsoft.Azure.Cosmos.Table;
+﻿using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Outkeep.Caching;
@@ -14,26 +13,23 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Hosting.Azure.Storage
 {
-    internal class AzureTableCacheRegistryStorage : IHostedService, ICacheRegistryStorage
+    public class AzureTableCacheRegistryStorage : IHostedService, ICacheRegistryStorage
     {
-        private readonly AzureTableCacheRegistryStorageOptions _options;
-        private readonly CloudStorageAccount _account;
-        private readonly CloudTableClient _client;
         private readonly CloudTable _table;
 
         public AzureTableCacheRegistryStorage(IOptions<AzureTableCacheRegistryStorageOptions> options)
         {
-            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            if (options?.Value is null) throw new ArgumentNullException(nameof(options));
 
-            if (!CloudStorageAccount.TryParse(_options.ConnectionString, out _account))
+            if (!CloudStorageAccount.TryParse(options.Value.ConnectionString, out var account))
             {
                 throw new OutkeepStorageException(Resources.Exception_InvalidCloudStorageAccountConnectionString);
             }
 
-            _client = _account.CreateCloudTableClient();
-            _client.TableClientConfiguration.UseRestExecutorForCosmosEndpoint = _options.UseRestExecutorForCosmosEndpoint;
+            var client = account.CreateCloudTableClient();
+            client.TableClientConfiguration.UseRestExecutorForCosmosEndpoint = options.Value.UseRestExecutorForCosmosEndpoint;
 
-            _table = _client.GetTableReference(_options.TableName);
+            _table = client.GetTableReference(options.Value.TableName);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

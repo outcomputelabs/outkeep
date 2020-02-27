@@ -2,20 +2,34 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 
 namespace Outkeep.Registry
 {
+    /// <summary>
+    /// Translates a registry state query into a registry storage query.
+    /// This class is not thread-safe and only one translation is supported at the same time.
+    /// </summary>
     internal class RegistryQueryTranslator : ExpressionVisitor
     {
-        private readonly StringBuilder _builder = new StringBuilder();
+        private StringBuilder? _builder = new StringBuilder();
 
         public string Translate(Expression expression)
         {
-            _builder.Clear();
+            if (Interlocked.CompareExchange(ref _builder, new StringBuilder(), null) == null)
+            {
+                try
+                {
+                    Visit(expression);
+                    return _builder.ToString();
+                }
+                finally
+                {
+                    _builder = null;
+                }
+            }
 
-            Visit(expression);
-
-            return _builder.ToString();
+            throw new InvalidOperationException("Only one translation is allowed at a time.");
         }
 
         private static Expression StripQuotes(Expression expression)

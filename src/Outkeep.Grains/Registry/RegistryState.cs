@@ -1,4 +1,5 @@
-﻿using Orleans;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Orleans;
 using Orleans.Runtime;
 using System;
 using System.Linq;
@@ -55,7 +56,8 @@ namespace Outkeep.Registry
 
         public IQueryable<IRegistryEntryState<TState>> CreateQuery()
         {
-            throw new NotImplementedException();
+            var provider = _context.ActivationServices.GetRequiredService<IRegistryQueryProvider<TState>>();
+            return new RegistryQuery<TState>(provider);
         }
     }
 }

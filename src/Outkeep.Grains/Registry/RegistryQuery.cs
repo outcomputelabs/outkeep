@@ -10,9 +10,9 @@ namespace Outkeep.Registry
     internal class RegistryQuery<TState> : IQueryable<IRegistryEntryState<TState>>, IAsyncEnumerable<IRegistryEntryState<TState>>
         where TState : new()
     {
-        private readonly RegistryQueryProvider<TState> _provider;
+        private readonly IRegistryQueryProvider<TState> _provider;
 
-        public RegistryQuery(RegistryQueryProvider<TState> provider)
+        public RegistryQuery(IRegistryQueryProvider<TState> provider)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             Expression = Expression.Constant(this);
