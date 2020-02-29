@@ -6,7 +6,7 @@ namespace Outkeep.Registry
     /// <summary>
     /// Acts as a bridge state object between the user entity object and the storage entity object.
     /// </summary>
-    internal class RegistryEntryState<TState> : IRegistryEntryState<TState>, IRegistryEntity<TState>
+    internal class RegistryEntryState<TState> : IRegistryEntryState<TState>, IKeyedGrainState<TState>
         where TState : class, new()
     {
         private readonly RegistryStateStorageBridge<TState> _bridge;

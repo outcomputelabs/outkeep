@@ -15,26 +15,30 @@ namespace Outkeep.Hosting.Azure.Storage
 {
     public class AzureTableCacheRegistryStorage : IHostedService, ICacheRegistryStorage
     {
+        private readonly string _name;
         private readonly CloudTable _table;
 
-        public AzureTableCacheRegistryStorage(IOptions<AzureTableCacheRegistryStorageOptions> options)
+        public AzureTableCacheRegistryStorage(string name, IOptionsSnapshot<AzureTableCacheRegistryStorageOptions> optionsSnapshot)
         {
-            if (options?.Value is null) throw new ArgumentNullException(nameof(options));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
+            if (optionsSnapshot is null) throw new ArgumentNullException(nameof(optionsSnapshot));
 
-            if (!CloudStorageAccount.TryParse(options.Value.ConnectionString, out var account))
+            var options = optionsSnapshot.Get(_name);
+
+            if (!CloudStorageAccount.TryParse(options.ConnectionString, out var account))
             {
                 throw new OutkeepStorageException(Resources.Exception_InvalidCloudStorageAccountConnectionString);
             }
 
             var client = account.CreateCloudTableClient();
-            client.TableClientConfiguration.UseRestExecutorForCosmosEndpoint = options.Value.UseRestExecutorForCosmosEndpoint;
+            client.TableClientConfiguration.UseRestExecutorForCosmosEndpoint = options.UseRestExecutorForCosmosEndpoint;
 
-            _table = client.GetTableReference(options.Value.TableName);
+            _table = client.GetTableReference(options.TableName);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            return _table.CreateIfNotExistsAsync(cancellationToken);
+            _table.CreateIfNotExistsAsync(cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

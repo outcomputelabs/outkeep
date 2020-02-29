@@ -117,7 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Exception_ClearOperationFailed" xml:space="preserve">
+    <value>Clear operation failed</value>
+  </data>
+  <data name="Exception_ClearOperationFailedWithHttpStatusCode_X" xml:space="preserve">
+    <value>Clear operation failed with HTTP Status Code {0}</value>
+  </data>
+  <data name="Exception_InsertOrReplaceOperationFailed" xml:space="preserve">
+    <value>InsertOrReplace operation failed</value>
+  </data>
+  <data name="Exception_InsertOrReplaceOperationFailedWithHttpStatusCode_X" xml:space="preserve">
+    <value>InsertOrReplace operation failed with HTTP Status Code {0}</value>
+  </data>
   <data name="Exception_InvalidCloudStorageAccountConnectionString" xml:space="preserve">
     <value>Invalid cloud storage account connection string</value>
+  </data>
+  <data name="Log_StartedAzureTableRegistryGrainStorageNamed_X_UsingTable_X" xml:space="preserve">
+    <value>Started azure table registry grain storage named {StorageName} using table {TableName}</value>
   </data>
 </root>

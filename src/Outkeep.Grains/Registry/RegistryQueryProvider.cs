@@ -57,6 +57,11 @@ namespace Outkeep.Registry
 
         private TResult InnerExecute<TResult>(Expression expression)
         {
+            var query = GetQueryText(expression);
+
+            // todo: run the storage query here
+
+            // todo: convert the storage results to state results
             throw new NotImplementedException();
         }
 

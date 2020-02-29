@@ -22,17 +22,17 @@ namespace Outkeep.Registry
             _grainReference = grainReference ?? throw new ArgumentNullException(nameof(grainReference));
         }
 
-        public Task ReadStateAsync(IRegistryEntity<TState> entity)
+        public Task ReadStateAsync(IKeyedGrainState<TState> entity)
         {
             return _storage.ReadStateAsync(_fullStateName, _grainReference, entity);
         }
 
-        public Task WriteStateAsync(IRegistryEntity<TState> entity)
+        public Task WriteStateAsync(IKeyedGrainState<TState> entity)
         {
             return _storage.WriteStateAsync(_fullStateName, _grainReference, entity);
         }
 
-        public Task ClearStateAsync(IRegistryEntity<TState> entity)
+        public Task ClearStateAsync(IKeyedGrainState<TState> entity)
         {
             return _storage.ClearStateAsync(_fullStateName, _grainReference, entity);
         }

@@ -61,11 +61,56 @@ namespace Outkeep.Hosting.Azure.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clear operation failed.
+        /// </summary>
+        internal static string Exception_ClearOperationFailed {
+            get {
+                return ResourceManager.GetString("Exception_ClearOperationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear operation failed with HTTP Status Code {0}.
+        /// </summary>
+        internal static string Exception_ClearOperationFailedWithHttpStatusCode_X {
+            get {
+                return ResourceManager.GetString("Exception_ClearOperationFailedWithHttpStatusCode_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to InsertOrReplace operation failed.
+        /// </summary>
+        internal static string Exception_InsertOrReplaceOperationFailed {
+            get {
+                return ResourceManager.GetString("Exception_InsertOrReplaceOperationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to InsertOrReplace operation failed with HTTP Status Code {0}.
+        /// </summary>
+        internal static string Exception_InsertOrReplaceOperationFailedWithHttpStatusCode_X {
+            get {
+                return ResourceManager.GetString("Exception_InsertOrReplaceOperationFailedWithHttpStatusCode_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid cloud storage account connection string.
         /// </summary>
         internal static string Exception_InvalidCloudStorageAccountConnectionString {
             get {
                 return ResourceManager.GetString("Exception_InvalidCloudStorageAccountConnectionString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Started azure table registry grain storage named {StorageName} using table {TableName}.
+        /// </summary>
+        internal static string Log_StartedAzureTableRegistryGrainStorageNamed_X_UsingTable_X {
+            get {
+                return ResourceManager.GetString("Log_StartedAzureTableRegistryGrainStorageNamed_X_UsingTable_X", resourceCulture);
             }
         }
     }
