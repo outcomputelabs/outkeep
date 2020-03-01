@@ -2,6 +2,7 @@
 using Outkeep.Properties;
 using Outkeep.Tcp;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using Xunit;
@@ -147,6 +148,7 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        [SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed")]
         public void GetFreePortThrowsOnStartPortGreaterThanMaxPort()
         {
             // arrange
@@ -161,6 +163,7 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        [SuppressMessage("Major Code Smell", "S1854:Unused assignments should be removed")]
         public void GetFreePortThrowsOnEndPortGreaterThanMaxPort()
         {
             // arrange

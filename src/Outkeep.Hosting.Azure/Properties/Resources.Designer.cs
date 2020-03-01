@@ -79,6 +79,24 @@ namespace Outkeep.Hosting.Azure.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete operation failed.
+        /// </summary>
+        internal static string Exception_DeleteOperationFailed {
+            get {
+                return ResourceManager.GetString("Exception_DeleteOperationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entry of type {0} is not supported by this registry implementation.
+        /// </summary>
+        internal static string Exception_EntryOfType_X_IsNotSupportedByThisRegistryImplementation {
+            get {
+                return ResourceManager.GetString("Exception_EntryOfType_X_IsNotSupportedByThisRegistryImplementation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to InsertOrReplace operation failed.
         /// </summary>
         internal static string Exception_InsertOrReplaceOperationFailed {
@@ -102,6 +120,15 @@ namespace Outkeep.Hosting.Azure.Properties {
         internal static string Exception_InvalidCloudStorageAccountConnectionString {
             get {
                 return ResourceManager.GetString("Exception_InvalidCloudStorageAccountConnectionString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retrieve operation failed.
+        /// </summary>
+        internal static string Exception_RetrieveOperationFailed {
+            get {
+                return ResourceManager.GetString("Exception_RetrieveOperationFailed", resourceCulture);
             }
         }
         

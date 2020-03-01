@@ -28,6 +28,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Registry\**" />
+    <EmbeddedResource Remove="Registry\**" />
+    <None Remove="Registry\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -67,10 +73,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Registry\" />
   </ItemGroup>
 
 </Project>

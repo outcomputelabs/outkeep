@@ -123,6 +123,12 @@
   <data name="Exception_ClearOperationFailedWithHttpStatusCode_X" xml:space="preserve">
     <value>Clear operation failed with HTTP Status Code {0}</value>
   </data>
+  <data name="Exception_DeleteOperationFailed" xml:space="preserve">
+    <value>Delete operation failed</value>
+  </data>
+  <data name="Exception_EntryOfType_X_IsNotSupportedByThisRegistryImplementation" xml:space="preserve">
+    <value>Entry of type {0} is not supported by this registry implementation</value>
+  </data>
   <data name="Exception_InsertOrReplaceOperationFailed" xml:space="preserve">
     <value>InsertOrReplace operation failed</value>
   </data>
@@ -131,6 +137,9 @@
   </data>
   <data name="Exception_InvalidCloudStorageAccountConnectionString" xml:space="preserve">
     <value>Invalid cloud storage account connection string</value>
+  </data>
+  <data name="Exception_RetrieveOperationFailed" xml:space="preserve">
+    <value>Retrieve operation failed</value>
   </data>
   <data name="Log_StartedAzureTableRegistryGrainStorageNamed_X_UsingTable_X" xml:space="preserve">
     <value>Started azure table registry grain storage named {StorageName} using table {TableName}</value>

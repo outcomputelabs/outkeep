@@ -63,6 +63,7 @@ namespace Benchmarks
         }
 
         [SuppressMessage("Design", "CA1062:Validate arguments of public methods")]
+        [SuppressMessage("Major Bug", "S2259:Null pointers should not be dereferenced")]
         public static string GetTypeNameWithFunctionCheck(this object target)
         {
             if (target == null) ThrowTargetNull();

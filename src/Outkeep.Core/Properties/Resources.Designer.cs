@@ -214,6 +214,15 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current ETag {0} does not match stored ETag {1}.
+        /// </summary>
+        internal static string Exception_CurrentETag_X_DoesNotMatchStoredETag_X {
+            get {
+                return ResourceManager.GetString("Exception_CurrentETag_X_DoesNotMatchStoredETag_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to clear cache file {0} for key {1}.
         /// </summary>
         internal static string Exception_FailedToClearCacheFile_X_ForKey_X {

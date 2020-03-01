@@ -29,6 +29,7 @@ namespace Outkeep.Caching
         private TaskCompletionSource<CachePulse> _promise = new TaskCompletionSource<CachePulse>();
 
         private string GrainKey => this.GetPrimaryKeyString();
+        private CacheRegistryEntry? _entry = null;
 
         public override async Task OnActivateAsync()
         {
@@ -37,6 +38,14 @@ namespace Outkeep.Caching
             {
                 await RemoveAsync().ConfigureAwait(true);
             }
+
+            // get the stored registry entry for etag reuse
+            _entry = await _context.CacheRegistry.GetAsync(GrainKey).ConfigureAwait(true);
+
+            // ensure the registry has up-to-date info in case a prior operation failed
+            _entry = await _context.CacheRegistry
+                .RegisterOrUpdateAsync(new CacheRegistryEntry(GrainKey, _state.State.Value?.Length, _state.State.AbsoluteExpiration, _state.State.SlidingExpiration, _entry?.ETag))
+                .ConfigureAwait(true);
 
             // enroll as a weak activation
             _activity.State.Priority = ActivityPriority.Normal;
@@ -120,6 +129,7 @@ namespace Outkeep.Caching
                 await Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync()).ConfigureAwait(true);
 
                 // unregister from the cache registry last
+                _context.CacheRegistry.UnregisterAsync(_entry ?? new CacheRegistryEntry(GrainKey, null, null, null))
                 await _context.CacheRegistry.UnregisterAsync(GrainKey).ConfigureAwait(true);
             }
             else

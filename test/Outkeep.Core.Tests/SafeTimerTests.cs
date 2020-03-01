@@ -3,6 +3,7 @@ using Outkeep.Core.Tests.Fakes;
 using Outkeep.Properties;
 using Outkeep.Timers;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -114,6 +115,7 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        [SuppressMessage("Minor Code Smell", "S3626:Jump statements should not be redundant")]
         public async Task LogsOnImmediateCancellation()
         {
             // arrange
@@ -147,6 +149,7 @@ namespace Outkeep.Core.Tests
         }
 
         [Fact]
+        [SuppressMessage("Minor Code Smell", "S3626:Jump statements should not be redundant")]
         public async Task LogsOnImmediateFault()
         {
             // arrange

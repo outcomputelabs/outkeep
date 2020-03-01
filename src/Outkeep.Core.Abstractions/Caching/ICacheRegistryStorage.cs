@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Linq;
 using System.Threading.Tasks;
 
 namespace Outkeep.Caching
 {
     public interface ICacheRegistryStorage
     {
-        Task WriteAsync(string key, int size, CancellationToken cancellationToken = default);
+        public Task<CacheRegistryEntry?> ReadAsync(string key);
 
-        Task ClearAsync(string key, CancellationToken cancellationToken = default);
+        public Task ClearAsync(CacheRegistryEntry entry);
 
-        IAsyncEnumerable<CacheRegistryEntry> EnumerateAsync(CancellationToken cancellationToken = default);
+        public Task<CacheRegistryEntry> WriteAsync(CacheRegistryEntry entry);
+
+        public IQueryable<CacheRegistryEntry> CreateQuery();
     }
 }

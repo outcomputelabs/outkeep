@@ -168,6 +168,9 @@
   <data name="Exception_CouldNotOpenADynamicPortForExclusiveUse" xml:space="preserve">
     <value>Could not open a dynamic port for exclusive use</value>
   </data>
+  <data name="Exception_CurrentETag_X_DoesNotMatchStoredETag_X" xml:space="preserve">
+    <value>Current ETag {0} does not match stored ETag {1}</value>
+  </data>
   <data name="Exception_FailedToClearCacheFile_X_ForKey_X" xml:space="preserve">
     <value>Failed to clear cache file {0} for key {1}</value>
   </data>
