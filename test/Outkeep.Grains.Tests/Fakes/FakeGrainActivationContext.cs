@@ -1,6 +1,5 @@
 ﻿using Orleans;
 using Orleans.Core;
-using Orleans.GrainDirectory;
 using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
@@ -20,7 +19,5 @@ namespace Outkeep.Grains.Tests.Fakes
         public IDictionary<object, object> Items { get; } = new Dictionary<object, object>();
 
         public IGrainLifecycle? ObservableLifecycle { get; set; }
-
-        public IMultiClusterRegistrationStrategy? RegistrationStrategy { get; set; }
     }
 }

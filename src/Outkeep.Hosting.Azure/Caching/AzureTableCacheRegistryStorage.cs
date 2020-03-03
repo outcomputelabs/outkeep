@@ -128,18 +128,25 @@ namespace Outkeep.Caching
 
         public IQueryable<ICacheRegistryEntryState> CreateQuery()
         {
-            throw new NotImplementedException();
+            return _table.CreateQuery<AzureTableCacheRegistryEntity>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken) => _table.CreateIfNotExistsAsync(cancellationToken);
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        private class AzureTableCacheRegistryEntity : TableEntity
+        private class AzureTableCacheRegistryEntity : TableEntity, ICacheRegistryEntryState
         {
             public int? Size { get; set; }
             public DateTimeOffset? AbsoluteExpiration { get; set; }
             public TimeSpan? SlidingExpiration { get; set; }
+
+            #region ICacheRegistryEntryState
+
+            string ICacheRegistryEntryState.Key => PartitionKey;
+            string? ICacheRegistryEntryState.ETag { get => ETag; set => ETag = value; }
+
+            #endregion ICacheRegistryEntryState
         }
     }
 }
