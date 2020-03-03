@@ -29,7 +29,7 @@ namespace Outkeep.Caching
         private TaskCompletionSource<CachePulse> _promise = new TaskCompletionSource<CachePulse>();
 
         private string GrainKey => this.GetPrimaryKeyString();
-        private CacheRegistryEntry? _entry = null;
+        private ICacheRegistryEntry _entry;
 
         public override async Task OnActivateAsync()
         {
@@ -39,13 +39,12 @@ namespace Outkeep.Caching
                 await RemoveAsync().ConfigureAwait(true);
             }
 
-            // get the stored registry entry for etag reuse
+            // ensure this instance is up-to-date in the cache registry
             _entry = await _context.CacheRegistry.GetAsync(GrainKey).ConfigureAwait(true);
-
-            // ensure the registry has up-to-date info in case a prior operation failed
-            _entry = await _context.CacheRegistry
-                .RegisterOrUpdateAsync(new CacheRegistryEntry(GrainKey, _state.State.Value?.Length, _state.State.AbsoluteExpiration, _state.State.SlidingExpiration, _entry?.ETag))
-                .ConfigureAwait(true);
+            _entry.Size = _state.State.Value?.Length;
+            _entry.AbsoluteExpiration = _state.State.AbsoluteExpiration;
+            _entry.SlidingExpiration = _state.State.SlidingExpiration;
+            await _entry.WriteStateAsync().ConfigureAwait(true);
 
             // enroll as a weak activation
             _activity.State.Priority = ActivityPriority.Normal;
@@ -53,6 +52,24 @@ namespace Outkeep.Caching
 
             // start the maintenance schedule
             RegisterTimer(TickMaintenanceAsyncDelegate, this, _context.Options.MaintenancePeriod, _context.Options.MaintenancePeriod);
+        }
+
+        public override async Task OnDeactivateAsync()
+        {
+            // check if there is any content left in this grain
+            if (_state.State is null)
+            {
+                // if there is no content then clear the control flags as well
+                await _flags.ClearStateAsync().ConfigureAwait(true);
+
+                // if the above succeeded then it is safe to clear the cache registry
+                if (!(_entry is null))
+                {
+                    await _entry.ClearStateAsync().ConfigureAwait(true);
+                }
+            }
+
+            await base.OnDeactivateAsync().ConfigureAwait(true);
         }
 
         /// <summary>
@@ -63,24 +80,22 @@ namespace Outkeep.Caching
         /// <summary>
         /// Performs maintenance tasks on the grain.
         /// </summary>
-        private static Task TickMaintenanceAsync(object state)
+        private static async Task TickMaintenanceAsync(object state)
         {
             var self = (CacheGrain)state;
 
             // check if the content has expired
             if (self.IsExpired())
             {
-                return self.RemoveAsync();
+                await self.RemoveAsync().ConfigureAwait(true);
             }
 
             // save control flags if changed
             if (self._flags.State.UtcLastAccessed != self._flags.State.PersistedUtcLastAccessed)
             {
                 self._flags.State.PersistedUtcLastAccessed = self._flags.State.UtcLastAccessed;
-                return self._flags.WriteStateAsync();
+                await self._flags.WriteStateAsync().ConfigureAwait(true);
             }
-
-            return Task.CompletedTask;
         }
 
         private bool IsExpired()
@@ -122,21 +137,23 @@ namespace Outkeep.Caching
                 _state.State.AbsoluteExpiration = default;
                 _state.State.SlidingExpiration = default;
 
+                // attempt to clear the state from storage
+                await _state.ClearStateAsync().ConfigureAwait(true);
+
+                // if we cleared the state then we can clear the flags as well
+                await _flags.ClearStateAsync().ConfigureAwait(true);
+
+                // notify the registry
+                _entry.Size = _state.State.Value?.Length;
+                _entry.AbsoluteExpiration = _state.State.AbsoluteExpiration;
+                _entry.SlidingExpiration = _state.State.SlidingExpiration;
+                await _entry.WriteStateAsync().ConfigureAwait(true);
+
                 // propagate the change to reactive requesters
                 Publish();
-
-                // attempt to clear the state from storage
-                await Task.WhenAll(_state.ClearStateAsync(), _flags.ClearStateAsync()).ConfigureAwait(true);
-
-                // unregister from the cache registry last
-                _context.CacheRegistry.UnregisterAsync(_entry ?? new CacheRegistryEntry(GrainKey, null, null, null))
-                await _context.CacheRegistry.UnregisterAsync(GrainKey).ConfigureAwait(true);
             }
             else
             {
-                // register on cache registry first
-                await _context.CacheRegistry.RegisterAsync(GrainKey, value.Value.Length).ConfigureAwait(true);
-
                 // now we can accept the new data
                 _state.State.Tag = Guid.NewGuid();
                 _state.State.Value = value.Value;
@@ -146,11 +163,20 @@ namespace Outkeep.Caching
                 // start measuring sliding expiration from this point onwards
                 _flags.State.UtcLastAccessed = now;
 
+                // attempt to write state to storage
+                await _state.WriteStateAsync().ConfigureAwait(true);
+
+                // attempt to write the control flags as well
+                await _flags.WriteStateAsync().ConfigureAwait(true);
+
+                // notify the registry
+                _entry.Size = _state.State.Value?.Length;
+                _entry.AbsoluteExpiration = _state.State.AbsoluteExpiration;
+                _entry.SlidingExpiration = _state.State.SlidingExpiration;
+                await _entry.WriteStateAsync().ConfigureAwait(true);
+
                 // propagate the change to reactive requesters
                 Publish();
-
-                // attempt to write state to storage while saving control flags
-                await Task.WhenAll(_state.WriteStateAsync(), _flags.WriteStateAsync()).ConfigureAwait(true);
             }
         }
 
@@ -164,7 +190,7 @@ namespace Outkeep.Caching
         }
 
         /// <inheritdoc />
-        public ValueTask<CachePulse> PollAsync(Guid tag)
+        public ValueTask<CachePulse> WaitAsync(Guid tag)
         {
             // delay the sliding expiration
             _flags.State.UtcLastAccessed = _context.Clock.UtcNow;

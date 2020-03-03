@@ -5,12 +5,12 @@ namespace Outkeep.Caching
 {
     public interface ICacheRegistryStorage
     {
-        public Task<CacheRegistryEntry?> ReadAsync(string key);
+        Task ReadStateAsync(ICacheRegistryEntryState state);
 
-        public Task ClearAsync(CacheRegistryEntry entry);
+        Task WriteStateAsync(ICacheRegistryEntryState state);
 
-        public Task<CacheRegistryEntry> WriteAsync(CacheRegistryEntry entry);
+        Task ClearStateAsync(ICacheRegistryEntryState state);
 
-        public IQueryable<CacheRegistryEntry> CreateQuery();
+        IQueryable<ICacheRegistryEntryState> CreateQuery();
     }
 }

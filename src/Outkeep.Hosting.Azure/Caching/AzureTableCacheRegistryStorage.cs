@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Outkeep.Caching
 {
-    public class AzureTableCacheRegistryStorage : ICacheRegistryStorage, IHostedService
+    internal class AzureTableCacheRegistryStorage : ICacheRegistryStorage, IHostedService
     {
         private readonly AzureTableCacheRegistryStorageOptions _options;
         private readonly CloudTable _table;
@@ -27,45 +27,93 @@ namespace Outkeep.Caching
             _table = account.CreateCloudTableClient().GetTableReference(_options.TableName);
         }
 
-        public Task<CacheRegistryEntry?> ReadAsync(string key)
+        public Task ReadStateAsync(ICacheRegistryEntryState state)
         {
-            if (key is null) throw new ArgumentNullException(nameof(key));
+            if (state is null) throw new ArgumentNullException(nameof(state));
 
-            return InnerReadAsync(key);
+            return InnerReadStateAsync(state);
         }
 
-        private async Task<CacheRegistryEntry?> InnerReadAsync(string key)
+        private async Task InnerReadStateAsync(ICacheRegistryEntryState state)
         {
-            var operation = TableOperation.Retrieve<AzureTableCacheRegistryEntity>(_options.MainPartitionKey, key);
+            var operation = TableOperation.Retrieve<AzureTableCacheRegistryEntity>(state.Key, _options.DataRowKey);
 
             try
             {
                 var result = await _table.ExecuteAsync(operation).ConfigureAwait(false);
                 if (result.Result is AzureTableCacheRegistryEntity entity)
                 {
-                    return entity.ToEntry();
+                    state.Size = entity.Size;
+                    state.AbsoluteExpiration = entity.AbsoluteExpiration;
+                    state.SlidingExpiration = entity.SlidingExpiration;
+                    state.ETag = entity.ETag;
                 }
                 else
                 {
-                    throw new AzureTableCacheRegistryException(Resources.Exception_RetrieveOperationFailed, _options.TableName, _options.MainPartitionKey, key);
+                    throw new AzureTableCacheRegistryException(Resources.Exception_RetrieveOperationFailed, _options.TableName, state.Key, _options.DataRowKey);
                 }
             }
             catch (StorageException exception)
             {
-                throw new AzureTableCacheRegistryException(Resources.Exception_RetrieveOperationFailed, _options.TableName, _options.MainPartitionKey, key, exception);
+                throw new AzureTableCacheRegistryException(Resources.Exception_RetrieveOperationFailed, _options.TableName, state.Key, _options.DataRowKey, exception);
             }
         }
 
-        public Task ClearAsync(CacheRegistryEntry entry)
+        public Task WriteStateAsync(ICacheRegistryEntryState state)
         {
-            if (entry is null) throw new ArgumentNullException(nameof(entry));
+            if (state is null) throw new ArgumentNullException(nameof(state));
 
-            return InnerClearAsync(entry);
+            return InnerWriteStateAsync(state);
         }
 
-        private async Task InnerClearAsync(CacheRegistryEntry entry)
+        private async Task InnerWriteStateAsync(ICacheRegistryEntryState state)
         {
-            var entity = AzureTableCacheRegistryEntity.FromEntry(_options.MainPartitionKey, entry);
+            var entity = new AzureTableCacheRegistryEntity
+            {
+                PartitionKey = state.Key,
+                RowKey = _options.DataRowKey,
+                Size = state.Size,
+                AbsoluteExpiration = state.AbsoluteExpiration,
+                SlidingExpiration = state.SlidingExpiration,
+                ETag = state.ETag
+            };
+
+            var operation = TableOperation.InsertOrReplace(entity);
+
+            try
+            {
+                var result = await _table.ExecuteAsync(operation).ConfigureAwait(false);
+                if (result.Result is AzureTableCacheRegistryEntity inserted)
+                {
+                    state.ETag = inserted.ETag;
+                }
+                else
+                {
+                    throw new AzureTableCacheRegistryException(Resources.Exception_InsertOrReplaceOperationFailed, _options.TableName, entity.PartitionKey, entity.RowKey);
+                }
+            }
+            catch (StorageException exception)
+            {
+                throw new AzureTableCacheRegistryException(Resources.Exception_InsertOrReplaceOperationFailed, _options.TableName, entity.PartitionKey, entity.RowKey, exception);
+            }
+        }
+
+        public Task ClearStateAsync(ICacheRegistryEntryState state)
+        {
+            if (state is null) throw new ArgumentNullException(nameof(state));
+
+            return InnerClearStateAsync(state);
+        }
+
+        private async Task InnerClearStateAsync(ICacheRegistryEntryState state)
+        {
+            var entity = new AzureTableCacheRegistryEntity
+            {
+                PartitionKey = state.Key,
+                RowKey = _options.DataRowKey,
+                ETag = state.ETag
+            };
+
             var operation = TableOperation.Delete(entity);
 
             try
@@ -74,41 +122,11 @@ namespace Outkeep.Caching
             }
             catch (StorageException exception)
             {
-                throw new AzureTableCacheRegistryException(Resources.Exception_DeleteOperationFailed, _options.TableName, _options.MainPartitionKey, entity.RowKey, exception);
+                throw new AzureTableCacheRegistryException(Resources.Exception_DeleteOperationFailed, _options.TableName, entity.PartitionKey, entity.RowKey, exception);
             }
         }
 
-        public Task<CacheRegistryEntry> WriteAsync(CacheRegistryEntry entry)
-        {
-            if (entry is null) throw new ArgumentNullException(nameof(entry));
-
-            return InnerWriteAsync(entry);
-        }
-
-        private async Task<CacheRegistryEntry> InnerWriteAsync(CacheRegistryEntry entry)
-        {
-            var entity = AzureTableCacheRegistryEntity.FromEntry(_options.MainPartitionKey, entry);
-            var operation = TableOperation.InsertOrReplace(entity);
-
-            try
-            {
-                var result = await _table.ExecuteAsync(operation).ConfigureAwait(false);
-                if (result.Result is AzureTableCacheRegistryEntity inserted)
-                {
-                    return inserted.ToEntry();
-                }
-                else
-                {
-                    throw new AzureTableCacheRegistryException(Resources.Exception_InsertOrReplaceOperationFailed, _options.TableName, _options.MainPartitionKey, entity.RowKey);
-                }
-            }
-            catch (StorageException exception)
-            {
-                throw new AzureTableCacheRegistryException(Resources.Exception_InsertOrReplaceOperationFailed, _options.TableName, _options.MainPartitionKey, entity.RowKey, exception);
-            }
-        }
-
-        public IQueryable<CacheRegistryEntry> CreateQuery()
+        public IQueryable<ICacheRegistryEntryState> CreateQuery()
         {
             throw new NotImplementedException();
         }
@@ -116,5 +134,12 @@ namespace Outkeep.Caching
         public Task StartAsync(CancellationToken cancellationToken) => _table.CreateIfNotExistsAsync(cancellationToken);
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        private class AzureTableCacheRegistryEntity : TableEntity
+        {
+            public int? Size { get; set; }
+            public DateTimeOffset? AbsoluteExpiration { get; set; }
+            public TimeSpan? SlidingExpiration { get; set; }
+        }
     }
 }

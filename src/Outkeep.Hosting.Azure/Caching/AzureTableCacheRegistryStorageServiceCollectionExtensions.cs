@@ -3,7 +3,7 @@ using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class AzureTableCacheRegistryServiceCollectionExtensions
+    public static class AzureTableCacheRegistryStorageServiceCollectionExtensions
     {
         public static IServiceCollection AddAzureTableCacheRegistryStorage(this IServiceCollection services, Action<AzureTableCacheRegistryStorageOptions> configure)
         {
