@@ -1,4 +1,4 @@
-﻿using Outkeep;
+﻿using Outkeep.Persistence;
 
 namespace Orleans.Runtime
 {

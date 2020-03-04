@@ -3,7 +3,7 @@ using Outkeep.Properties;
 using System;
 using System.Threading.Tasks;
 
-namespace Outkeep
+namespace Outkeep.Persistence
 {
     /// <summary>
     /// A rudimentary wrapper that batches reads and writes to the orleans state in a reentrancy safe manner.
