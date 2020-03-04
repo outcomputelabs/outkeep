@@ -1,13 +1,14 @@
-﻿using Outkeep.Properties;
+﻿using Orleans.Runtime;
+using Outkeep.Properties;
 using System;
 using System.Threading.Tasks;
 
-namespace Orleans.Runtime
+namespace Outkeep
 {
     /// <summary>
     /// A rudimentary wrapper that batches reads and writes to the orleans state in a reentrancy safe manner.
     /// </summary>
-    public class PersistentStateConflater<TState> : IPersistentState<TState>
+    internal class PersistentStateConflater<TState> : IPersistentState<TState>
         where TState : new()
     {
         public PersistentStateConflater(IPersistentState<TState> underlying)

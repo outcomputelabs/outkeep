@@ -1,4 +1,6 @@
-﻿namespace Orleans.Runtime
+﻿using Outkeep;
+
+namespace Orleans.Runtime
 {
     public static class PersistentStateExtensions
     {
