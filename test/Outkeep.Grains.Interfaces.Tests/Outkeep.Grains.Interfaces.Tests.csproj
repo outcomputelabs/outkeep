@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Outkeep.Grains.Interfaces\Outkeep.Grains.Interfaces.csproj" />
+    <ProjectReference Include="..\..\src\Outkeep.Core.Abstractions\Outkeep.Core.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
