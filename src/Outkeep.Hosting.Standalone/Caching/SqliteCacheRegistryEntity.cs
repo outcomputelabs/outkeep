@@ -15,7 +15,7 @@ namespace Outkeep.Hosting.Standalone.Caching
 
         public TimeSpan? SlidingExpiration { get; set; }
 
-        [Timestamp]
+        [ConcurrencyCheck]
         public string? ETag { get; set; }
     }
 }

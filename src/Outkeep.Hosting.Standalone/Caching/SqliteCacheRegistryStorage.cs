@@ -3,6 +3,7 @@ using Orleans.Storage;
 using Outkeep.Caching;
 using Outkeep.Hosting.Standalone.Properties;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -66,17 +67,26 @@ namespace Outkeep.Hosting.Standalone.Caching
             if (entity is null)
             {
                 entity = new SqliteCacheRegistryEntity();
-                context.Entry(entity).State = EntityState.Added;
+                context.Add(entity);
             }
             else
             {
-                context.Entry(entity).State = EntityState.Modified;
+                context.Update(entity);
             }
 
             entity.Size = state.Size;
             entity.AbsoluteExpiration = state.AbsoluteExpiration;
             entity.SlidingExpiration = state.SlidingExpiration;
-            await context.SaveChangesAsync().ConfigureAwait(false);
+            entity.ETag = Guid.NewGuid().ToString("D", CultureInfo.InvariantCulture);
+
+            try
+            {
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
+                throw new InconsistentStateException(Resources.Exception_CannotDeleteEntryWithKey_X_BecauseETagsDoeNotMatch.Format(state.Key), entity.ETag, state.ETag, exception);
+            }
 
             state.ETag = entity.ETag;
         }
@@ -97,18 +107,22 @@ namespace Outkeep.Hosting.Standalone.Caching
             if (stored is null)
             {
                 // the entry does not exist so there is nothing to do
+                state.ETag = null;
                 return;
             }
 
-            // ensure the etags match attempting database work
-            if (stored.ETag != state.ETag)
-            {
-                throw new InconsistentStateException(Resources.Exception_CannotDeleteEntryWithKey_X_BecauseETagsDoeNotMatch.Format(state.Key), stored.ETag, state.ETag);
-            }
-
             // attempt to remove the entity from the database
+            stored.ETag = state.ETag;
             context.Remove(stored);
-            await context.SaveChangesAsync().ConfigureAwait(false);
+
+            try
+            {
+                await context.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
+                throw new InconsistentStateException(Resources.Exception_CannotDeleteEntryWithKey_X_BecauseETagsDoeNotMatch.Format(state.Key), stored.ETag, state.ETag, exception);
+            }
 
             // reflect the clear in the user state
             state.ETag = null;

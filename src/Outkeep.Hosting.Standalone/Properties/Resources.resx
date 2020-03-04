@@ -120,4 +120,7 @@
   <data name="Exception_CannotDeleteEntryWithKey_X_BecauseETagsDoeNotMatch" xml:space="preserve">
     <value>Cannot delete entry with key {0} because the etags do not match</value>
   </data>
+  <data name="Exception_CannotWriteEntryWithKey_X_BecauseETagsDoeNotMatch" xml:space="preserve">
+    <value>Cannot write entry with key {0} because the etags do not match</value>
+  </data>
 </root>

@@ -68,5 +68,14 @@ namespace Outkeep.Hosting.Standalone.Properties {
                 return ResourceManager.GetString("Exception_CannotDeleteEntryWithKey_X_BecauseETagsDoeNotMatch", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot write entry with key {0} because the etags do not match.
+        /// </summary>
+        internal static string Exception_CannotWriteEntryWithKey_X_BecauseETagsDoeNotMatch {
+            get {
+                return ResourceManager.GetString("Exception_CannotWriteEntryWithKey_X_BecauseETagsDoeNotMatch", resourceCulture);
+            }
+        }
     }
 }
