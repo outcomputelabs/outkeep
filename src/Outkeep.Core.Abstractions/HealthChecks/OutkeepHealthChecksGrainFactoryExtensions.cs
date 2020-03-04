@@ -3,10 +3,7 @@ using System;
 
 namespace Orleans
 {
-    /// <summary>
-    /// Quality-of-life extension methods for <see cref="IGrainFactory"/>.
-    /// </summary>
-    public static class OutkeepGrainFactoryExtensions
+    public static class OutkeepHealthChecksGrainFactoryExtensions
     {
         /// <summary>
         /// Gets a proxy to an <see cref="IEchoGrain"/>.
