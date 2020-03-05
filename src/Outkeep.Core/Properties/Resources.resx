@@ -180,6 +180,9 @@
   <data name="Exception_FailedToWriteCacheFile_X_For_Key_X" xml:space="preserve">
     <value>Failed to write cache file '{0}' for key '{1}'</value>
   </data>
+  <data name="Exception_NoResourceGovernorNamed_X_FoundForGrainType_X" xml:space="preserve">
+    <value>No Resource Governor named {0} found for grain type {1}</value>
+  </data>
   <data name="Exception_Property_X_MustImplementIComparable" xml:space="preserve">
     <value>Property {0} must implement IComparable</value>
   </data>
@@ -195,6 +198,9 @@
   <data name="Exception_UnexpectedEndpointType" xml:space="preserve">
     <value>Unexpected endpoint type</value>
   </data>
+  <data name="Log_AttemptingToDeactivate_X_GrainsOutOf_X_InResponseToMemoryPressure" xml:space="preserve">
+    <value>Attempting to deactivate {Count} grains out of {Total} in response to memory pressure</value>
+  </data>
   <data name="Log_CacheDirectorCannotCompactToTargetSizeOf_X" xml:space="preserve">
     <value>The cache director could not compact the cache to target capacity of {Size}</value>
   </data>
@@ -207,11 +213,20 @@
   <data name="Log_DeletedCacheFile_X_ForKey_X" xml:space="preserve">
     <value>Deleted cache file {Path} for key {Key}</value>
   </data>
+  <data name="Log_Echo_X" xml:space="preserve">
+    <value>Echo {Message}</value>
+  </data>
   <data name="Log_EvictionCallbackForKey_X_WithCause_X_Failed" xml:space="preserve">
     <value>The eviction callback for key {Key} and cause {Cause} failed</value>
   </data>
   <data name="Log_FailedOperationOnCacheFile_X_ForKey_X" xml:space="preserve">
     <value>Failed operation on cache file {Path} for key {Key}</value>
+  </data>
+  <data name="Log_FailedToDeactivateTargetGrain_X" xml:space="preserve">
+    <value>Failed to deactivate target grain {GrainReference}</value>
+  </data>
+  <data name="Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry" xml:space="preserve">
+    <value>Failed to deactivate target grain {GrainReference} after {MaxAttempts} attempts. Will not retry.</value>
   </data>
   <data name="Log_ReadCacheFile_X_ForKey_X_WithValueSizeOf_X_Bytes" xml:space="preserve">
     <value>Read cache file {Path} for key {Key} with value size of {Size} bytes</value>

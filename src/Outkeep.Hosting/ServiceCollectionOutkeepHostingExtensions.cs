@@ -1,8 +1,5 @@
-﻿using Orleans.Runtime;
-using Outkeep;
+﻿using Outkeep;
 using Outkeep.Caching;
-using Outkeep.Governance;
-using Outkeep.Governance.Memory;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -16,29 +13,19 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            // add the built-in memory pressure monitor
-            services.AddSingleton<IMemoryPressureMonitor, MemoryPressureMonitor>();
-
-            // add weak activation facet
-            services.AddSingleton<IWeakActivationStateFactory, WeakActivationStateFactory>();
-            services.AddSingleton<IAttributeToFactoryMapper<WeakActivationStateAttribute>, WeakActivationStateAttributeMapper>();
-
-            // add default memory resource governor
-            services.AddMemoryResourceGovernor(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
-
-            // add the default system clock
-            services.AddSingleton<ISystemClock, SystemClock>();
-
-            // add safe timers
-            services.AddSafeTimer();
-
-            // add the default caching storage provider
-            services.AddNullGrainStorage(OutkeepProviderNames.OutkeepCache);
+            services
+                .AddMemoryPressureMonitor()
+                .AddWeakActivationFacet()
+                .AddMemoryResourceGovernor(OutkeepProviderNames.OutkeepMemoryResourceGovernor)
+                .AddSystemClock()
+                .AddSafeTimer();
 
             // add validation of cache options
+            // todo: move this to the cache extensions
             services.AddOptions<CacheOptions>().ValidateDataAnnotations();
 
             // add the cache activation context
+            // todo: move this to the cache extensions
             services.AddCacheActivationContext();
 
             return services;

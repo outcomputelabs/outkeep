@@ -250,6 +250,15 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Resource Governor named {0} found for grain type {1}.
+        /// </summary>
+        internal static string Exception_NoResourceGovernorNamed_X_FoundForGrainType_X {
+            get {
+                return ResourceManager.GetString("Exception_NoResourceGovernorNamed_X_FoundForGrainType_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property {0} must implement IComparable.
         /// </summary>
         internal static string Exception_Property_X_MustImplementIComparable {
@@ -296,6 +305,15 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempting to deactivate {Count} grains out of {Total} in response to memory pressure.
+        /// </summary>
+        internal static string Log_AttemptingToDeactivate_X_GrainsOutOf_X_InResponseToMemoryPressure {
+            get {
+                return ResourceManager.GetString("Log_AttemptingToDeactivate_X_GrainsOutOf_X_InResponseToMemoryPressure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The cache director could not compact the cache to target capacity of {Size}.
         /// </summary>
         internal static string Log_CacheDirectorCannotCompactToTargetSizeOf_X {
@@ -332,6 +350,15 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Echo {Message}.
+        /// </summary>
+        internal static string Log_Echo_X {
+            get {
+                return ResourceManager.GetString("Log_Echo_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The eviction callback for key {Key} and cause {Cause} failed.
         /// </summary>
         internal static string Log_EvictionCallbackForKey_X_WithCause_X_Failed {
@@ -346,6 +373,24 @@ namespace Outkeep.Properties {
         internal static string Log_FailedOperationOnCacheFile_X_ForKey_X {
             get {
                 return ResourceManager.GetString("Log_FailedOperationOnCacheFile_X_ForKey_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to deactivate target grain {GrainReference}.
+        /// </summary>
+        internal static string Log_FailedToDeactivateTargetGrain_X {
+            get {
+                return ResourceManager.GetString("Log_FailedToDeactivateTargetGrain_X", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to deactivate target grain {GrainReference} after {MaxAttempts} attempts. Will not retry..
+        /// </summary>
+        internal static string Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry {
+            get {
+                return ResourceManager.GetString("Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry", resourceCulture);
             }
         }
         

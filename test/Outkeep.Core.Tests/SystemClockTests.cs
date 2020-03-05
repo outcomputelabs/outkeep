@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Outkeep.Time;
+using System;
 using Xunit;
 
 namespace Outkeep.Interfaces.Tests

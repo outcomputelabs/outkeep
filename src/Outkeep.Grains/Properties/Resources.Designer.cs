@@ -107,29 +107,11 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No Resource Governor named {0} found for grain type {1}.
-        /// </summary>
-        internal static string Exception_NoResourceGovernorNamed_X_FoundForGrainType_X {
-            get {
-                return ResourceManager.GetString("Exception_NoResourceGovernorNamed_X_FoundForGrainType_X", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0} must be a positive {1}.
         /// </summary>
         internal static string Exception_XMustBeAPositiveX {
             get {
                 return ResourceManager.GetString("Exception_XMustBeAPositiveX", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Attempting to deactivate {Count} grains out of {Total} in response to memory pressure.
-        /// </summary>
-        internal static string Log_AttemptingToDeactivate_X_GrainsOutOf_X_InResponseToMemoryPressure {
-            get {
-                return ResourceManager.GetString("Log_AttemptingToDeactivate_X_GrainsOutOf_X_InResponseToMemoryPressure", resourceCulture);
             }
         }
         
@@ -170,38 +152,11 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Echo {Message}.
-        /// </summary>
-        internal static string Log_Echo_X {
-            get {
-                return ResourceManager.GetString("Log_Echo_X", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Failed to deactivate one or more target grains.
         /// </summary>
         internal static string Log_FailedToDeactivateOneOrMoreTargetGrains {
             get {
                 return ResourceManager.GetString("Log_FailedToDeactivateOneOrMoreTargetGrains", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to deactivate target grain {GrainReference}.
-        /// </summary>
-        internal static string Log_FailedToDeactivateTargetGrain_X {
-            get {
-                return ResourceManager.GetString("Log_FailedToDeactivateTargetGrain_X", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to deactivate target grain {GrainReference} after {MaxAttempts} attempts. Will not retry..
-        /// </summary>
-        internal static string Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry {
-            get {
-                return ResourceManager.GetString("Log_FailedToDeactivateTargetGrain_X_After_X_AttemptsWillNotRetry", resourceCulture);
             }
         }
     }
