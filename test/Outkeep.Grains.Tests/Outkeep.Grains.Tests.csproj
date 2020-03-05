@@ -36,8 +36,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Outkeep.Grains\Outkeep.Grains.csproj" />
-  </ItemGroup>
-
 </Project>

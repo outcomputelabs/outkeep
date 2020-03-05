@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Xunit;
 
-namespace Outkeep.Grains.Tests
+namespace Outkeep.Core.Tests
 {
     public class ResourceGovernorExceptionTests
     {
