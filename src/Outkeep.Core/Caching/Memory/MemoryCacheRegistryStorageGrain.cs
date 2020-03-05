@@ -1,0 +1,85 @@
+﻿using Orleans;
+using Outkeep.Properties;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
+
+namespace Outkeep.Caching.Memory
+{
+    /// <summary>
+    /// This grain keeps the cache registry information in memory.
+    /// This is for use with unit testing and one-box non-reliable deployments.
+    /// </summary>
+    internal class MemoryCacheRegistryStorageGrain : Grain, IMemoryCacheRegistryStorageGrain
+    {
+        private readonly Dictionary<string, MemoryCacheRegistryEntity> _dictionary = new Dictionary<string, MemoryCacheRegistryEntity>();
+
+        public Task<MemoryCacheRegistryEntity?> TryGetEntityAsync(string key)
+        {
+            if (_dictionary.TryGetValue(key, out var entity))
+            {
+                return Task.FromResult<MemoryCacheRegistryEntity?>(entity);
+            }
+
+            return Task.FromResult<MemoryCacheRegistryEntity?>(null);
+        }
+
+        public Task RemoveEntityAsync(MemoryCacheRegistryEntity entity)
+        {
+            if (entity is null) throw new ArgumentNullException(nameof(entity));
+
+            // check if there is anything stored
+            if (_dictionary.TryGetValue(entity.Key, out var stored))
+            {
+                // if there is something stored then check if it has the same etag
+                if (entity.ETag == stored.ETag)
+                {
+                    // if there is has the same etag then we can remove it
+                    _dictionary.Remove(entity.Key);
+                }
+                else
+                {
+                    // the etags do not match
+                    throw new MemoryCacheRegistryInconsistentStateException(Resources.Exception_CurrentETag_X_DoesNotMatchStoredETag_X, stored.ETag, entity.ETag);
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task<MemoryCacheRegistryEntity> WriteEntityAsync(MemoryCacheRegistryEntity entity)
+        {
+            // check if there is anything stored already
+            if (_dictionary.TryGetValue(entity.Key, out var stored))
+            {
+                // if there is something stored then check if the etags match
+                if (stored.ETag != entity.ETag)
+                {
+                    // the etags do not match
+                    throw new MemoryCacheRegistryInconsistentStateException(Resources.Exception_CurrentETag_X_DoesNotMatchStoredETag_X, stored.ETag, entity.ETag);
+                }
+            }
+            else
+            {
+                // if there is nothing stored then ensure the incoming etag is null
+                if (entity.ETag != null)
+                {
+                    throw new MemoryCacheRegistryInconsistentStateException(Resources.Exception_CurrentETag_X_DoesNotMatchStoredETag_X, null, entity.ETag);
+                }
+            }
+
+            // if all checks are okay then insert the entry while generating a new etag
+            var inserted = new MemoryCacheRegistryEntity(
+                entity.Key,
+                entity.Size,
+                entity.AbsoluteExpiration,
+                entity.SlidingExpiration,
+                Guid.NewGuid().ToString("D", CultureInfo.InvariantCulture));
+
+            _dictionary[entity.Key] = inserted;
+
+            return Task.FromResult(inserted);
+        }
+    }
+}

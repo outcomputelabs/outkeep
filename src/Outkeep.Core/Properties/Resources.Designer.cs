@@ -259,6 +259,15 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A method returned a null result where such a result is not expected..
+        /// </summary>
+        internal static string Exception_NullResultUnexpected {
+            get {
+                return ResourceManager.GetString("Exception_NullResultUnexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property {0} must implement IComparable.
         /// </summary>
         internal static string Exception_Property_X_MustImplementIComparable {

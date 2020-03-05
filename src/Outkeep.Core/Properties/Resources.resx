@@ -183,6 +183,9 @@
   <data name="Exception_NoResourceGovernorNamed_X_FoundForGrainType_X" xml:space="preserve">
     <value>No Resource Governor named {0} found for grain type {1}</value>
   </data>
+  <data name="Exception_NullResultUnexpected" xml:space="preserve">
+    <value>A method returned a null result where such a result is not expected.</value>
+  </data>
   <data name="Exception_Property_X_MustImplementIComparable" xml:space="preserve">
     <value>Property {0} must implement IComparable</value>
   </data>
