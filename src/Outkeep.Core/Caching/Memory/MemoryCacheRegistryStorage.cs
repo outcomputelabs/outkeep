@@ -9,10 +9,12 @@ namespace Outkeep.Caching.Memory
     internal class MemoryCacheRegistryStorage : ICacheRegistryStorage
     {
         private readonly IGrainFactory _factory;
+        private readonly RegistryQueryProvider _provider;
 
-        public MemoryCacheRegistryStorage(IGrainFactory factory)
+        public MemoryCacheRegistryStorage(IGrainFactory factory, RegistryQueryProvider provider)
         {
             _factory = factory;
+            _provider = provider;
         }
 
         public Task ClearStateAsync(ICacheRegistryEntryState state)
@@ -39,9 +41,13 @@ namespace Outkeep.Caching.Memory
             }
         }
 
-        public IQueryable<ICacheRegistryEntryState> CreateQuery()
+        public IQueryable<T> CreateQuery<T>(Func<string, T> factory) where T : ICacheRegistryEntryState
         {
-            throw new NotImplementedException();
+            var query = new MemoryCacheRegistryQuery<T>(_provider)
+                .Where(x => true)
+                .WithStateFactory<T>(key => new MemoryCacheRegistryEntryState(key) as ICacheRegistryEntryState);
+
+            return query;
         }
 
         public Task ReadStateAsync(ICacheRegistryEntryState state)

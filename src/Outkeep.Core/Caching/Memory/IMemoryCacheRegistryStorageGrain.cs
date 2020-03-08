@@ -1,4 +1,5 @@
 ﻿using Orleans;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Outkeep.Caching.Memory
@@ -10,5 +11,7 @@ namespace Outkeep.Caching.Memory
         Task<MemoryCacheRegistryEntity> WriteEntityAsync(MemoryCacheRegistryEntity entity);
 
         Task<MemoryCacheRegistryEntity?> TryGetEntityAsync(string key);
+
+        Task<ImmutableList<MemoryCacheRegistryEntity>> QueryAsync(GrainQuery query);
     }
 }

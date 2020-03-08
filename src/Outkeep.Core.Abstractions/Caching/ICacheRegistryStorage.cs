@@ -11,6 +11,6 @@ namespace Outkeep.Caching
 
         Task ClearStateAsync(ICacheRegistryEntryState state);
 
-        IQueryable<ICacheRegistryEntryState> CreateQuery();
+        IQueryable<T> CreateQuery<T>(CreateStateAction<T> factory) where T : ICacheRegistryEntryState;
     }
 }

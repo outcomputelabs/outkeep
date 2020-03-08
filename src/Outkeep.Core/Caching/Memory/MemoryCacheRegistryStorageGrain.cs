@@ -2,7 +2,9 @@
 using Outkeep.Properties;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Outkeep.Caching.Memory
@@ -80,6 +82,25 @@ namespace Outkeep.Caching.Memory
             _dictionary[entity.Key] = inserted;
 
             return Task.FromResult(inserted);
+        }
+
+        public Task<ImmutableList<MemoryCacheRegistryEntity>> QueryAsync(GrainQuery query)
+        {
+            if (query is null) throw new ArgumentNullException(nameof(query));
+
+            var enumerable = _dictionary.AsEnumerable();
+
+            foreach (var criteria in query.Criteria)
+            {
+                enumerable = criteria switch
+                {
+                    KeyEqualsGrainQueryCriterion keyEquals => enumerable.Where(x => x.Key == keyEquals.Value),
+
+                    _ => throw new NotSupportedException(Resources.Exception_CriteriaType_X_IsNotSupported.Format(criteria.GetType().FullName)),
+                };
+            }
+
+            return Task.FromResult(enumerable.Select(x => x.Value).ToImmutableList());
         }
     }
 }

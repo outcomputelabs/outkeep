@@ -214,6 +214,15 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Criteria type {0} is not supported.
+        /// </summary>
+        internal static string Exception_CriteriaType_X_IsNotSupported {
+            get {
+                return ResourceManager.GetString("Exception_CriteriaType_X_IsNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current ETag {0} does not match stored ETag {1}.
         /// </summary>
         internal static string Exception_CurrentETag_X_DoesNotMatchStoredETag_X {
