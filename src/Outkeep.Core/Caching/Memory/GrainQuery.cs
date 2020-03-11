@@ -13,6 +13,7 @@ namespace Outkeep.Caching.Memory
     {
         protected GrainQuery()
         {
+            Criteria = ImmutableList<GrainQueryCriterion>.Empty;
         }
 
         public GrainQuery(ImmutableList<GrainQueryCriterion> criteria)
@@ -21,6 +22,6 @@ namespace Outkeep.Caching.Memory
         }
 
         [ProtoMember(1, OverwriteList = true)]
-        public ImmutableList<GrainQueryCriterion> Criteria { get; protected set; } = ImmutableList<GrainQueryCriterion>.Empty;
+        public ImmutableList<GrainQueryCriterion> Criteria { get; protected set; }
     }
 }

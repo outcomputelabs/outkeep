@@ -7,16 +7,15 @@ using System.Threading;
 
 namespace Outkeep.Caching.Memory
 {
-    internal class MemoryCacheRegistryQuery<T> : IQueryable<T>, IAsyncEnumerable<T>
-        where T : ICacheRegistryEntryState
+    internal class RegistryQuery<T> : IQueryable<T>, IAsyncEnumerable<T>
     {
-        public MemoryCacheRegistryQuery(RegistryQueryProvider provider)
+        public RegistryQuery(RegistryQueryProvider provider)
         {
             Provider = provider ?? throw new ArgumentNullException(nameof(provider));
             Expression = Expression.Constant(this);
         }
 
-        public MemoryCacheRegistryQuery(RegistryQueryProvider provider, Expression expression)
+        public RegistryQuery(RegistryQueryProvider provider, Expression expression)
         {
             Provider = provider ?? throw new ArgumentNullException(nameof(provider));
             Expression = expression ?? throw new ArgumentNullException(nameof(expression));

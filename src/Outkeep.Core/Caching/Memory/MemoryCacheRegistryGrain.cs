@@ -13,21 +13,21 @@ namespace Outkeep.Caching.Memory
     /// This grain keeps the cache registry information in memory.
     /// This is for use with unit testing and one-box non-reliable deployments.
     /// </summary>
-    internal class MemoryCacheRegistryStorageGrain : Grain, IMemoryCacheRegistryStorageGrain
+    internal class MemoryCacheRegistryGrain : Grain, IMemoryCacheRegistryGrain
     {
-        private readonly Dictionary<string, MemoryCacheRegistryEntity> _dictionary = new Dictionary<string, MemoryCacheRegistryEntity>();
+        private readonly Dictionary<string, RegistryEntity> _dictionary = new Dictionary<string, RegistryEntity>();
 
-        public Task<MemoryCacheRegistryEntity?> TryGetEntityAsync(string key)
+        public Task<RegistryEntity?> TryGetEntityAsync(string key)
         {
             if (_dictionary.TryGetValue(key, out var entity))
             {
-                return Task.FromResult<MemoryCacheRegistryEntity?>(entity);
+                return Task.FromResult<RegistryEntity?>(entity);
             }
 
-            return Task.FromResult<MemoryCacheRegistryEntity?>(null);
+            return Task.FromResult<RegistryEntity?>(null);
         }
 
-        public Task RemoveEntityAsync(MemoryCacheRegistryEntity entity)
+        public Task RemoveEntityAsync(RegistryEntity entity)
         {
             if (entity is null) throw new ArgumentNullException(nameof(entity));
 
@@ -50,7 +50,7 @@ namespace Outkeep.Caching.Memory
             return Task.CompletedTask;
         }
 
-        public Task<MemoryCacheRegistryEntity> WriteEntityAsync(MemoryCacheRegistryEntity entity)
+        public Task<RegistryEntity> WriteEntityAsync(RegistryEntity entity)
         {
             // check if there is anything stored already
             if (_dictionary.TryGetValue(entity.Key, out var stored))
@@ -72,7 +72,7 @@ namespace Outkeep.Caching.Memory
             }
 
             // if all checks are okay then insert the entry while generating a new etag
-            var inserted = new MemoryCacheRegistryEntity(
+            var inserted = new RegistryEntity(
                 entity.Key,
                 entity.Size,
                 entity.AbsoluteExpiration,
@@ -84,23 +84,25 @@ namespace Outkeep.Caching.Memory
             return Task.FromResult(inserted);
         }
 
-        public Task<ImmutableList<MemoryCacheRegistryEntity>> QueryAsync(GrainQuery query)
+        public Task<ImmutableList<RegistryEntity>> QueryAsync(GrainQuery query)
         {
             if (query is null) throw new ArgumentNullException(nameof(query));
 
             var enumerable = _dictionary.AsEnumerable();
 
-            foreach (var criteria in query.Criteria)
+            foreach (var criterion in query.Criteria)
             {
-                enumerable = criteria switch
+                enumerable = criterion switch
                 {
-                    KeyEqualsGrainQueryCriterion keyEquals => enumerable.Where(x => x.Key == keyEquals.Value),
+                    KeyEqualsCriterion keyEquals => enumerable.Where(x => x.Key == keyEquals.Value),
 
-                    _ => throw new NotSupportedException(Resources.Exception_CriteriaType_X_IsNotSupported.Format(criteria.GetType().FullName)),
+                    _ => throw new NotSupportedException(Resources.Exception_CriterionOfType_X_IsNotSupported.Format(criterion.GetType().FullName)),
                 };
             }
 
-            return Task.FromResult(enumerable.Select(x => x.Value).ToImmutableList());
+            var result = enumerable.Select(x => x.Value).ToImmutableList();
+
+            return Task.FromResult(result);
         }
     }
 }

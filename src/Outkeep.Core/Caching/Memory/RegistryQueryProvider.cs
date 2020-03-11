@@ -1,32 +1,30 @@
-﻿using Outkeep.Properties;
+﻿using Orleans;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Outkeep.Caching.Memory
 {
     internal class RegistryQueryProvider : IQueryProvider
     {
-        private IMemoryCacheRegistryStorageGrain _grain;
+        private IGrainFactory _factory;
 
-        public RegistryQueryProvider(IMemoryCacheRegistryStorageGrain grain)
+        public RegistryQueryProvider(IGrainFactory factory)
         {
-            _grain = grain ?? throw new ArgumentNullException(nameof(grain));
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
         public IQueryable CreateQuery(Expression expression)
         {
             var type = TypeUtility.GetElementType(expression.Type);
 
-            return (IQueryable)Activator.CreateInstance(typeof(MemoryCacheRegistryQuery<>).MakeGenericType(type), this, expression);
+            return (IQueryable)Activator.CreateInstance(typeof(RegistryQuery<>).MakeGenericType(type), this, expression);
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            return new MemoryCacheRegistryQuery<TElement>(this, expression);
+            return new RegistryQuery<TElement>(this, expression);
         }
 
         public object Execute(Expression expression)
@@ -36,8 +34,6 @@ namespace Outkeep.Caching.Memory
 
         public TResult Execute<TResult>(Expression expression)
         {
-            throw new NotImplementedException();
-
             // todo: do query translation and execution here
             // todo: support IEnumerable<object>
             // todo: support IEnumerable<TResult>
@@ -46,48 +42,8 @@ namespace Outkeep.Caching.Memory
             using (var translator = new RegistryQueryTranslator())
             {
                 var query = translator.Translate(expression);
-            }
-        }
 
-        private class AsyncEnumerator : IAsyncEnumerator<ICacheRegistryEntryState>
-        {
-            private readonly IMemoryCacheRegistryStorageGrain _grain;
-            private readonly GrainQuery _query;
-
-            public AsyncEnumerator(IMemoryCacheRegistryStorageGrain grain, GrainQuery query)
-            {
-                _grain = grain ?? throw new ArgumentNullException(nameof(grain));
-                _query = query ?? throw new ArgumentNullException(nameof(query));
-            }
-
-            private bool _loaded = false;
-            private ImmutableList<MemoryCacheRegistryEntity>.Enumerator? _enumerator = null;
-
-            public ICacheRegistryEntryState Current
-            {
-                get
-                {
-                    if (_enumerator.HasValue)
-                    {
-                        return _enumerator.Value.Current;
-                    }
-                }
-            }
-
-            public ValueTask DisposeAsync()
-            {
                 throw new NotImplementedException();
-            }
-
-            public async ValueTask<bool> MoveNextAsync()
-            {
-                if (_enumerator is null)
-                {
-                    var results = await _grain.QueryAsync(_query).ConfigureAwait(false) ?? throw new InvalidOperationException(Resources.Exception_NullResultUnexpected);
-                    _enumerator = results.GetEnumerator();
-                }
-
-                return _enumerator.Value.MoveNext();
             }
         }
     }

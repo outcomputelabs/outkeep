@@ -1,4 +1,6 @@
-﻿using Outkeep.Caching;
+﻿using Moq;
+using Orleans;
+using Outkeep.Caching;
 using Outkeep.Caching.Memory;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,8 +13,10 @@ namespace Outkeep.Core.Tests.Caching.Memory
         [Fact]
         public async Task Test()
         {
-            var provider = new RegistryQueryProvider();
-            var query = new MemoryCacheRegistryQuery<ICacheRegistryEntryState>(provider);
+            var factory = Mock.Of<IGrainFactory>();
+            var provider = new RegistryQueryProvider(factory);
+            var query = new RegistryQuery<RegistryEntry>(provider);
+
             var key = "SomeKey";
 
             var result = await query.Where(x => x.Key == key).ToImmutableListAsync().ConfigureAwait(false);

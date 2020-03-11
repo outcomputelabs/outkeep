@@ -214,11 +214,11 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Criteria type {0} is not supported.
+        ///   Looks up a localized string similar to Criterion of type {0} is not supported.
         /// </summary>
-        internal static string Exception_CriteriaType_X_IsNotSupported {
+        internal static string Exception_CriterionOfType_X_IsNotSupported {
             get {
-                return ResourceManager.GetString("Exception_CriteriaType_X_IsNotSupported", resourceCulture);
+                return ResourceManager.GetString("Exception_CriterionOfType_X_IsNotSupported", resourceCulture);
             }
         }
         
