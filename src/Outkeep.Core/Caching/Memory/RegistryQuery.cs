@@ -19,6 +19,11 @@ namespace Outkeep.Caching.Memory
         {
             Provider = provider ?? throw new ArgumentNullException(nameof(provider));
             Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+
+            if (!typeof(IQueryable<T>).IsAssignableFrom(expression.Type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(expression));
+            }
         }
 
         public Type ElementType => typeof(T);
