@@ -9,8 +9,6 @@ namespace Outkeep.Caching.Memory
     // todo: implement on dispose to return this object to the pool
     internal sealed class RegistryQueryTranslator : ExpressionVisitor, IDisposable
     {
-        private readonly static MethodInfo QueryableWhereMethod = typeof(Queryable).GetMethod(nameof(Queryable.Where), new[] { typeof(IQueryable<>), typeof(Expression<>) });
-
         private readonly ImmutableList<GrainQueryCriterion>.Builder _criteria = ImmutableList.CreateBuilder<GrainQueryCriterion>();
 
         public GrainQuery Translate(Expression expression)
@@ -22,33 +20,85 @@ namespace Outkeep.Caching.Memory
             return result;
         }
 
-        public override Expression Visit(Expression node)
-        {
-            //throw new NotSupportedException();
-
-            return base.Visit(node);
-        }
+        private GrainQueryCriterion _current;
+        private bool _isWhere = false;
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.Name == nameof(Queryable.Where) && node.Method.DeclaringType == typeof(Queryable))
+            if (node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == nameof(Queryable.Where))
             {
+                _isWhere = true;
+
                 Visit(node.Arguments);
+
+                _isWhere = false;
+
+                return node;
             }
 
             throw new NotSupportedException();
-
-            return base.VisitMethodCall(node);
         }
 
-        protected override Expression VisitLambda<T>(Expression<T> node)
+        protected override Expression VisitConstant(ConstantExpression node)
         {
-            return base.VisitLambda(node);
+            if (_isWhere)
+            {
+                if (node.Value is RegistryQuery<RegistryEntry>)
+                {
+                    // valid - keep going down
+                    return base.VisitConstant(node);
+                }
+
+                throw new NotSupportedException();
+            }
+
+            throw new NotSupportedException();
         }
 
-        protected override Expression VisitParameter(ParameterExpression node)
+        protected override Expression VisitBinary(BinaryExpression node)
         {
-            return base.VisitParameter(node);
+            if (_isWhere)
+            {
+                switch (node.NodeType)
+                {
+                    case ExpressionType.Equal:
+
+                        // check for the key equals where
+                        if (node.Left is MemberExpression member && member.Member.DeclaringType == typeof(RegistryEntry) && member.Member.Name == nameof(RegistryEntry.Key))
+                        {
+                            ConstantExpression constant;
+
+                            if (node.Right is ConstantExpression c)
+                            {
+                                constant = c;
+                            }
+                            else if (node.Right is MemberExpression rightMember)
+                            {
+                                constant = Expression.Constant(Expression.Lambda(rightMember).Compile().DynamicInvoke(), rightMember.Type);
+                            }
+                            else
+                            {
+                                throw new NotSupportedException();
+                            }
+
+                            if (constant.Type == typeof(string))
+                            {
+                                _criteria.Add(new KeyEqualsCriterion((string)constant.Value));
+                                return node;
+                            }
+
+                            throw new NotSupportedException();
+                        }
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                throw new NotSupportedException();
+            }
+
+            throw new NotSupportedException();
         }
 
         // todo: call this from the object pool

@@ -17,9 +17,9 @@ namespace Outkeep.Core.Tests.Caching.Memory
             var provider = new RegistryQueryProvider(factory);
             var query = new RegistryQuery<RegistryEntry>(provider);
 
-            var key = "SomeKey";
+            var testKey = "SomeKey";
 
-            var result = await query.Where(x => x.Key == key).ToImmutableListAsync().ConfigureAwait(false);
+            var result = await query.Where(x => x.Key == testKey).ToImmutableListAsync().ConfigureAwait(false);
 
             Assert.NotNull(result);
         }

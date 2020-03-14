@@ -43,7 +43,9 @@ namespace Outkeep.Caching.Memory
             {
                 var query = translator.Translate(expression);
 
-                throw new NotImplementedException();
+                throw new NotSupportedException();
+                // _factory.GetGrain<IMemoryCacheRegistryGrain>(Guid.Empty)
+                  //  .QueryAsync(query)
             }
         }
     }
