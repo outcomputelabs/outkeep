@@ -41,5 +41,17 @@ namespace Outkeep.Core.Tests.Caching.Memory
             Assert.NotNull(result);
             Assert.Collection(result, x => Assert.Equal("B", x.Key));
         }
+
+        [Fact]
+        public async Task QueryingWhereKeyLambdaEqualsReturnsFilteredResult()
+        {
+            var registry = _fixture.PrimarySiloServiceProvider.GetService<ICacheRegistry>();
+
+            var key = "B";
+            var result = await registry.CreateQuery().Where(x => x.Key == key).ToImmutableListAsync().ConfigureAwait(false);
+
+            Assert.NotNull(result);
+            Assert.Collection(result, x => Assert.Equal("B", x.Key));
+        }
     }
 }
