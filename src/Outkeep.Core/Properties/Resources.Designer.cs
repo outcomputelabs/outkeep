@@ -305,11 +305,30 @@ namespace Outkeep.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Synchronous enumerations are not supported with this provider. Use asynchronous enumerations instead..
+        /// </summary>
+        internal static string Exception_SynchronousEnumerationsAreNotSupportedUseAsynchronousEnumerationsInstead {
+            get {
+                return ResourceManager.GetString("Exception_SynchronousEnumerationsAreNotSupportedUseAsynchronousEnumerationsInstea" +
+                        "d", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There are no free ports within the input range.
         /// </summary>
         internal static string Exception_ThereAreNoFreePortsWithinTheInputRange {
             get {
                 return ResourceManager.GetString("Exception_ThereAreNoFreePortsWithinTheInputRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The result type {0} is not supported by this provider.
+        /// </summary>
+        internal static string Exception_TheResultType_X_IsNotSupportedByThisProvider {
+            get {
+                return ResourceManager.GetString("Exception_TheResultType_X_IsNotSupportedByThisProvider", resourceCulture);
             }
         }
         

@@ -198,8 +198,14 @@
   <data name="Exception_Property_X_WithValue_X_MustBeGreaterThanOrEqualToProperty_X_WithValue_X" xml:space="preserve">
     <value>Property {0} with value {1} must be greater than or equal to {2} with value {3}</value>
   </data>
+  <data name="Exception_SynchronousEnumerationsAreNotSupportedUseAsynchronousEnumerationsInstead" xml:space="preserve">
+    <value>Synchronous enumerations are not supported with this provider. Use asynchronous enumerations instead.</value>
+  </data>
   <data name="Exception_ThereAreNoFreePortsWithinTheInputRange" xml:space="preserve">
     <value>There are no free ports within the input range</value>
+  </data>
+  <data name="Exception_TheResultType_X_IsNotSupportedByThisProvider" xml:space="preserve">
+    <value>The result type {0} is not supported by this provider</value>
   </data>
   <data name="Exception_UnexpectedEndpointType" xml:space="preserve">
     <value>Unexpected endpoint type</value>

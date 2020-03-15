@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Configuration;
@@ -8,26 +8,31 @@ using Orleans.Runtime;
 using Orleans.TestingHost;
 using Orleans.Timers;
 using Outkeep.Caching;
+using Outkeep.Caching.Memory;
 using Outkeep.Core.Tests.Fakes;
 using Outkeep.Governance;
 using Outkeep.HealthChecks;
 using Outkeep.Time;
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Outkeep.Core.Tests
 {
     public sealed class ClusterFixture : IDisposable
     {
         private readonly string _clusterId = TestClusterBuilder.CreateClusterId();
+        private static readonly ConcurrentDictionary<string, IServiceProvider> _primarySiloServiceProviders = new ConcurrentDictionary<string, IServiceProvider>();
 
         public TestCluster Cluster { get; }
+        public IServiceProvider PrimarySiloServiceProvider => _primarySiloServiceProviders[_clusterId];
 
         public ClusterFixture()
         {
             var builder = new TestClusterBuilder(1)
-                .AddSiloBuilderConfigurator<SiloBuilderConfigurator>()
-                .AddClientBuilderConfigurator<ClientBuilderConfigurator>();
+                .AddSiloBuilderConfigurator<SiloBuilderConfigurator>();
 
             builder.Options.ClusterId = _clusterId;
 
@@ -41,14 +46,11 @@ namespace Outkeep.Core.Tests
             Cluster.Dispose();
         }
 
-        private static readonly ConcurrentDictionary<string, IServiceProvider> _siloServiceProvider =
-            new ConcurrentDictionary<string, IServiceProvider>();
-
-        private class SiloBuilderConfigurator : ISiloBuilderConfigurator
+        private class SiloBuilderConfigurator : ISiloConfigurator
         {
-            public void Configure(ISiloHostBuilder hostBuilder)
+            public void Configure(ISiloBuilder siloBuilder)
             {
-                hostBuilder
+                siloBuilder
                     .ConfigureApplicationParts(apm =>
                     {
                         apm.AddApplicationPart(typeof(EchoGrain).Assembly).WithReferences();
@@ -77,41 +79,30 @@ namespace Outkeep.Core.Tests
                             .AddSingleton<FakeTimerRegistry>()
                             .AddSingleton<ITimerRegistry>(sp => sp.GetService<FakeTimerRegistry>());
 
+                        // add the memory cache registry
+                        services.AddMemoryCacheRegistry();
+
                         // add other services
                         services
                             .AddSingleton<ISystemClock, SystemClock>()
                             .AddSafeTimer();
                     })
                     .AddMemoryGrainStorage(OutkeepProviderNames.OutkeepCache)
-                    .UseServiceProviderFactory(services =>
+                    .AddStartupTask((provider, token) =>
                     {
-                        var provider = services.BuildServiceProvider();
-                        var clusterId = provider.GetRequiredService<IOptions<ClusterOptions>>().Value.ClusterId;
-
-                        _siloServiceProvider.TryAdd(clusterId, provider);
-
-                        return provider;
+                        // capture the service provider of the primary silo for use in tests
+                        var options = provider.GetRequiredService<IOptions<ClusterOptions>>().Value;
+                        _primarySiloServiceProviders.TryAdd(options.ClusterId, provider);
+                        return Task.CompletedTask;
+                    })
+                    .AddStartupTask(async (provider, token) =>
+                    {
+                        // seed the memory cache registry with test data
+                        var grain = provider.GetRequiredService<IGrainFactory>().GetMemoryCacheRegistryGrain();
+                        await grain.WriteEntityAsync(new RegistryEntity("A", 1, DateTimeOffset.UtcNow.AddHours(1), TimeSpan.FromHours(1), null)).ConfigureAwait(true);
+                        await grain.WriteEntityAsync(new RegistryEntity("B", 2, DateTimeOffset.UtcNow.AddHours(2), TimeSpan.FromHours(2), null)).ConfigureAwait(true);
+                        await grain.WriteEntityAsync(new RegistryEntity("C", 3, DateTimeOffset.UtcNow.AddHours(3), TimeSpan.FromHours(3), null)).ConfigureAwait(true);
                     });
-            }
-        }
-
-        private class ClientBuilderConfigurator : IClientBuilderConfigurator
-        {
-            public void Configure(IConfiguration configuration, IClientBuilder clientBuilder)
-            {
-                // placeholder
-            }
-        }
-
-        public IServiceProvider PrimarySiloServiceProvider
-        {
-            get
-            {
-                if (_siloServiceProvider.TryGetValue(_clusterId, out var provider))
-                {
-                    return provider;
-                }
-                throw new InvalidOperationException();
             }
         }
     }

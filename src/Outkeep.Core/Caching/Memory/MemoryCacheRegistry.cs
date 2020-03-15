@@ -11,16 +11,16 @@ namespace Outkeep.Caching.Memory
         private readonly IGrainFactory _factory;
         private readonly RegistryQueryProvider _provider;
 
-        public MemoryCacheRegistry(IGrainFactory factory, RegistryQueryProvider provider)
+        public MemoryCacheRegistry(IGrainFactory factory)
         {
             _factory = factory;
-            _provider = provider;
+            _provider = new RegistryQueryProvider(_factory, this);
         }
 
         public async Task<ICacheRegistryEntry> GetAsync(string key)
         {
             var entity = await _factory
-                .GetGrain<IMemoryCacheRegistryGrain>(Guid.Empty)
+                .GetMemoryCacheRegistryGrain()
                 .TryGetEntityAsync(key)
                 .ConfigureAwait(false);
 
@@ -48,9 +48,8 @@ namespace Outkeep.Caching.Memory
 
             try
             {
-                // todo: grab the grain reference at startup
                 await _factory
-                    .GetGrain<IMemoryCacheRegistryGrain>(Guid.Empty)
+                    .GetMemoryCacheRegistryGrain()
                     .RemoveEntityAsync(entity)
                     .ConfigureAwait(false);
             }
@@ -70,7 +69,7 @@ namespace Outkeep.Caching.Memory
         private async Task InnerReadStateAsync(RegistryEntry entry)
         {
             var entity = await _factory
-                .GetGrain<IMemoryCacheRegistryGrain>(Guid.Empty)
+                .GetMemoryCacheRegistryGrain()
                 .TryGetEntityAsync(entry.Key)
                 .ConfigureAwait(false);
 
@@ -103,7 +102,7 @@ namespace Outkeep.Caching.Memory
             try
             {
                 result = await _factory
-                    .GetGrain<IMemoryCacheRegistryGrain>(Guid.Empty)
+                    .GetMemoryCacheRegistryGrain()
                     .WriteEntityAsync(entity)
                     .ConfigureAwait(false);
             }
@@ -117,7 +116,7 @@ namespace Outkeep.Caching.Memory
 
         public IQueryable<ICacheRegistryEntry> CreateQuery()
         {
-            return new RegistryQuery<RegistryEntry>(_provider);
+            return _provider.CreateQuery<RegistryEntry>();
         }
     }
 }

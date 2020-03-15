@@ -1,27 +1,34 @@
-﻿using Moq;
-using Orleans;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Outkeep.Caching;
-using Outkeep.Caching.Memory;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Outkeep.Core.Tests.Caching.Memory
 {
+    [Collection(nameof(ClusterCollection))]
     public class RegistryQueryTests
     {
-        [Fact]
-        public async Task Test()
+        private readonly ClusterFixture _fixture;
+
+        public RegistryQueryTests(ClusterFixture fixture)
         {
-            var factory = Mock.Of<IGrainFactory>();
-            var provider = new RegistryQueryProvider(factory);
-            var query = new RegistryQuery<RegistryEntry>(provider);
+            _fixture = fixture ?? throw new ArgumentNullException(nameof(fixture));
+        }
 
-            var testKey = "SomeKey";
+        [Fact]
+        public async Task QueryingEverythingReturnsEverything()
+        {
+            var registry = _fixture.PrimarySiloServiceProvider.GetService<ICacheRegistry>();
 
-            var result = await query.Where(x => x.Key == testKey).ToImmutableListAsync().ConfigureAwait(false);
+            var result = await registry.CreateQuery().ToImmutableListAsync().ConfigureAwait(false);
 
             Assert.NotNull(result);
+            Assert.Collection(result.OrderBy(x => x.Key),
+                x => Assert.Equal("A", x.Key),
+                x => Assert.Equal("B", x.Key),
+                x => Assert.Equal("C", x.Key));
         }
     }
 }

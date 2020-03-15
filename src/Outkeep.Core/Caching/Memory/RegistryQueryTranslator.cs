@@ -39,22 +39,6 @@ namespace Outkeep.Caching.Memory
             throw new NotSupportedException();
         }
 
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            if (_isWhere)
-            {
-                if (node.Value is RegistryQuery<RegistryEntry>)
-                {
-                    // valid - keep going down
-                    return base.VisitConstant(node);
-                }
-
-                throw new NotSupportedException();
-            }
-
-            throw new NotSupportedException();
-        }
-
         protected override Expression VisitBinary(BinaryExpression node)
         {
             if (_isWhere)
