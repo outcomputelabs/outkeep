@@ -52,7 +52,7 @@ namespace Outkeep.Caching.Memory
         public TResult Execute<TResult>(Expression expression)
         {
             // return the async query enumerator
-            if (typeof(TResult) == typeof(IAsyncEnumerator<RegistryEntry>))
+            if (typeof(IAsyncEnumerator<ICacheRegistryEntry>).IsAssignableFrom(typeof(TResult)))
             {
                 return (TResult)Execute(expression);
             }

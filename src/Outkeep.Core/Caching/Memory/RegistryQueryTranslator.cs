@@ -48,7 +48,7 @@ namespace Outkeep.Caching.Memory
                     case ExpressionType.Equal:
 
                         // check for the key equals where
-                        if (node.Left is MemberExpression member && member.Member.DeclaringType == typeof(RegistryEntry) && member.Member.Name == nameof(RegistryEntry.Key))
+                        if (node.Left is MemberExpression member && typeof(ICacheRegistryEntry).IsAssignableFrom(member.Member.DeclaringType) && member.Member.Name == nameof(ICacheRegistryEntry.Key))
                         {
                             ConstantExpression constant;
 

@@ -30,5 +30,16 @@ namespace Outkeep.Core.Tests.Caching.Memory
                 x => Assert.Equal("B", x.Key),
                 x => Assert.Equal("C", x.Key));
         }
+
+        [Fact]
+        public async Task QueryingWhereKeyEqualsReturnsFilteredResult()
+        {
+            var registry = _fixture.PrimarySiloServiceProvider.GetService<ICacheRegistry>();
+
+            var result = await registry.CreateQuery().Where(x => x.Key == "B").ToImmutableListAsync().ConfigureAwait(false);
+
+            Assert.NotNull(result);
+            Assert.Collection(result, x => Assert.Equal("B", x.Key));
+        }
     }
 }
