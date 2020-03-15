@@ -53,5 +53,19 @@ namespace Outkeep.Core.Tests.Caching.Memory
             Assert.NotNull(result);
             Assert.Collection(result, x => Assert.Equal("B", x.Key));
         }
+
+        [Fact]
+        public async Task QueryingOrderByReturnsOrderedResult()
+        {
+            var registry = _fixture.PrimarySiloServiceProvider.GetService<ICacheRegistry>();
+
+            var result = await registry.CreateQuery().OrderBy(x => x.Size).ToImmutableListAsync().ConfigureAwait(false);
+
+            Assert.NotNull(result);
+            Assert.Collection(result.OrderBy(x => x.Key),
+                x => { Assert.Equal("A", x.Key); Assert.Equal(1, x.Size); },
+                x => { Assert.Equal("B", x.Key); Assert.Equal(2, x.Size); },
+                x => { Assert.Equal("C", x.Key); Assert.Equal(3, x.Size); });
+        }
     }
 }
