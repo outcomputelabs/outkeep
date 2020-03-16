@@ -67,7 +67,7 @@ namespace Outkeep.Caching.Memory
 
                             if (constant.Type == typeof(string))
                             {
-                                _criteria.Add(new KeyEqualsCriterion((string)constant.Value));
+                                _criteria.Add(new WhereCriterion(nameof(ICacheRegistryEntry.Key), (string)constant.Value));
                                 return node;
                             }
 

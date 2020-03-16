@@ -94,7 +94,13 @@ namespace Outkeep.Caching.Memory
             {
                 enumerable = criterion switch
                 {
-                    KeyEqualsCriterion keyEquals => enumerable.Where(x => x.Key == keyEquals.Value),
+                    WhereCriterion where =>
+
+                        where.Name switch
+                        {
+                            nameof(RegistryEntry.Key) => where.Value is CriterionStringValue value ? enumerable.Where(x => x.Key == value.Value) : throw new NotSupportedException(),
+                            _ => throw new NotSupportedException()
+                        },
 
                     _ => throw new NotSupportedException(Resources.Exception_CriterionOfType_X_IsNotSupported.Format(criterion.GetType().FullName)),
                 };
