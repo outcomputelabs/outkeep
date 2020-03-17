@@ -94,7 +94,7 @@ namespace Outkeep.Caching.Memory
             {
                 enumerable = criterion switch
                 {
-                    WhereCriterion where =>
+                    FilterCriterion where =>
 
                         where.Name switch
                         {

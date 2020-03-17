@@ -4,24 +4,30 @@ using static System.String;
 namespace Outkeep.Caching.Memory
 {
     [ProtoContract]
-    [ProtoInclude(1, typeof(WhereCriterion))]
+    [ProtoInclude(1, typeof(FilterCriterion))]
     internal abstract class GrainQueryCriterion
     {
     }
 
     [ProtoContract]
-    internal class WhereCriterion : GrainQueryCriterion
+    internal class FilterCriterion : GrainQueryCriterion
     {
-        protected WhereCriterion()
+        protected FilterCriterion()
         {
             Name = Empty;
             Value = CriterionUndefinedValue.Default;
         }
 
-        public WhereCriterion(string name, string? value)
+        public FilterCriterion(string name, string? value)
         {
             Name = name;
             Value = new CriterionStringValue(value);
+        }
+
+        public FilterCriterion(string name, int? value)
+        {
+            Name = name;
+            Value = new CriterionInt32Value(value);
         }
 
         [ProtoMember(1)]
@@ -29,6 +35,23 @@ namespace Outkeep.Caching.Memory
 
         [ProtoMember(2)]
         public CriterionValue Value { get; protected set; }
+
+        [ProtoMember(3)]
+        public FilterType Type { get; protected set; }
+    }
+
+    [ProtoContract]
+    internal enum FilterType
+    {
+        Undefined = 0,
+        And = 1,
+        Or = 2,
+        Equal = 3,
+        NotEqual = 4,
+        LessThan = 5,
+        LessThanOrEqual = 6,
+        GreaterThan = 7,
+        GreaterThanOrEqual = 8
     }
 
     [ProtoContract]
