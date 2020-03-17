@@ -1,4 +1,5 @@
 ﻿using Orleans;
+using Outkeep.Caching.Memory.Expressions;
 using Outkeep.Properties;
 using System;
 using System.Collections.Generic;
@@ -94,11 +95,11 @@ namespace Outkeep.Caching.Memory
             {
                 enumerable = criterion switch
                 {
-                    FilterCriterion where =>
+                    BinaryGrainQueryExpression where =>
 
                         where.Name switch
                         {
-                            nameof(RegistryEntry.Key) => where.Value is CriterionStringValue value ? enumerable.Where(x => x.Key == value.Value) : throw new NotSupportedException(),
+                            nameof(RegistryEntry.Key) => where.Value is StringConstantGrainQueryExpression value ? enumerable.Where(x => x.Key == value.Value) : throw new NotSupportedException(),
                             _ => throw new NotSupportedException()
                         },
 

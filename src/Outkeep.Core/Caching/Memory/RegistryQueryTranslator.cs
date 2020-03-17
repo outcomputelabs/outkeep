@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Outkeep.Caching.Memory.Expressions;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,29 +10,24 @@ namespace Outkeep.Caching.Memory
     // todo: implement on dispose to return this object to the pool
     internal sealed class RegistryQueryTranslator : ExpressionVisitor, IDisposable
     {
-        private readonly ImmutableList<GrainQueryCriterion>.Builder _criteria = ImmutableList.CreateBuilder<GrainQueryCriterion>();
+        private GrainQueryExpression _query;
 
-        public GrainQuery Translate(Expression expression)
+        public GrainQueryExpression Translate(Expression expression)
         {
+            _query = RegistryGrainQueryExpression.Default;
+
             Visit(expression);
 
-            var result = new GrainQuery(_criteria.ToImmutable());
-
-            return result;
+            return _query;
         }
-
-        private GrainQueryCriterion _current;
-        private bool _isWhere = false;
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
+            _query = new MethodCallGrainQueryExpression(node.Method.DeclaringType.FullName, node.Method.Name);
+
             if (node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == nameof(Queryable.Where))
             {
-                _isWhere = true;
-
                 Visit(node.Arguments);
-
-                _isWhere = false;
 
                 return node;
             }
@@ -67,7 +63,7 @@ namespace Outkeep.Caching.Memory
 
                             if (constant.Type == typeof(string))
                             {
-                                _criteria.Add(new FilterCriterion(nameof(ICacheRegistryEntry.Key), (string)constant.Value));
+                                _criteria.Add(new BinaryGrainQueryExpression(nameof(ICacheRegistryEntry.Key), (string)constant.Value));
                                 return node;
                             }
 
