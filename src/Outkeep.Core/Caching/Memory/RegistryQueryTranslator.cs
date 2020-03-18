@@ -1,9 +1,7 @@
 ﻿using Outkeep.Caching.Memory.Expressions;
 using System;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Outkeep.Caching.Memory
 {
@@ -37,45 +35,39 @@ namespace Outkeep.Caching.Memory
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            if (_isWhere)
+            switch (node.NodeType)
             {
-                switch (node.NodeType)
-                {
-                    case ExpressionType.Equal:
+                case ExpressionType.Equal:
 
-                        // check for the key equals where
-                        if (node.Left is MemberExpression member && typeof(ICacheRegistryEntry).IsAssignableFrom(member.Member.DeclaringType) && member.Member.Name == nameof(ICacheRegistryEntry.Key))
+                    // check for the key equals where
+                    if (node.Left is MemberExpression member && typeof(ICacheRegistryEntry).IsAssignableFrom(member.Member.DeclaringType) && member.Member.Name == nameof(ICacheRegistryEntry.Key))
+                    {
+                        ConstantExpression constant;
+
+                        if (node.Right is ConstantExpression c)
                         {
-                            ConstantExpression constant;
-
-                            if (node.Right is ConstantExpression c)
-                            {
-                                constant = c;
-                            }
-                            else if (node.Right is MemberExpression rightMember)
-                            {
-                                constant = Expression.Constant(Expression.Lambda(rightMember).Compile().DynamicInvoke(), rightMember.Type);
-                            }
-                            else
-                            {
-                                throw new NotSupportedException();
-                            }
-
-                            if (constant.Type == typeof(string))
-                            {
-                                _criteria.Add(new BinaryGrainQueryExpression(nameof(ICacheRegistryEntry.Key), (string)constant.Value));
-                                return node;
-                            }
-
+                            constant = c;
+                        }
+                        else if (node.Right is MemberExpression rightMember)
+                        {
+                            constant = Expression.Constant(Expression.Lambda(rightMember).Compile().DynamicInvoke(), rightMember.Type);
+                        }
+                        else
+                        {
                             throw new NotSupportedException();
                         }
-                        break;
 
-                    default:
+                        if (constant.Type == typeof(string))
+                        {
+                            throw new NotImplementedException();
+                        }
+
                         throw new NotSupportedException();
-                }
+                    }
+                    break;
 
-                throw new NotSupportedException();
+                default:
+                    throw new NotSupportedException();
             }
 
             throw new NotSupportedException();
@@ -84,14 +76,11 @@ namespace Outkeep.Caching.Memory
         // todo: call this from the object pool
         public void Reset()
         {
-            _criteria.Clear();
+            throw new NotImplementedException();
         }
 
         public void Dispose()
         {
-            _criteria.Clear();
-
-            // todo: return this object to the pool here
         }
     }
 }

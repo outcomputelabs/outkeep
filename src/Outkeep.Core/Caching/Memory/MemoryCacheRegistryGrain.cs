@@ -1,11 +1,9 @@
 ﻿using Orleans;
-using Outkeep.Caching.Memory.Expressions;
 using Outkeep.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Outkeep.Caching.Memory
@@ -85,31 +83,16 @@ namespace Outkeep.Caching.Memory
             return Task.FromResult(inserted);
         }
 
-        public Task<ImmutableList<RegistryEntity>> QueryAsync(GrainQuery query)
+        public Task<ImmutableList<RegistryEntity>> GetAllEntitiesAsync()
         {
-            if (query is null) throw new ArgumentNullException(nameof(query));
+            var builder = ImmutableList.CreateBuilder<RegistryEntity>();
 
-            var enumerable = _dictionary.AsEnumerable();
-
-            foreach (var criterion in query.Criteria)
+            foreach (var item in _dictionary)
             {
-                enumerable = criterion switch
-                {
-                    BinaryGrainQueryExpression where =>
-
-                        where.Name switch
-                        {
-                            nameof(RegistryEntry.Key) => where.Value is StringConstantGrainQueryExpression value ? enumerable.Where(x => x.Key == value.Value) : throw new NotSupportedException(),
-                            _ => throw new NotSupportedException()
-                        },
-
-                    _ => throw new NotSupportedException(Resources.Exception_CriterionOfType_X_IsNotSupported.Format(criterion.GetType().FullName)),
-                };
+                builder.Add(item.Value);
             }
 
-            var result = enumerable.Select(x => x.Value).ToImmutableList();
-
-            return Task.FromResult(result);
+            return Task.FromResult(builder.ToImmutable());
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Orleans;
+using Outkeep.Caching.Memory.Expressions;
 using Outkeep.Properties;
 using System;
 using System.Collections.Generic;
@@ -70,10 +71,10 @@ namespace Outkeep.Caching.Memory
         private sealed class RegistryQueryEnumerator : IAsyncEnumerator<RegistryEntry>
         {
             private readonly IGrainFactory _factory;
-            private readonly GrainQuery _query;
+            private readonly GrainQueryExpression _query;
             private readonly MemoryCacheRegistry _registry;
 
-            public RegistryQueryEnumerator(IGrainFactory factory, GrainQuery query, MemoryCacheRegistry registry)
+            public RegistryQueryEnumerator(IGrainFactory factory, GrainQueryExpression query, MemoryCacheRegistry registry)
             {
                 _factory = factory ?? throw new ArgumentNullException(nameof(factory));
                 _query = query ?? throw new ArgumentNullException(nameof(query));
@@ -87,35 +88,9 @@ namespace Outkeep.Caching.Memory
 
             public RegistryEntry Current => _current ?? throw new InvalidOperationException();
 
-            public async ValueTask<bool> MoveNextAsync()
+            public ValueTask<bool> MoveNextAsync()
             {
-                if (!_initialized)
-                {
-                    var result = await _factory.GetMemoryCacheRegistryGrain().QueryAsync(_query).ConfigureAwait(false);
-                    _enumerator = result.GetEnumerator();
-                    _initialized = true;
-                }
-
-                if (_enumerator.MoveNext())
-                {
-                    // get the current data entity
-                    var entity = _enumerator.Current;
-
-                    // convert it into a usable registry entry
-                    _current = new RegistryEntry(entity.Key, _registry)
-                    {
-                        AbsoluteExpiration = entity.AbsoluteExpiration,
-                        SlidingExpiration = entity.SlidingExpiration,
-                        Size = entity.Size,
-                        ETag = entity.ETag
-                    };
-                    return true;
-                }
-                else
-                {
-                    _current = null;
-                    return false;
-                }
+                throw new NotImplementedException();
             }
 
             public ValueTask DisposeAsync() => new ValueTask();

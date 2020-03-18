@@ -12,6 +12,6 @@ namespace Outkeep.Caching.Memory
 
         Task<RegistryEntity?> TryGetEntityAsync(string key);
 
-        Task<ImmutableList<RegistryEntity>> QueryAsync(GrainQuery query);
+        Task<ImmutableList<RegistryEntity>> GetAllEntitiesAsync();
     }
 }
