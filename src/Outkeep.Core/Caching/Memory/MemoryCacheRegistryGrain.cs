@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Outkeep.Caching.Memory
@@ -93,6 +94,21 @@ namespace Outkeep.Caching.Memory
             }
 
             return Task.FromResult(builder.ToImmutable());
+        }
+
+        public Task<ImmutableList<RegistryEntity>> GetTopEntitiesBySizeAsync(bool ascending = false, int? limit = null)
+        {
+            var query = _dictionary.AsEnumerable();
+
+            query = ascending
+                ? query.OrderBy(x => x.Value.Size)
+                : query.OrderByDescending(x => x.Value.Size);
+
+            query = limit.HasValue
+                ? query.Take(limit.Value)
+                : query;
+
+            return Task.FromResult(query.Select(x => x.Value).ToImmutableList());
         }
     }
 }

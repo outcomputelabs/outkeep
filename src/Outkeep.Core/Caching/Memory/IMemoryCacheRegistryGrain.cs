@@ -13,5 +13,7 @@ namespace Outkeep.Caching.Memory
         Task<RegistryEntity?> TryGetEntityAsync(string key);
 
         Task<ImmutableList<RegistryEntity>> GetAllEntitiesAsync();
+
+        Task<ImmutableList<RegistryEntity>> GetTopEntitiesBySizeAsync(bool ascending = false, int? limit = null);
     }
 }
