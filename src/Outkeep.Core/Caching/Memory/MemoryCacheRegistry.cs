@@ -93,11 +93,11 @@ namespace Outkeep.Caching.Memory
             entry.ETag = result.ETag;
         }
 
-        public async Task<ImmutableList<ICacheRegistryEntry>> GetAllEntriesAsync()
+        public async Task<ImmutableList<ICacheRegistryEntry>> GetEntriesAsync()
         {
             var result = await _factory
                 .GetMemoryCacheRegistryGrain()
-                .GetAllEntitiesAsync()
+                .GetEntitiesAsync()
                 .ConfigureAwait(false);
 
             return ConvertToEntries(result);

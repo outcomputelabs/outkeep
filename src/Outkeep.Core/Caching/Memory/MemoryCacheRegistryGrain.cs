@@ -84,7 +84,7 @@ namespace Outkeep.Caching.Memory
             return Task.FromResult(inserted);
         }
 
-        public Task<ImmutableList<RegistryEntity>> GetAllEntitiesAsync()
+        public Task<ImmutableList<RegistryEntity>> GetEntitiesAsync()
         {
             var builder = ImmutableList.CreateBuilder<RegistryEntity>();
 

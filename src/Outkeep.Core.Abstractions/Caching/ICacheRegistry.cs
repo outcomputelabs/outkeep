@@ -7,7 +7,7 @@ namespace Outkeep.Caching
     {
         Task<ICacheRegistryEntry> GetEntryAsync(string key);
 
-        Task<ImmutableList<ICacheRegistryEntry>> GetAllEntriesAsync();
+        Task<ImmutableList<ICacheRegistryEntry>> GetEntriesAsync();
 
         Task<ImmutableList<ICacheRegistryEntry>> GetTopEntriesBySizeAsync(bool ascending = false, int? limit = null);
     }
