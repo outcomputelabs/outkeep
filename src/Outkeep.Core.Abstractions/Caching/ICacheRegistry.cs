@@ -1,12 +1,14 @@
-﻿using System.Linq;
+﻿using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Outkeep.Caching
 {
     public interface ICacheRegistry
     {
-        Task<ICacheRegistryEntry> GetAsync(string key);
+        Task<ICacheRegistryEntry> GetEntryAsync(string key);
 
-        IQueryable<ICacheRegistryEntry> CreateQuery();
+        Task<ImmutableList<ICacheRegistryEntry>> GetAllEntriesAsync();
+
+        Task<ImmutableList<ICacheRegistryEntry>> GetTopEntriesBySizeAsync(bool ascending = false, int? limit = null);
     }
 }

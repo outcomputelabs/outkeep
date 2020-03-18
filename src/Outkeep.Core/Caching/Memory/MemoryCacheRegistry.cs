@@ -1,7 +1,7 @@
 ﻿using Orleans;
 using Orleans.Storage;
 using System;
-using System.Linq;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Outkeep.Caching.Memory
@@ -9,30 +9,20 @@ namespace Outkeep.Caching.Memory
     internal class MemoryCacheRegistry : ICacheRegistry
     {
         private readonly IGrainFactory _factory;
-        private readonly RegistryQueryProvider _provider;
 
         public MemoryCacheRegistry(IGrainFactory factory)
         {
             _factory = factory;
-            _provider = new RegistryQueryProvider(_factory, this);
         }
 
-        public async Task<ICacheRegistryEntry> GetAsync(string key)
+        public async Task<ICacheRegistryEntry> GetEntryAsync(string key)
         {
             var entity = await _factory
                 .GetMemoryCacheRegistryGrain()
                 .TryGetEntityAsync(key)
                 .ConfigureAwait(false);
 
-            var entry = new RegistryEntry(key, this);
-            if (entity != null)
-            {
-                entry.AbsoluteExpiration = entity.AbsoluteExpiration;
-                entry.SlidingExpiration = entity.SlidingExpiration;
-                entry.Size = entity.Size;
-                entry.ETag = entity.ETag;
-            }
-            return entry;
+            return entity is null ? new RegistryEntry(key, this) : ConvertToEntry(entity);
         }
 
         public Task ClearStateAsync(RegistryEntry entry)
@@ -73,13 +63,7 @@ namespace Outkeep.Caching.Memory
                 .TryGetEntityAsync(entry.Key)
                 .ConfigureAwait(false);
 
-            if (entity != null)
-            {
-                entry.Size = entity.Size;
-                entry.AbsoluteExpiration = entity.AbsoluteExpiration;
-                entry.SlidingExpiration = entity.SlidingExpiration;
-                entry.ETag = entity.ETag;
-            }
+            TryApplyEntity(entry, entity);
         }
 
         public Task WriteStateAsync(RegistryEntry entry)
@@ -91,12 +75,7 @@ namespace Outkeep.Caching.Memory
 
         private async Task InnerWriteStateAsync(RegistryEntry entry)
         {
-            var entity = new RegistryEntity(
-                entry.Key,
-                entry.Size,
-                entry.AbsoluteExpiration,
-                entry.SlidingExpiration,
-                entry.ETag);
+            var entity = ConvertToEntity(entry);
 
             RegistryEntity result;
             try
@@ -114,9 +93,67 @@ namespace Outkeep.Caching.Memory
             entry.ETag = result.ETag;
         }
 
-        public IQueryable<ICacheRegistryEntry> CreateQuery()
+        public async Task<ImmutableList<ICacheRegistryEntry>> GetAllEntriesAsync()
         {
-            return _provider.CreateQuery<RegistryEntry>();
+            var result = await _factory
+                .GetMemoryCacheRegistryGrain()
+                .GetAllEntitiesAsync()
+                .ConfigureAwait(false);
+
+            return ConvertToEntries(result);
+        }
+
+        public async Task<ImmutableList<ICacheRegistryEntry>> GetTopEntriesBySizeAsync(bool ascending = false, int? limit = null)
+        {
+            var result = await _factory
+                .GetMemoryCacheRegistryGrain()
+                .GetTopEntitiesBySizeAsync(ascending, limit)
+                .ConfigureAwait(false);
+
+            return ConvertToEntries(result);
+        }
+
+        public ImmutableList<ICacheRegistryEntry> ConvertToEntries(ImmutableList<RegistryEntity> result)
+        {
+            // quick path for empty result
+            if (result.IsEmpty)
+            {
+                return ImmutableList<ICacheRegistryEntry>.Empty;
+            }
+
+            // regular path for non empty result
+            return result.ToBuilder().ConvertAll<ICacheRegistryEntry>(entity => ConvertToEntry(entity));
+        }
+
+        private RegistryEntry ConvertToEntry(RegistryEntity entity)
+        {
+            return new RegistryEntry(entity.Key, this)
+            {
+                Size = entity.Size,
+                AbsoluteExpiration = entity.AbsoluteExpiration,
+                SlidingExpiration = entity.SlidingExpiration,
+                ETag = entity.ETag
+            };
+        }
+
+        private static RegistryEntity ConvertToEntity(RegistryEntry entry)
+        {
+            return new RegistryEntity(
+                entry.Key,
+                entry.Size,
+                entry.AbsoluteExpiration,
+                entry.SlidingExpiration,
+                entry.ETag);
+        }
+
+        private static void TryApplyEntity(RegistryEntry target, RegistryEntity? source)
+        {
+            if (source is null) return;
+
+            target.Size = source.Size;
+            target.AbsoluteExpiration = source.AbsoluteExpiration;
+            target.SlidingExpiration = source.SlidingExpiration;
+            target.ETag = source.ETag;
         }
     }
 }

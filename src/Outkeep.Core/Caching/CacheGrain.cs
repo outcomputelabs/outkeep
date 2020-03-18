@@ -42,7 +42,7 @@ namespace Outkeep.Caching
             }
 
             // ensure this instance is up-to-date in the cache registry
-            _entry = await _context.CacheRegistry.GetAsync(GrainKey).ConfigureAwait(true);
+            _entry = await _context.CacheRegistry.GetEntryAsync(GrainKey).ConfigureAwait(true);
             _entry.Size = _state.State.Value?.Length;
             _entry.AbsoluteExpiration = _state.State.AbsoluteExpiration;
             _entry.SlidingExpiration = _state.State.SlidingExpiration;
