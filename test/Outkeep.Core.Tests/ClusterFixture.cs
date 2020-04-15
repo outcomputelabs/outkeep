@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Orleans;
 using Orleans.Configuration;
@@ -16,8 +15,6 @@ using Outkeep.HealthChecks;
 using Outkeep.Time;
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Outkeep.Core.Tests
@@ -55,7 +52,7 @@ namespace Outkeep.Core.Tests
                     .ConfigureApplicationParts(apm =>
                     {
                         apm.AddApplicationPart(typeof(EchoGrain).Assembly).WithReferences();
-                        apm.AddApplicationPart(typeof(ClusterFixture).Assembly);
+                        apm.AddApplicationPart(typeof(WeakActivationTestGrain).Assembly);
                     })
                     .ConfigureServices((context, services) =>
                     {
