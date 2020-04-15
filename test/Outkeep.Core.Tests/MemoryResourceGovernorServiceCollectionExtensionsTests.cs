@@ -23,7 +23,8 @@ namespace Outkeep.Core.Tests
                 .AddSingleton(typeof(IKeyedServiceCollection<,>), typeof(KeyedServiceCollection<,>))
                 .AddSingleton(typeof(ILogger<>), typeof(NullLogger<>))
                 .AddSingleton<IHostEnvironmentStatistics, FakeHostEnvironmentStatistics>()
-                .AddSingleton<ISafeTimerFactory, FakeSafeTimerFactory>();
+                .AddSingleton<ISafeTimerFactory, FakeSafeTimerFactory>()
+                .AddSingleton<IMemoryPressureMonitor, FakeMemoryPressureMonitor>();
 
             // act
             var result = services.AddMemoryResourceGovernorAsDefault(options =>
@@ -42,10 +43,6 @@ namespace Outkeep.Core.Tests
 
             var options = provider.GetService<IOptions<MemoryGovernanceOptions>>().Value;
             Assert.Equal(123, options.LowMemoryBytesThreshold);
-
-            var monitor = provider.GetService<IMemoryPressureMonitor>();
-            Assert.NotNull(monitor);
-            Assert.IsType<MemoryPressureMonitor>(monitor);
 
             var hosted = provider.GetService<IHostedService>();
             Assert.Same(governor, hosted);
