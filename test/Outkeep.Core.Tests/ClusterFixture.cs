@@ -11,6 +11,7 @@ using Outkeep.Caching;
 using Outkeep.Caching.Memory;
 using Outkeep.Core.Tests.Fakes;
 using Outkeep.Governance;
+using Outkeep.Governance.Memory;
 using Outkeep.HealthChecks;
 using Outkeep.Time;
 using System;
@@ -69,6 +70,7 @@ namespace Outkeep.Core.Tests
                         services.AddSingleton<IAttributeToFactoryMapper<WeakActivationStateAttribute>, WeakActivationStateAttributeMapper>();
 
                         // add memory resource governor
+                        services.AddSingleton<IMemoryPressureMonitor, MemoryPressureMonitor>();
                         services.AddMemoryResourceGovernor(OutkeepProviderNames.OutkeepMemoryResourceGovernor);
 
                         // add test resource governor
@@ -84,6 +86,7 @@ namespace Outkeep.Core.Tests
 
                         // add other services
                         services
+                            .AddCacheActivationContext()
                             .AddSingleton<ISystemClock, SystemClock>()
                             .AddSafeTimer();
                     })
