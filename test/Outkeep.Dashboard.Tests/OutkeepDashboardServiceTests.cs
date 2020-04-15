@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
-using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -12,13 +11,17 @@ namespace Outkeep.Dashboard.Tests
         public async Task Cycles()
         {
             // arrange
-            var logger = NullLogger<OutkeepDashboardService>.Instance;
-            var provider = Mock.Of<IServiceProvider>();
-            var service = new OutkeepDashboardService(logger, provider);
-
-            // act
-            await service.StartAsync(default).ConfigureAwait(true);
-            await service.StopAsync(default).ConfigureAwait(true);
+            using (var host = new HostBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddHostedService<OutkeepDashboardService>();
+                })
+                .Build())
+            {
+                // act - sanity test only for now
+                await host.StartAsync().ConfigureAwait(false);
+                await host.StopAsync().ConfigureAwait(false);
+            }
 
             // assert
             Assert.True(true);
